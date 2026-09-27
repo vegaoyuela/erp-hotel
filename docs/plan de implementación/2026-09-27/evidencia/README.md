@@ -77,3 +77,15 @@ La comprobación de compatibilidad encontró que el formato histórico calculaba
 | [p02-qa.log](p02-qa.log) | Build sin advertencias, 83 unitarias, 4 integraciones PostgreSQL, 5 pruebas N01–N06, auditoría npm, lint y frontend aprobados. |
 
 P02 continúa abierta. Faltan la extracción de casos de uso, la unidad de trabajo, las interfaces restantes, la descripción OpenAPI completa, la validación automática de tipos TypeScript, la matriz formal API/DAT/SEC y la revisión técnica independiente. El estado preciso se mantiene en [P02 — ejecución de base técnica](../p02-base-tecnica/README.md).
+
+### P02-B — servicios de movimientos financieros
+
+La segunda entrega mueve la creación de pagos, reembolsos y liquidaciones de tarjeta desde los controladores hacia servicios de aplicación. Cada servicio controla una transacción PostgreSQL exterior que incluye locks, idempotencia, saldos, caja cuando corresponde, estado de facturas o pagos, asiento contable y bitácora. Una prueba de arquitectura protege esta separación.
+
+| Archivo | Resultado |
+|---|---|
+| [p02b-modelo-ef.log](p02b-modelo-ef.log) | EF Core confirma que la extracción no requiere migración. |
+| [p02b-qa-resumen.json](p02b-qa-resumen.json) | Resumen estructurado y hashes SHA-256 de código y evidencia. |
+| [p02b-qa.log](p02b-qa.log) | Build sin advertencias, 86 unitarias, 4 integraciones PostgreSQL, 5 pruebas N01–N06, auditoría npm, lint y frontend aprobados. |
+
+P02-01 y P02-02 continúan parciales: aún deben extraerse factura/notas, reservas, caja, compras, inventario y respaldo; también faltan pruebas explícitas de rollback con fallos inyectados.

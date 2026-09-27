@@ -106,6 +106,9 @@ builder.Services.AddScoped<IAccountingService, AccountingService>();
 builder.Services.AddScoped<IFiscalAuthorizationService, FiscalAuthorizationService>();
 builder.Services.AddScoped<FiscalProfileService>();
 builder.Services.AddScoped<IdempotencyService>();
+builder.Services.AddScoped<PaymentApplicationService>();
+builder.Services.AddScoped<RefundApplicationService>();
+builder.Services.AddScoped<CardSettlementApplicationService>();
 builder.Services.AddScoped<DatabaseBackupService>();
 builder.Services.AddHostedService<BackupHostedService>();
 

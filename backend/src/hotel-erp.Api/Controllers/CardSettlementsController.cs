@@ -5,7 +5,6 @@ using hotel_erp.Api.Database;
 using hotel_erp.Api.Database.Entities;
 using hotel_erp.Api.Dtos.Payments;
 using hotel_erp.Api.Services;
-using hotel_erp.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -18,25 +17,16 @@ namespace hotel_erp.Api.Controllers
     public class CardSettlementsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
-        private readonly IAccountingService _accountingService;
-        private readonly AuditService _auditService;
-        private readonly IdempotencyService _idempotencyService;
-        private readonly IHotelClock _clock;
+        private readonly CardSettlementApplicationService _settlementService;
         private readonly IMapper _mapper;
 
         public CardSettlementsController(
             ApplicationDbContext context,
-            IAccountingService accountingService,
-            AuditService auditService,
-            IdempotencyService idempotencyService,
-            IHotelClock clock,
+            CardSettlementApplicationService settlementService,
             IMapper mapper)
         {
             _context = context;
-            _accountingService = accountingService;
-            _auditService = auditService;
-            _idempotencyService = idempotencyService;
-            _clock = clock;
+            _settlementService = settlementService;
             _mapper = mapper;
         }
 
@@ -113,177 +103,16 @@ namespace hotel_erp.Api.Controllers
             [FromBody] CreateCardSettlementRequest request,
             [FromHeader(Name = "Idempotency-Key")] string? idempotencyKey)
         {
-            if (!IdempotencyService.TryNormalizeKey(idempotencyKey, out var normalizedKey))
-                return BadRequest("Idempotency-Key debe ser un UUID válido");
-            if (request.SettlementDate == default)
-                return BadRequest("La fecha de liquidación es obligatoria");
-            if (request.SettlementDate > _clock.Today)
-                return BadRequest("La fecha de liquidación no puede estar en el futuro");
-
-            var grossAmount = TaxService.RoundCurrency(request.GrossAmount);
-            var bankDepositAmount = TaxService.RoundCurrency(request.BankDepositAmount);
-            var commissionAmount = TaxService.RoundCurrency(request.CommissionAmount);
-            var withholdingAmount = TaxService.RoundCurrency(request.WithholdingAmount);
-            var applications = request.Applications
-                .Select(application => new
-                {
-                    application.PaymentId,
-                    Amount = TaxService.RoundCurrency(application.Amount)
-                })
-                .OrderBy(application => application.PaymentId)
-                .ToList();
-            if (grossAmount <= 0m || applications.Any(application => application.Amount <= 0m))
-                return BadRequest("Los importes de la liquidación deben ser mayores que cero");
-            if (applications.Select(application => application.PaymentId).Distinct().Count() != applications.Count)
-                return BadRequest("Un pago solo puede aparecer una vez dentro de la liquidación");
-            if (applications.Sum(application => application.Amount) != grossAmount)
-                return BadRequest("La suma de pagos aplicados debe coincidir exactamente con el importe bruto");
-            if (bankDepositAmount + commissionAmount + withholdingAmount != grossAmount)
-                return BadRequest("Depósito, comisión y retención deben sumar exactamente el importe bruto");
-
-            var externalReference = request.ExternalReference.Trim().ToUpperInvariant();
-            if (externalReference.Length < 3)
-                return BadRequest("La liquidación requiere una referencia de al menos 3 caracteres");
-
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            var requestHash = IdempotencyService.ComputeRequestHash(new
-            {
-                Currency = request.Currency,
-                GrossAmount = grossAmount,
-                BankDepositAmount = bankDepositAmount,
-                CommissionAmount = commissionAmount,
-                WithholdingAmount = withholdingAmount,
-                ExternalReference = externalReference,
-                request.SettlementDate,
-                Applications = applications
-            });
-
-            await using var transaction = await _context.Database.BeginTransactionAsync();
-            try
-            {
-                var existingIntent = await _idempotencyService.LockAndFindAsync(
-                    userId,
-                    "card-settlement:create",
-                    normalizedKey,
-                    requestHash,
-                    HttpContext.RequestAborted);
-                if (existingIntent is not null)
-                {
-                    var existingSettlement = await DetailedSettlements()
-                        .AsSplitQuery()
-                        .SingleOrDefaultAsync(settlement => settlement.Id == existingIntent.ResourceId);
-                    if (existingSettlement is null)
-                        return Conflict("El resultado idempotente de la liquidación ya no está disponible");
-                    await transaction.CommitAsync();
-                    return CreatedAtAction(
-                        nameof(GetById),
-                        new { id = existingSettlement.Id },
-                        _mapper.Map<CardSettlementDto>(existingSettlement));
-                }
-            }
-            catch (IdempotencyConflictException exception)
-            {
-                return Conflict(exception.Message);
-            }
-
-            var referenceLock = $"card-settlement-reference:{externalReference.ToUpperInvariant()}";
-            await _context.Database.ExecuteSqlInterpolatedAsync(
-                $"SELECT pg_advisory_xact_lock(hashtext({referenceLock}));",
-                HttpContext.RequestAborted);
-            if (await _context.CardSettlements.AnyAsync(
-                    settlement => settlement.ExternalReference == externalReference,
-                    HttpContext.RequestAborted))
-            {
-                return Conflict("La referencia del adquirente ya fue registrada");
-            }
-
-            foreach (var paymentId in applications.Select(application => application.PaymentId))
-            {
-                var paymentLock = $"payment-financial:{paymentId:N}";
-                await _context.Database.ExecuteSqlInterpolatedAsync(
-                    $"SELECT pg_advisory_xact_lock(hashtext({paymentLock}));",
-                    HttpContext.RequestAborted);
-            }
-
-            var paymentIds = applications.Select(application => application.PaymentId).ToList();
-            var payments = await _context.Payments
-                .Include(payment => payment.Refunds)
-                .Include(payment => payment.CardSettlementApplications)
-                .ThenInclude(application => application.CardSettlement)
-                .Where(payment => paymentIds.Contains(payment.Id))
-                .AsSplitQuery()
-                .ToListAsync();
-            if (payments.Count != paymentIds.Count)
-                return BadRequest("Uno o más pagos no existen");
-
-            foreach (var application in applications)
-            {
-                var payment = payments.Single(candidate => candidate.Id == application.PaymentId);
-                if (payment.Method != PaymentMethod.Tarjeta || payment.Status == PaymentStatus.Anulado)
-                    return Conflict($"El pago {payment.PaymentNumber} no es un cobro con tarjeta liquidable");
-                var refunded = payment.Refunds
-                    .Where(refund => refund.Status == RefundStatus.Confirmado)
-                    .Sum(refund => refund.Amount);
-                var settled = payment.CardSettlementApplications
-                    .Where(existing => existing.CardSettlement.Status == CardSettlementStatus.Confirmado)
-                    .Sum(existing => existing.Amount);
-                var available = Math.Max(0m, TaxService.RoundCurrency(payment.Amount - refunded - settled));
-                if (application.Amount > available)
-                    return Conflict($"La aplicación excede el saldo por liquidar de {payment.PaymentNumber}");
-            }
-
-            var settlementId = Guid.CreateVersion7();
-            var recordedBy = await _context.Users.SingleAsync(user => user.Id == userId);
-            var settlement = new CardSettlement
-            {
-                Id = settlementId,
-                SettlementNumber = $"LTJ-{settlementId:N}".ToUpperInvariant(),
-                RecordedByUserId = userId,
-                RecordedByUser = recordedBy,
-                Currency = request.Currency,
-                GrossAmount = grossAmount,
-                BankDepositAmount = bankDepositAmount,
-                CommissionAmount = commissionAmount,
-                WithholdingAmount = withholdingAmount,
-                ExternalReference = externalReference,
-                SettlementDate = request.SettlementDate,
-                Status = CardSettlementStatus.Confirmado,
-                Applications = applications.Select(application => new CardSettlementApplication
-                {
-                    Id = Guid.CreateVersion7(),
-                    PaymentId = application.PaymentId,
-                    Payment = payments.Single(payment => payment.Id == application.PaymentId),
-                    Amount = application.Amount
-                }).ToList()
-            };
-            _context.CardSettlements.Add(settlement);
-            await _context.SaveChangesAsync();
-            await _accountingService.CreateCardSettlementEntryAsync(settlement);
-            await _auditService.LogAsync(
+            var result = await _settlementService.CreateAsync(
                 userId,
-                "CreateCardSettlement",
-                nameof(CardSettlement),
-                settlement.Id,
-                new
-                {
-                    settlement.SettlementNumber,
-                    settlement.Currency,
-                    settlement.GrossAmount,
-                    settlement.BankDepositAmount,
-                    settlement.CommissionAmount,
-                    settlement.WithholdingAmount,
-                    settlement.ExternalReference,
-                    settlement.SettlementDate,
-                    Applications = applications
-                });
-            await _idempotencyService.StoreAsync(
-                userId,
-                "card-settlement:create",
-                normalizedKey,
-                requestHash,
-                settlement.Id,
+                request,
+                idempotencyKey,
                 HttpContext.RequestAborted);
-            await transaction.CommitAsync();
+            if (!result.Succeeded)
+                return StatusCode(result.FailureStatus!.Value, result.FailureDetail);
+
+            var settlement = result.Settlement!;
             return CreatedAtAction(
                 nameof(GetById),
                 new { id = settlement.Id },

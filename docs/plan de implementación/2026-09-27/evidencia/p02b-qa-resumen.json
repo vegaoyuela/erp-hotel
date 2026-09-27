@@ -1,0 +1,88 @@
+{
+  "generated_at": "2026-09-27T22:23:21.895670+00:00",
+  "status": "passed",
+  "contains_secret_values": false,
+  "scope": "P02-B financial application services",
+  "implementation": {
+    "payment_controller_delegates_mutation": true,
+    "refund_controller_delegates_mutation": true,
+    "card_settlement_controller_delegates_mutation": true,
+    "outer_transaction_owned_by_application_service": true,
+    "idempotency_inside_transaction": true,
+    "accounting_audit_and_idempotency_before_commit": true,
+    "architecture_boundary_test": true
+  },
+  "qa": {
+    "backend_build": {
+      "warnings": 0,
+      "errors": 0
+    },
+    "unit_tests": {
+      "passed": 86,
+      "skipped": 0,
+      "total": 86
+    },
+    "postgresql_integration_tests": {
+      "passed": 4,
+      "skipped": 0,
+      "total": 4
+    },
+    "dossier_validator_tests": {
+      "passed": 5,
+      "total": 5
+    },
+    "frontend": {
+      "npm_audit_vulnerabilities": 0,
+      "lint": "passed",
+      "production_build": "passed"
+    },
+    "ef_pending_model_changes": false
+  },
+  "qa_database": {
+    "table_count": 42,
+    "total_rows": 345,
+    "migration_count": 11,
+    "temporary_databases_remaining": 0,
+    "unchanged_from_p00": true
+  },
+  "remaining": {
+    "p02_01": [
+      "invoice and adjustments",
+      "reservations and check-in/out",
+      "cash closures",
+      "purchases",
+      "inventory",
+      "backups"
+    ],
+    "p02_02": [
+      "remove repository-owned persistence",
+      "explicit failure injection and rollback tests for each operation"
+    ]
+  },
+  "evidence": {
+    "qa": {
+      "path": "docs/plan de implementación/2026-09-27/evidencia/p02b-qa.log",
+      "sha256": "4918ab70b87a653dae27a18c9e6d60934c5a25f8de7f6cbed2bcaf062ac2c54c"
+    },
+    "ef_model": {
+      "path": "docs/plan de implementación/2026-09-27/evidencia/p02b-modelo-ef.log",
+      "sha256": "815c5cd494b61a9d8737ba7653cd05fb05926e7b40a924683fa4eef4ca87566c"
+    },
+    "payment_service": {
+      "path": "backend/src/hotel-erp.Api/Services/PaymentApplicationService.cs",
+      "sha256": "d88844a92e524bcf052df940902b646f0072e7893c0f25e3b395241212750689"
+    },
+    "refund_service": {
+      "path": "backend/src/hotel-erp.Api/Services/RefundApplicationService.cs",
+      "sha256": "6f7099f7783665917eef9e7124b103ec13c6b1c46dba6c36e634131e3afe8e4a"
+    },
+    "card_settlement_service": {
+      "path": "backend/src/hotel-erp.Api/Services/CardSettlementApplicationService.cs",
+      "sha256": "ffa5da80f7d1068cecd6b00607cbcf0ebb47b2c24abc312676f5dc4409d2dda9"
+    },
+    "architecture_test": {
+      "path": "backend/tests/hotel-erp.UnitTests/ApplicationServiceArchitectureTests.cs",
+      "sha256": "81831e5a89bc5c247a54a944d2344283bf469de8e834cae500cee5da89b30c14"
+    }
+  }
+}

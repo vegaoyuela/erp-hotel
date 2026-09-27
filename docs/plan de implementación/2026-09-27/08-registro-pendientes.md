@@ -51,4 +51,4 @@ La plantilla puede copiarse desde [expediente P01](p01-expediente/README.md), pe
 
 ## Pendientes técnicos abiertos de P02
 
-La primera entrega de P02 completó el reloj determinista, la normalización inicial de errores y el verificador/exportador de auditoría. Permanecen abiertos P02-01, P02-02, la parte restante de P02-03 y P02-04, P02-05, P02-06, la rotación de P02-07, la matriz completa P02-09 y la revisión independiente P02-10. El detalle y el orden de la siguiente entrega están en [P02 — base técnica](p02-base-tecnica/README.md).
+Las entregas iniciales de P02 completaron el reloj determinista, la normalización de errores, el verificador/exportador de auditoría y la extracción de pagos, reembolsos y liquidaciones a servicios transaccionales. Permanecen abiertas las partes restantes de P02-01, P02-02, P02-03 y P02-04, además de P02-05, P02-06, la rotación de P02-07, la matriz completa P02-09 y la revisión independiente P02-10. El detalle y el orden de la siguiente entrega están en [P02 — base técnica](p02-base-tecnica/README.md).
