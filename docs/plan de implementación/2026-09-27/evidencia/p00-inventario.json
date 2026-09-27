@@ -1,0 +1,71 @@
+{
+  "generated_at": "2026-09-27T18:08:48.919236+00:00",
+  "contains_secret_values": false,
+  "branch": "codex/implementacion-final-2026-09-27",
+  "baseline": {
+    "tag": "implementation-baseline-2026-09-27",
+    "commit": "3403dad5f5c9f6d3ba70b48e3b59b9c7f940c5f0"
+  },
+  "data_sources": {
+    "synthetic_qa": {
+      "available": true,
+      "classification": "synthetic-qa",
+      "backup_restore_evidence": "docs/plan de implementación/2026-09-27/evidencia/p00-respaldo-restauracion-sintetica.json"
+    },
+    "official_hotel_database": {
+      "available": false,
+      "status": "pending_external_delivery",
+      "required_action": "Inventariar, respaldar y restaurar cuando el propietario entregue la fuente oficial."
+    }
+  },
+  "counts": {
+    "tracked_files_at_baseline": 797,
+    "csharp_files": 153,
+    "typescript_react_files": 40,
+    "api_controllers": 29,
+    "ef_migration_files": 23,
+    "backend_test_files": 17,
+    "dated_plan_markdown_files": 10
+  },
+  "attachments": {
+    "runtime_file_count": 0,
+    "total_size_bytes": 0,
+    "paths_recorded": [],
+    "pii_copied_to_evidence": false
+  },
+  "configuration_files": [
+    "backend/src/hotel-erp.Api/appsettings.Development.json",
+    "backend/src/hotel-erp.Api/appsettings.json",
+    "docker/backend/Dockerfile",
+    "docker/docker-compose.yml",
+    "docker/frontend/Dockerfile",
+    "docs/auditoria-2026-09-06/pruebas/backend-build/appsettings.Development.json",
+    "docs/auditoria-2026-09-06/pruebas/backend-build/appsettings.json",
+    "docs/auditoria-2026-09-06/pruebas/runtime/appsettings.json",
+    "docs/auditoria-2026-09-06/pruebas/vite-cache/deps/package.json",
+    "frontend/package-lock.json",
+    "frontend/package.json"
+  ],
+  "seed_or_bootstrap_files": [
+    "backend/src/hotel-erp.Api/Database/SecurityCatalogSeeder.cs"
+  ],
+  "generated_artifact_cleanup": {
+    "files_scheduled_for_deletion": 261,
+    "categories": {
+      "bin": 169,
+      "language_server_cache": 1,
+      "logs": 3,
+      "obj": 30,
+      "secondary_lockfile": 1,
+      "sqlite": 1,
+      "wwwroot": 56
+    }
+  },
+  "secret_hygiene": {
+    "compose_fixed_operational_secrets_removed": true,
+    "compose_requires_external_postgres_and_jwt_values": true,
+    "known_operational_literal_scan": "passed",
+    "test_fixture_credentials": "retained_only_in_test_sources",
+    "claim": "No se afirma ausencia absoluta; la revisión automatizada y manual no detectó secretos operativos conocidos."
+  }
+}

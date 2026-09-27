@@ -3,8 +3,12 @@ data/secrets/
 **/bin/
 **/obj/
 **/logs/
+backend/src/hotel-erp.Api/wwwroot/
+backend/src/hotel-erp.Api/Data/*.db
+backend/src/hotel-erp.Api/Uploads/
 frontend/dist/
 *.user
 *.suo
+*.lscache
 .codex
 .agents

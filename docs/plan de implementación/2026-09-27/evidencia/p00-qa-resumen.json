@@ -1,0 +1,48 @@
+{
+  "generated_at": "2026-09-27T18:08:48.738313+00:00",
+  "status": "passed",
+  "contains_secret_values": false,
+  "database_classification": "synthetic-qa",
+  "command": "bash scripts/qa.sh",
+  "clean_checkout_precondition": {
+    "wwwroot_absent_before_qa": true,
+    "result": "passed"
+  },
+  "backend_build": {
+    "warnings": 0,
+    "errors": 0
+  },
+  "unit_tests": {
+    "passed": 76,
+    "skipped": 0,
+    "total": 76
+  },
+  "postgresql_integration_tests": {
+    "passed": 4,
+    "skipped": 0,
+    "total": 4
+  },
+  "frontend": {
+    "npm_audit_vulnerabilities": 0,
+    "lint": "passed",
+    "production_build": "passed"
+  },
+  "repository_diff_check": "passed",
+  "compose_configuration": {
+    "without_required_secrets": "rejected_as_expected",
+    "with_ephemeral_validation_values": "passed",
+    "secret_values_recorded": false
+  },
+  "evidence_log": {
+    "path": "docs/plan de implementación/2026-09-27/evidencia/p00-qa.log",
+    "sha256": "fc3bd1af4bc2db172b4f8c1ff67110b2b795f143c16178f57637f4f6b5ed8e23"
+  },
+  "defect_resolved": {
+    "description": "Una clonación sin bundles no contenía wwwroot y la API de prueba no podía iniciar.",
+    "resolution": "MSBuild crea wwwroot antes de compilar; los bundles siguen ignorados y se regeneran.",
+    "initial_failure_log": {
+      "path": "docs/plan de implementación/2026-09-27/evidencia/p00-qa-initial-failure.log",
+      "sha256": "766ca95ed9021d61b02dc39ba54b031b612bd50e7533d1d5fb11a3e73dd0b7e7"
+    }
+  }
+}

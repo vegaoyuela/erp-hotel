@@ -5,7 +5,7 @@ services:
     environment:
       POSTGRES_DB: hotel_erp
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_PASSWORD: ${HOTEL_ERP_POSTGRES_ADMIN_PASSWORD:?Configure HOTEL_ERP_POSTGRES_ADMIN_PASSWORD fuera del repositorio}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
@@ -24,8 +24,8 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: http://+:8080
-      ConnectionStrings__DefaultConnection: "Host=db;Port=5432;Database=hotel_erp;Username=postgres;Password=postgrespassword;Include Error Detail=true"
-      Jwt__SecretKey: "SuperSecretKey2024HotelERPHonduras!@#$%^&*()MinimumLength32Chars"
+      ConnectionStrings__DefaultConnection: "Host=db;Port=5432;Database=hotel_erp;Username=postgres;Password=${HOTEL_ERP_POSTGRES_ADMIN_PASSWORD:?Configure HOTEL_ERP_POSTGRES_ADMIN_PASSWORD fuera del repositorio};Include Error Detail=false"
+      Jwt__SecretKey: ${HOTEL_ERP_JWT_SECRET_KEY:?Configure HOTEL_ERP_JWT_SECRET_KEY fuera del repositorio}
       Jwt__Issuer: "HotelERP"
       Jwt__Audience: "HotelERP"
       Backup__Enabled: "true"

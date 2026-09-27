@@ -1,0 +1,157 @@
+[QA] Restaurando backend
+  Determining projects to restore...
+  Restored /home/vm/Projects/erp-hotel/backend/src/hotel-erp.Api/hotel-erp.Api.csproj (in 2.14 sec).
+  2 of 3 projects are up-to-date for restore.
+[QA] Compilando backend
+  hotel-erp.Api -> /home/vm/Projects/erp-hotel/backend/src/hotel-erp.Api/bin/Debug/net10.0/hotel-erp.Api.dll
+  hotel-erp.UnitTests -> /home/vm/Projects/erp-hotel/backend/tests/hotel-erp.UnitTests/bin/Debug/net10.0/hotel-erp.UnitTests.dll
+  hotel-erp.IntegrationTests -> /home/vm/Projects/erp-hotel/backend/tests/hotel-erp.IntegrationTests/bin/Debug/net10.0/hotel-erp.IntegrationTests.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:29.66
+[QA] Ejecutando pruebas unitarias
+  hotel-erp.Api -> /home/vm/Projects/erp-hotel/backend/src/hotel-erp.Api/bin/Debug/net10.0/hotel-erp.Api.dll
+  hotel-erp.UnitTests -> /home/vm/Projects/erp-hotel/backend/tests/hotel-erp.UnitTests/bin/Debug/net10.0/hotel-erp.UnitTests.dll
+Test run for /home/vm/Projects/erp-hotel/backend/tests/hotel-erp.UnitTests/bin/Debug/net10.0/hotel-erp.UnitTests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+
+Passed!  - Failed:     0, Passed:    76, Skipped:     0, Total:    76, Duration: 145 ms - hotel-erp.UnitTests.dll (net10.0)
+[QA] Ejecutando integración PostgreSQL
+  hotel-erp.Api -> /home/vm/Projects/erp-hotel/backend/src/hotel-erp.Api/bin/Debug/net10.0/hotel-erp.Api.dll
+  hotel-erp.IntegrationTests -> /home/vm/Projects/erp-hotel/backend/tests/hotel-erp.IntegrationTests/bin/Debug/net10.0/hotel-erp.IntegrationTests.dll
+Test run for /home/vm/Projects/erp-hotel/backend/tests/hotel-erp.IntegrationTests/bin/Debug/net10.0/hotel-erp.IntegrationTests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+[xUnit.net 00:00:04.44]     hotel_erp.IntegrationTests.AuthenticationFlowTests.AuthenticationAbuse_IsRateLimited_AndInternalErrorsAreSafe [FAIL]
+  Failed hotel_erp.IntegrationTests.AuthenticationFlowTests.AuthenticationAbuse_IsRateLimited_AndInternalErrorsAreSafe [3 s]
+  Error Message:
+   System.IO.DirectoryNotFoundException : /home/vm/Projects/erp-hotel/backend/src/hotel-erp.Api/wwwroot/
+  Stack Trace:
+     at Microsoft.Extensions.FileProviders.PhysicalFileProvider..ctor(String root, ExclusionFilters filters)
+   at Microsoft.AspNetCore.Hosting.StaticWebAssets.StaticWebAssetsLoader.<>c.<UseStaticWebAssetsCore>b__1_0(String contentRoot)
+   at Microsoft.AspNetCore.StaticWebAssets.ManifestStaticWebAssetFileProvider..ctor(StaticWebAssetManifest manifest, Func`2 fileProviderFactory)
+   at Microsoft.AspNetCore.Hosting.StaticWebAssets.StaticWebAssetsLoader.UseStaticWebAssetsCore(IWebHostEnvironment environment, Stream manifest)
+   at Microsoft.AspNetCore.Hosting.StaticWebAssets.StaticWebAssetsLoader.UseStaticWebAssets(IWebHostEnvironment environment, IConfiguration configuration)
+   at Microsoft.AspNetCore.Hosting.BootstrapHostBuilder.RunDefaultCallbacks()
+   at Microsoft.AspNetCore.Builder.WebApplicationBuilder.InitializeHosting(BootstrapHostBuilder bootstrapHostBuilder)
+   at Microsoft.AspNetCore.Builder.WebApplicationBuilder..ctor(WebApplicationOptions options, Action`1 configureDefaults)
+   at Microsoft.AspNetCore.Builder.WebApplication.CreateBuilder(String[] args)
+   at Program.<Main>$(String[] args) in /home/vm/Projects/erp-hotel/backend/src/hotel-erp.Api/Program.cs:line 23
+   at Program.<Main>(String[] args)
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeDirectByRefWithFewArgs(Object obj, Span`1 copyOfArgs, BindingFlags invokeAttr)
+--- End of stack trace from previous location ---
+   at Microsoft.Extensions.Hosting.HostFactoryResolver.HostingListener.CreateHost()
+   at Microsoft.Extensions.Hosting.HostFactoryResolver.<>c__DisplayClass10_0.<ResolveHostFactory>b__0(String[] args)
+   at Microsoft.AspNetCore.Mvc.Testing.DeferredHostBuilder.Build()
+   at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateHost(IHostBuilder builder)
+   at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.ConfigureHostBuilder(IHostBuilder hostBuilder)
+   at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.StartServer()
+   at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateDefaultClient(DelegatingHandler[] handlers)
+   at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateDefaultClient(Uri baseAddress, DelegatingHandler[] handlers)
+   at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateClient(WebApplicationFactoryClientOptions options)
+   at hotel_erp.IntegrationTests.AuthenticationFlowTests.AuthenticationAbuse_IsRateLimited_AndInternalErrorsAreSafe() in /home/vm/Projects/erp-hotel/backend/tests/hotel-erp.IntegrationTests/AuthenticationFlowTests.cs:line 47
+   at hotel_erp.IntegrationTests.AuthenticationFlowTests.AuthenticationAbuse_IsRateLimited_AndInternalErrorsAreSafe() in /home/vm/Projects/erp-hotel/backend/tests/hotel-erp.IntegrationTests/AuthenticationFlowTests.cs:line 114
+   at hotel_erp.IntegrationTests.AuthenticationFlowTests.AuthenticationAbuse_IsRateLimited_AndInternalErrorsAreSafe() in /home/vm/Projects/erp-hotel/backend/tests/hotel-erp.IntegrationTests/AuthenticationFlowTests.cs:line 129
+--- End of stack trace from previous location ---
+[xUnit.net 00:00:06.60]     hotel_erp.IntegrationTests.AuthenticationFlowTests.BootstrapPasswordChangeAndLogout_InvalidatePreviousTokens [FAIL]
+  Failed hotel_erp.IntegrationTests.AuthenticationFlowTests.BootstrapPasswordChangeAndLogout_InvalidatePreviousTokens [2 s]
+  Error Message:
+   System.IO.DirectoryNotFoundException : /home/vm/Projects/erp-hotel/backend/src/hotel-erp.Api/wwwroot/
+  Stack Trace:
+     at Microsoft.Extensions.FileProviders.PhysicalFileProvider..ctor(String root, ExclusionFilters filters)
+   at Microsoft.AspNetCore.Hosting.StaticWebAssets.StaticWebAssetsLoader.<>c.<UseStaticWebAssetsCore>b__1_0(String contentRoot)
+   at Microsoft.AspNetCore.StaticWebAssets.ManifestStaticWebAssetFileProvider..ctor(StaticWebAssetManifest manifest, Func`2 fileProviderFactory)
+   at Microsoft.AspNetCore.Hosting.StaticWebAssets.StaticWebAssetsLoader.UseStaticWebAssetsCore(IWebHostEnvironment environment, Stream manifest)
+   at Microsoft.AspNetCore.Hosting.StaticWebAssets.StaticWebAssetsLoader.UseStaticWebAssets(IWebHostEnvironment environment, IConfiguration configuration)
+   at Microsoft.AspNetCore.Hosting.BootstrapHostBuilder.RunDefaultCallbacks()
+   at Microsoft.AspNetCore.Builder.WebApplicationBuilder.InitializeHosting(BootstrapHostBuilder bootstrapHostBuilder)
+   at Microsoft.AspNetCore.Builder.WebApplicationBuilder..ctor(WebApplicationOptions options, Action`1 configureDefaults)
+   at Microsoft.AspNetCore.Builder.WebApplication.CreateBuilder(String[] args)
+   at Program.<Main>$(String[] args) in /home/vm/Projects/erp-hotel/backend/src/hotel-erp.Api/Program.cs:line 23
+   at Program.<Main>(String[] args)
+   at InvokeStub_Program.<Main>(Object, Span`1)
+   at System.Reflection.MethodBaseInvoker.InvokeWithOneArg(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+--- End of stack trace from previous location ---
+   at Microsoft.Extensions.Hosting.HostFactoryResolver.HostingListener.CreateHost()
+   at Microsoft.Extensions.Hosting.HostFactoryResolver.<>c__DisplayClass10_0.<ResolveHostFactory>b__0(String[] args)
+   at Microsoft.AspNetCore.Mvc.Testing.DeferredHostBuilder.Build()
+   at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateHost(IHostBuilder builder)
+   at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.ConfigureHostBuilder(IHostBuilder hostBuilder)
+   at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.StartServer()
+   at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateDefaultClient(DelegatingHandler[] handlers)
+   at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateDefaultClient(Uri baseAddress, DelegatingHandler[] handlers)
+   at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateClient(WebApplicationFactoryClientOptions options)
+   at hotel_erp.IntegrationTests.AuthenticationFlowTests.BootstrapPasswordChangeAndLogout_InvalidatePreviousTokens() in /home/vm/Projects/erp-hotel/backend/tests/hotel-erp.IntegrationTests/AuthenticationFlowTests.cs:line 262
+   at hotel_erp.IntegrationTests.AuthenticationFlowTests.BootstrapPasswordChangeAndLogout_InvalidatePreviousTokens() in /home/vm/Projects/erp-hotel/backend/tests/hotel-erp.IntegrationTests/AuthenticationFlowTests.cs:line 551
+   at hotel_erp.IntegrationTests.AuthenticationFlowTests.BootstrapPasswordChangeAndLogout_InvalidatePreviousTokens() in /home/vm/Projects/erp-hotel/backend/tests/hotel-erp.IntegrationTests/AuthenticationFlowTests.cs:line 551
+--- End of stack trace from previous location ---
+[xUnit.net 00:00:08.32]     hotel_erp.IntegrationTests.AuthenticationFlowTests.SystemRoleMatrix_EnforcesSensitiveEndpointPolicies [FAIL]
+  Failed hotel_erp.IntegrationTests.AuthenticationFlowTests.SystemRoleMatrix_EnforcesSensitiveEndpointPolicies [1 s]
+  Error Message:
+   System.IO.DirectoryNotFoundException : /home/vm/Projects/erp-hotel/backend/src/hotel-erp.Api/wwwroot/
+  Stack Trace:
+     at Microsoft.Extensions.FileProviders.PhysicalFileProvider..ctor(String root, ExclusionFilters filters)
+   at Microsoft.AspNetCore.Hosting.StaticWebAssets.StaticWebAssetsLoader.<>c.<UseStaticWebAssetsCore>b__1_0(String contentRoot)
+   at Microsoft.AspNetCore.StaticWebAssets.ManifestStaticWebAssetFileProvider..ctor(StaticWebAssetManifest manifest, Func`2 fileProviderFactory)
+   at Microsoft.AspNetCore.Hosting.StaticWebAssets.StaticWebAssetsLoader.UseStaticWebAssetsCore(IWebHostEnvironment environment, Stream manifest)
+   at Microsoft.AspNetCore.Hosting.StaticWebAssets.StaticWebAssetsLoader.UseStaticWebAssets(IWebHostEnvironment environment, IConfiguration configuration)
+   at Microsoft.AspNetCore.Hosting.BootstrapHostBuilder.RunDefaultCallbacks()
+   at Microsoft.AspNetCore.Builder.WebApplicationBuilder.InitializeHosting(BootstrapHostBuilder bootstrapHostBuilder)
+   at Microsoft.AspNetCore.Builder.WebApplicationBuilder..ctor(WebApplicationOptions options, Action`1 configureDefaults)
+   at Microsoft.AspNetCore.Builder.WebApplication.CreateBuilder(String[] args)
+   at Program.<Main>$(String[] args) in /home/vm/Projects/erp-hotel/backend/src/hotel-erp.Api/Program.cs:line 23
+   at Program.<Main>(String[] args)
+   at InvokeStub_Program.<Main>(Object, Span`1)
+   at System.Reflection.MethodBaseInvoker.InvokeWithOneArg(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+--- End of stack trace from previous location ---
+   at Microsoft.Extensions.Hosting.HostFactoryResolver.HostingListener.CreateHost()
+   at Microsoft.Extensions.Hosting.HostFactoryResolver.<>c__DisplayClass10_0.<ResolveHostFactory>b__0(String[] args)
+   at Microsoft.AspNetCore.Mvc.Testing.DeferredHostBuilder.Build()
+   at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateHost(IHostBuilder builder)
+   at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.ConfigureHostBuilder(IHostBuilder hostBuilder)
+   at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.StartServer()
+   at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateDefaultClient(DelegatingHandler[] handlers)
+   at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateDefaultClient(Uri baseAddress, DelegatingHandler[] handlers)
+   at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateClient(WebApplicationFactoryClientOptions options)
+   at hotel_erp.IntegrationTests.AuthenticationFlowTests.SystemRoleMatrix_EnforcesSensitiveEndpointPolicies() in /home/vm/Projects/erp-hotel/backend/tests/hotel-erp.IntegrationTests/AuthenticationFlowTests.cs:line 151
+   at hotel_erp.IntegrationTests.AuthenticationFlowTests.SystemRoleMatrix_EnforcesSensitiveEndpointPolicies() in /home/vm/Projects/erp-hotel/backend/tests/hotel-erp.IntegrationTests/AuthenticationFlowTests.cs:line 235
+   at hotel_erp.IntegrationTests.AuthenticationFlowTests.SystemRoleMatrix_EnforcesSensitiveEndpointPolicies() in /home/vm/Projects/erp-hotel/backend/tests/hotel-erp.IntegrationTests/AuthenticationFlowTests.cs:line 235
+--- End of stack trace from previous location ---
+[xUnit.net 00:00:11.84]     hotel_erp.IntegrationTests.DatabaseLeastPrivilegeTests.ApplicationRole_RunsOrdinaryFlow_ButCannotMigrateOrRewriteAudit [FAIL]
+  Failed hotel_erp.IntegrationTests.DatabaseLeastPrivilegeTests.ApplicationRole_RunsOrdinaryFlow_ButCannotMigrateOrRewriteAudit [3 s]
+  Error Message:
+   System.IO.DirectoryNotFoundException : /home/vm/Projects/erp-hotel/backend/src/hotel-erp.Api/wwwroot/
+  Stack Trace:
+     at Microsoft.Extensions.FileProviders.PhysicalFileProvider..ctor(String root, ExclusionFilters filters)
+   at Microsoft.AspNetCore.Hosting.StaticWebAssets.StaticWebAssetsLoader.<>c.<UseStaticWebAssetsCore>b__1_0(String contentRoot)
+   at Microsoft.AspNetCore.StaticWebAssets.ManifestStaticWebAssetFileProvider..ctor(StaticWebAssetManifest manifest, Func`2 fileProviderFactory)
+   at Microsoft.AspNetCore.Hosting.StaticWebAssets.StaticWebAssetsLoader.UseStaticWebAssetsCore(IWebHostEnvironment environment, Stream manifest)
+   at Microsoft.AspNetCore.Hosting.StaticWebAssets.StaticWebAssetsLoader.UseStaticWebAssets(IWebHostEnvironment environment, IConfiguration configuration)
+   at Microsoft.AspNetCore.Hosting.BootstrapHostBuilder.RunDefaultCallbacks()
+   at Microsoft.AspNetCore.Builder.WebApplicationBuilder.InitializeHosting(BootstrapHostBuilder bootstrapHostBuilder)
+   at Microsoft.AspNetCore.Builder.WebApplicationBuilder..ctor(WebApplicationOptions options, Action`1 configureDefaults)
+   at Microsoft.AspNetCore.Builder.WebApplication.CreateBuilder(String[] args)
+   at Program.<Main>$(String[] args) in /home/vm/Projects/erp-hotel/backend/src/hotel-erp.Api/Program.cs:line 23
+   at Program.<Main>(String[] args)
+   at InvokeStub_Program.<Main>(Object, Span`1)
+   at System.Reflection.MethodBaseInvoker.InvokeWithOneArg(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+--- End of stack trace from previous location ---
+   at Microsoft.Extensions.Hosting.HostFactoryResolver.HostingListener.CreateHost()
+   at Microsoft.Extensions.Hosting.HostFactoryResolver.<>c__DisplayClass10_0.<ResolveHostFactory>b__0(String[] args)
+   at Microsoft.AspNetCore.Mvc.Testing.DeferredHostBuilder.Build()
+   at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateHost(IHostBuilder builder)
+   at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.ConfigureHostBuilder(IHostBuilder hostBuilder)
+   at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.StartServer()
+   at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateDefaultClient(DelegatingHandler[] handlers)
+   at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateDefaultClient(Uri baseAddress, DelegatingHandler[] handlers)
+   at Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory`1.CreateClient(WebApplicationFactoryClientOptions options)
+   at hotel_erp.IntegrationTests.DatabaseLeastPrivilegeTests.ApplicationRole_RunsOrdinaryFlow_ButCannotMigrateOrRewriteAudit() in /home/vm/Projects/erp-hotel/backend/tests/hotel-erp.IntegrationTests/DatabaseLeastPrivilegeTests.cs:line 33
+   at hotel_erp.IntegrationTests.DatabaseLeastPrivilegeTests.ApplicationRole_RunsOrdinaryFlow_ButCannotMigrateOrRewriteAudit() in /home/vm/Projects/erp-hotel/backend/tests/hotel-erp.IntegrationTests/DatabaseLeastPrivilegeTests.cs:line 39
+   at hotel_erp.IntegrationTests.DatabaseLeastPrivilegeTests.ApplicationRole_RunsOrdinaryFlow_ButCannotMigrateOrRewriteAudit() in /home/vm/Projects/erp-hotel/backend/tests/hotel-erp.IntegrationTests/DatabaseLeastPrivilegeTests.cs:line 98
+   at hotel_erp.IntegrationTests.DatabaseLeastPrivilegeTests.ApplicationRole_RunsOrdinaryFlow_ButCannotMigrateOrRewriteAudit() in /home/vm/Projects/erp-hotel/backend/tests/hotel-erp.IntegrationTests/DatabaseLeastPrivilegeTests.cs:line 98
+--- End of stack trace from previous location ---
+
+Failed!  - Failed:     4, Passed:     0, Skipped:     0, Total:     4, Duration: 11 s - hotel-erp.IntegrationTests.dll (net10.0)

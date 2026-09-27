@@ -32,4 +32,8 @@
     <PackageReference Include="System.Drawing.Common" Version="10.0.8" />
   </ItemGroup>
 
+  <Target Name="EnsureWwwrootExists" BeforeTargets="PrepareForBuild">
+    <MakeDir Directories="$(ProjectDir)wwwroot" Condition="!Exists('$(ProjectDir)wwwroot')" />
+  </Target>
+
 </Project>

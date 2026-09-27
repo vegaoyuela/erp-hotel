@@ -1,0 +1,82 @@
+{
+  "generated_at": "2026-09-27T18:08:48.919236+00:00",
+  "contains_secret_values": false,
+  "hash_algorithm": "SHA-256",
+  "aggregate_algorithm": "SHA-256 de cada ruta relativa, NUL, hash de archivo y salto de línea; rutas ordenadas.",
+  "baseline": {
+    "tag": "implementation-baseline-2026-09-27",
+    "commit": "3403dad5f5c9f6d3ba70b48e3b59b9c7f940c5f0"
+  },
+  "groups": {
+    "backend_application": {
+      "file_count": 140,
+      "total_size_bytes": 1899826,
+      "aggregate_sha256": "daddb2c400bca80578638a0c740b82a4e35698a9bd720b9888b0345fcbe762e1"
+    },
+    "backend_tests": {
+      "file_count": 19,
+      "total_size_bytes": 167279,
+      "aggregate_sha256": "6b22253690df009a165f4b6cf8ff0335b29321c1c0d303f3a09af2e9d254f095"
+    },
+    "frontend": {
+      "file_count": 57,
+      "total_size_bytes": 775526,
+      "aggregate_sha256": "1d34ae09fafe20aa532528ec0a2b3e39f8a742b776c812bb80e89742e6080439"
+    },
+    "migrations": {
+      "file_count": 23,
+      "total_size_bytes": 1270251,
+      "aggregate_sha256": "dad33a7d11cde5dde02623ca6a329d226c7c9f7bf313ed22865f1ee11c75c2cb"
+    },
+    "deployment": {
+      "file_count": 4,
+      "total_size_bytes": 3768,
+      "aggregate_sha256": "85bde91a00c8d78a2e24c8af13ec55464645b5d2fe9daab3b8b1baed55ea4bf0"
+    },
+    "scripts": {
+      "file_count": 7,
+      "total_size_bytes": 31197,
+      "aggregate_sha256": "46298224f09206487d9fdee91887106d2bcec1a86df9f457ab0d4ada3893fbcb"
+    },
+    "dated_plan_docs": {
+      "file_count": 10,
+      "total_size_bytes": 66154,
+      "aggregate_sha256": "b9fd85816ff4e09db2267577f5033350584242df8338fad46056ef9802db8974"
+    },
+    "runtime_attachments": {
+      "file_count": 0,
+      "total_size_bytes": 0,
+      "aggregate_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "key_files": {
+    ".gitignore": {
+      "size_bytes": 212,
+      "sha256": "4ce817b9793e4ae7b61805e5a0d56a77e5e5f75fe2367d3e529bf91c03cb19b0"
+    },
+    "docker/docker-compose.yml": {
+      "size_bytes": 1943,
+      "sha256": "05498d5d7117a475269e12e657c788f3892dd02a4f57ad3722f3d1573b166d2d"
+    },
+    "frontend/package-lock.json": {
+      "size_bytes": 135020,
+      "sha256": "cebe538e9af9237eadc419063a47b0411e9fb60faf5b3c8e4651a96adc0b73f4"
+    },
+    "backend/hotel-erp.slnx": {
+      "size_bytes": 325,
+      "sha256": "79bbb41eafca05d0eea16ec723c0413274cfb3d2f5fa4315fd912300df9ca2dc"
+    }
+  },
+  "database_backup": {
+    "classification": "synthetic-qa",
+    "path": "/home/vm/Projects/erp-hotel/data/backups/p00-2026-09-27/hotel_erp_qa_20260927T175223Z.dump",
+    "size_bytes": 139229,
+    "sha256": "ac377234683bcee061212fdcbf8ebc8ac317037d8952bb197d856d69c0cbfbd2",
+    "restore_table_counts_match": true
+  },
+  "official_hotel_database": {
+    "available": false,
+    "hash": null,
+    "status": "pending_external_delivery"
+  }
+}
