@@ -2,7 +2,7 @@
 
 **Inicio:** 27 de septiembre de 2026
 
-**Estado:** en ejecución; primera entrega transversal aprobada por pruebas automáticas
+**Estado:** en ejecución; entregas P02-A, P02-B y P02-C aprobadas por pruebas automáticas
 
 Este registro divide P02 en entregas comprobables. No se declara G2 mientras queden controladores con lógica de negocio, repositorios que confirman cambios por su cuenta o contratos sin prueba.
 
@@ -28,8 +28,8 @@ La versión anterior calculaba el hash con ticks de 100 ns antes de guardar un `
 
 | Tarea | Estado verificable | Trabajo restante |
 |---|---|---|
-| P02-01 | Parcial | Pagos, reembolsos y liquidaciones de tarjeta ya están en servicios de aplicación; faltan emisión/notas, check-in/out, compras, inventario, cierres y respaldos. |
-| P02-02 | Parcial | Los tres servicios financieros son dueños de una transacción exterior; faltan los demás casos de uso y retirar confirmaciones implícitas de repositorios. |
+| P02-01 | Parcial | Pagos, reembolsos, liquidaciones, factura y notas fiscales ya están en servicios de aplicación; faltan reservas, check-in/out, folios, caja, compras, inventario y respaldos. |
+| P02-02 | Parcial | Los servicios financieros y fiscales extraídos son dueños de su transacción exterior; factura y notas tienen pruebas de rollback. Faltan los demás casos y retirar confirmaciones implícitas de repositorios. |
 | P02-03 | Parcial | Reloj completado; faltan interfaces para cálculo, correlativo, impresión y respaldo, y mover su orquestación a servicios de aplicación. |
 | P02-04 | Parcial | `ProblemDetails`, código y `traceId` completados; faltan paginación general, convenciones de fechas/enums y descripción OpenAPI por respuesta. |
 | P02-05 | Pendiente | Generar o validar tipos TypeScript desde OpenAPI en QA. |
@@ -45,8 +45,14 @@ Se crearon `PaymentApplicationService`, `RefundApplicationService` y `CardSettle
 
 La prueba de arquitectura impide que estos tres controladores vuelvan a depender directamente de contabilidad, auditoría, idempotencia o reloj. La integración PostgreSQL existente recorre creación, reintento, conflicto, saldos, caja, notas de crédito, asiento y liquidación.
 
+## Entrega P02-C — emisión y ajustes fiscales
+
+`InvoiceApplicationService` concentra la actualización de borradores, emisión de factura, liquidación completa de folio y creación de notas de crédito y débito. La transacción exterior incluye correlativo, documento, pago y caja cuando corresponden, estado del folio/reserva/habitación, asiento, auditoría e idempotencia. `InvoicesController` conserva únicamente consultas, identidad del actor y traducción HTTP.
+
+Los tres flujos fiscales incorporan puntos de fallo de prueba después de persistencia, contabilidad, auditoría e idempotencia. La integración provoca un fallo después del asiento en factura, nota de crédito y nota de débito, y comprueba que PostgreSQL revierte documento, asiento, cuentas creadas, bitácora, idempotencia, estado de la factura original y avance del correlativo. Los flujos normales, reintentos y conflictos siguen cubiertos por la misma suite.
+
 ## Criterio para la siguiente entrega
 
-P02-C aplicará el mismo patrón a factura y notas de crédito/débito, seguido por reservas, check-in/out y cierres de caja. También agregará inyección de fallo explícita entre persistencia, asiento, auditoría e idempotencia para demostrar rollback sin residuos.
+P02-D aplicará el patrón a reservas, check-in/out, cargos de folio y apertura/cierre de caja. Después continuará con compras, inventario y respaldos, y retirará las confirmaciones implícitas de los repositorios que todavía las conservan.
 
 La evidencia de QA y compatibilidad se conserva en el [expediente general](../evidencia/README.md#p02--base-técnica-primera-entrega).

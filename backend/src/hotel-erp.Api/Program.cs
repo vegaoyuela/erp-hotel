@@ -109,6 +109,8 @@ builder.Services.AddScoped<IdempotencyService>();
 builder.Services.AddScoped<PaymentApplicationService>();
 builder.Services.AddScoped<RefundApplicationService>();
 builder.Services.AddScoped<CardSettlementApplicationService>();
+builder.Services.AddScoped<InvoiceApplicationService>();
+builder.Services.AddSingleton<IApplicationFailureInjector, NoOpApplicationFailureInjector>();
 builder.Services.AddScoped<DatabaseBackupService>();
 builder.Services.AddHostedService<BackupHostedService>();
 

@@ -1,0 +1,106 @@
+{
+  "generated_at": "2026-09-27T22:45:20.833678+00:00",
+  "status": "passed",
+  "contains_secret_values": false,
+  "scope": "P02-C invoice and fiscal adjustments application service",
+  "implementation": {
+    "invoice_controller_delegates_mutations": true,
+    "outer_transaction_owned_by_application_service": true,
+    "invoice_and_folio_settlement_extracted": true,
+    "credit_note_extracted": true,
+    "debit_note_extracted": true,
+    "failure_checkpoints_between_transaction_stages": true,
+    "architecture_boundary_test": true
+  },
+  "rollback_proof": {
+    "invoice_failure_after_accounting": true,
+    "credit_note_failure_after_accounting": true,
+    "debit_note_failure_after_accounting": true,
+    "asserted_no_residual_document": true,
+    "asserted_no_residual_accounting_or_accounts": true,
+    "asserted_no_residual_audit_or_idempotency": true,
+    "asserted_correlative_not_consumed": true,
+    "asserted_original_invoice_status_unchanged": true
+  },
+  "qa": {
+    "backend_build": {
+      "warnings": 0,
+      "errors": 0
+    },
+    "unit_tests": {
+      "passed": 87,
+      "skipped": 0,
+      "total": 87
+    },
+    "postgresql_integration_tests": {
+      "passed": 4,
+      "skipped": 0,
+      "total": 4
+    },
+    "fiscal_rollback_scenarios": {
+      "passed": 3,
+      "total": 3
+    },
+    "dossier_validator_tests": {
+      "passed": 5,
+      "total": 5
+    },
+    "frontend": {
+      "npm_audit_vulnerabilities": 0,
+      "lint": "passed",
+      "production_build": "passed"
+    },
+    "ef_pending_model_changes": false
+  },
+  "qa_database": {
+    "table_count": 42,
+    "total_rows": 345,
+    "migration_count": 11,
+    "temporary_databases_remaining": 0,
+    "unchanged_from_p00": true
+  },
+  "remaining": {
+    "p02_01": [
+      "reservations and check-in/out",
+      "folio charges",
+      "cash-register lifecycle",
+      "purchases",
+      "inventory",
+      "backups"
+    ],
+    "p02_02": [
+      "remove repository-owned persistence",
+      "rollback injection tests for P02-B financial movements and remaining operations"
+    ]
+  },
+  "evidence": {
+    "qa": {
+      "path": "docs/plan de implementación/2026-09-27/evidencia/p02c-qa.log",
+      "sha256": "95767a5ab6bb85a82a025cdd2ffb845ee68e6f89665bdc013ec2ff9950d9fd31"
+    },
+    "ef_model": {
+      "path": "docs/plan de implementación/2026-09-27/evidencia/p02c-modelo-ef.log",
+      "sha256": "815c5cd494b61a9d8737ba7653cd05fb05926e7b40a924683fa4eef4ca87566c"
+    },
+    "invoice_service": {
+      "path": "backend/src/hotel-erp.Api/Services/InvoiceApplicationService.cs",
+      "sha256": "69b49bc1b63b6cc3a055ac8eef6a63fdfd4b62cb56899458678c71875c99cad2"
+    },
+    "failure_injection": {
+      "path": "backend/src/hotel-erp.Api/Services/ApplicationFailureInjection.cs",
+      "sha256": "a34a38134f7c505222ad4988de63db46a8aabec67b5f383cc345480fb8c443ea"
+    },
+    "invoice_controller": {
+      "path": "backend/src/hotel-erp.Api/Controllers/InvoicesController.cs",
+      "sha256": "0d3c8554db3d283d4ebaabbbbb1dc867e3f69631fa29e6935c751c8e04dc09a7"
+    },
+    "architecture_test": {
+      "path": "backend/tests/hotel-erp.UnitTests/ApplicationServiceArchitectureTests.cs",
+      "sha256": "aa21c876f84b2ada38a905d2b403e65c4ba5c10b4b34c61279ca77dfef5f35af"
+    },
+    "integration_test": {
+      "path": "backend/tests/hotel-erp.IntegrationTests/AuthenticationFlowTests.cs",
+      "sha256": "c69c459cebf4102701f6818fa7eae0013b612ad9d8d7d2d8257ad435b431003d"
+    }
+  }
+}

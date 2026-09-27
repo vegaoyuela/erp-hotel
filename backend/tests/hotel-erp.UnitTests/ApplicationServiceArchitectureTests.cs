@@ -10,6 +10,7 @@ public class ApplicationServiceArchitectureTests
     [InlineData(typeof(PaymentsController), typeof(PaymentApplicationService))]
     [InlineData(typeof(RefundsController), typeof(RefundApplicationService))]
     [InlineData(typeof(CardSettlementsController), typeof(CardSettlementApplicationService))]
+    [InlineData(typeof(InvoicesController), typeof(InvoiceApplicationService))]
     public void FinancialMutationController_DelegatesToExpectedApplicationService(
         Type controllerType,
         Type applicationServiceType)

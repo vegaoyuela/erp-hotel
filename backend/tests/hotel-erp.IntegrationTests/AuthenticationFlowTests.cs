@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace hotel_erp.IntegrationTests;
 
@@ -378,6 +379,11 @@ public class AuthenticationFlowTests
         Assert.Equal(64, approvedRevision.SnapshotSha256.Length);
 
         var caiId = await CreateActiveCaiAsync(factory.Services);
+        await AssertInvoiceRollbackAfterAccountingFailureAsync(
+            database.ConnectionString,
+            currentSession.AccessToken!,
+            caiId,
+            factory.Services);
         var invoiceIdempotencyKey = Guid.NewGuid().ToString("D");
         using var invoiceAfterApprovalRequest = InvoiceRequest(currentSession.AccessToken!, caiId, invoiceIdempotencyKey);
         var invoiceAfterApprovalResponse = await client.SendAsync(invoiceAfterApprovalRequest);
@@ -403,6 +409,13 @@ public class AuthenticationFlowTests
             currentSession.AccessToken!,
             InvoiceDocumentType.NotaDebito,
             "002-001-02-00000001");
+        await AssertAdjustmentRollbackAfterAccountingFailureAsync(
+            database.ConnectionString,
+            currentSession.AccessToken!,
+            issuedInvoice,
+            debitAuthorizationId,
+            isCredit: false,
+            factory.Services);
         var debitKey = Guid.NewGuid().ToString("D");
         using var debitRequest = DebitNoteRequest(
             currentSession.AccessToken!,
@@ -432,6 +445,13 @@ public class AuthenticationFlowTests
             currentSession.AccessToken!,
             InvoiceDocumentType.NotaCredito,
             "003-001-03-00000001");
+        await AssertAdjustmentRollbackAfterAccountingFailureAsync(
+            database.ConnectionString,
+            currentSession.AccessToken!,
+            issuedInvoice,
+            creditAuthorizationId,
+            isCredit: true,
+            factory.Services);
         var creditKey = Guid.NewGuid().ToString("D");
         using var creditRequest = CreditNoteRequest(
             currentSession.AccessToken!,
@@ -2494,6 +2514,138 @@ public class AuthenticationFlowTests
         return request;
     }
 
+    private static async Task AssertInvoiceRollbackAfterAccountingFailureAsync(
+        string connectionString,
+        string accessToken,
+        Guid caiId,
+        IServiceProvider baselineServices)
+    {
+        int invoicesBefore;
+        int entriesBefore;
+        int accountsBefore;
+        int auditsBefore;
+        int idempotencyBefore;
+        string correlativeBefore;
+        using (var beforeScope = baselineServices.CreateScope())
+        {
+            var context = beforeScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            invoicesBefore = await context.Invoices.CountAsync();
+            entriesBefore = await context.AccountingEntries.CountAsync();
+            accountsBefore = await context.AccountingAccounts.CountAsync();
+            auditsBefore = await context.AuditLogs.CountAsync();
+            idempotencyBefore = await context.IdempotencyRecords.CountAsync();
+            correlativeBefore = await context.CAIs
+                .Where(cai => cai.Id == caiId)
+                .Select(cai => cai.CurrentCorrelative)
+                .SingleAsync();
+        }
+
+        await using var failingFactory = new HotelErpWebApplicationFactory(
+            connectionString,
+            services =>
+            {
+                services.RemoveAll<IApplicationFailureInjector>();
+                services.AddSingleton<IApplicationFailureInjector>(
+                    new ThrowingFailureInjector(ApplicationFailureCheckpoints.InvoiceAfterAccounting));
+            });
+        using var failingClient = failingFactory.CreateClient(new WebApplicationFactoryClientOptions
+        {
+            AllowAutoRedirect = false
+        });
+        using var request = InvoiceRequest(
+            accessToken,
+            caiId,
+            Guid.NewGuid().ToString("D"),
+            unitPrice: 137m);
+        using var response = await failingClient.SendAsync(request);
+        await AssertSafeProblemDetailsAsync(response, HttpStatusCode.InternalServerError);
+
+        using var assertScope = baselineServices.CreateScope();
+        var assertContext = assertScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        Assert.Equal(invoicesBefore, await assertContext.Invoices.CountAsync());
+        Assert.Equal(entriesBefore, await assertContext.AccountingEntries.CountAsync());
+        Assert.Equal(accountsBefore, await assertContext.AccountingAccounts.CountAsync());
+        Assert.Equal(auditsBefore, await assertContext.AuditLogs.CountAsync());
+        Assert.Equal(idempotencyBefore, await assertContext.IdempotencyRecords.CountAsync());
+        Assert.Equal(
+            correlativeBefore,
+            await assertContext.CAIs
+                .Where(cai => cai.Id == caiId)
+                .Select(cai => cai.CurrentCorrelative)
+                .SingleAsync());
+    }
+
+    private static async Task AssertAdjustmentRollbackAfterAccountingFailureAsync(
+        string connectionString,
+        string accessToken,
+        InvoiceDto original,
+        Guid authorizationId,
+        bool isCredit,
+        IServiceProvider baselineServices)
+    {
+        int invoicesBefore;
+        int entriesBefore;
+        int auditsBefore;
+        int idempotencyBefore;
+        string authorizationCorrelativeBefore;
+        InvoiceStatus originalStatusBefore;
+        using (var beforeScope = baselineServices.CreateScope())
+        {
+            var context = beforeScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            invoicesBefore = await context.Invoices.CountAsync();
+            entriesBefore = await context.AccountingEntries.CountAsync();
+            auditsBefore = await context.AuditLogs.CountAsync();
+            idempotencyBefore = await context.IdempotencyRecords.CountAsync();
+            authorizationCorrelativeBefore = await context.DocumentAuthorizations
+                .Where(authorization => authorization.Id == authorizationId)
+                .Select(authorization => authorization.CurrentCorrelative)
+                .SingleAsync();
+            originalStatusBefore = await context.Invoices
+                .Where(invoice => invoice.Id == original.Id)
+                .Select(invoice => invoice.Status)
+                .SingleAsync();
+        }
+
+        var checkpoint = isCredit
+            ? ApplicationFailureCheckpoints.CreditNoteAfterAccounting
+            : ApplicationFailureCheckpoints.DebitNoteAfterAccounting;
+        await using var failingFactory = new HotelErpWebApplicationFactory(
+            connectionString,
+            services =>
+            {
+                services.RemoveAll<IApplicationFailureInjector>();
+                services.AddSingleton<IApplicationFailureInjector>(new ThrowingFailureInjector(checkpoint));
+            });
+        using var failingClient = failingFactory.CreateClient(new WebApplicationFactoryClientOptions
+        {
+            AllowAutoRedirect = false
+        });
+        using var request = isCredit
+            ? CreditNoteRequest(accessToken, original, authorizationId, Guid.NewGuid().ToString("D"))
+            : DebitNoteRequest(accessToken, original, authorizationId, Guid.NewGuid().ToString("D"));
+        using var response = await failingClient.SendAsync(request);
+        await AssertSafeProblemDetailsAsync(response, HttpStatusCode.InternalServerError);
+
+        using var assertScope = baselineServices.CreateScope();
+        var assertContext = assertScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        Assert.Equal(invoicesBefore, await assertContext.Invoices.CountAsync());
+        Assert.Equal(entriesBefore, await assertContext.AccountingEntries.CountAsync());
+        Assert.Equal(auditsBefore, await assertContext.AuditLogs.CountAsync());
+        Assert.Equal(idempotencyBefore, await assertContext.IdempotencyRecords.CountAsync());
+        Assert.Equal(
+            authorizationCorrelativeBefore,
+            await assertContext.DocumentAuthorizations
+                .Where(authorization => authorization.Id == authorizationId)
+                .Select(authorization => authorization.CurrentCorrelative)
+                .SingleAsync());
+        Assert.Equal(
+            originalStatusBefore,
+            await assertContext.Invoices
+                .Where(invoice => invoice.Id == original.Id)
+                .Select(invoice => invoice.Status)
+                .SingleAsync());
+    }
+
     private static HttpRequestMessage FolioSettlementRequest(
         string accessToken,
         Guid caiId,
@@ -2731,6 +2883,7 @@ public class AuthenticationFlowTests
         Assert.DoesNotContain("unknown_operator", body, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("Incorrect!", body, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("synthetic-database-failure", body, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("synthetic-application-failure", body, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("Npgsql", body, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("stack", body, StringComparison.OrdinalIgnoreCase);
     }
@@ -2746,5 +2899,16 @@ public class AuthenticationFlowTests
         public Task ChangePasswordAsync(Guid userId, ChangePasswordRequest request) => throw new NotSupportedException();
         public Task ForgotPasswordAsync(ForgotPasswordRequest request) => throw new NotSupportedException();
         public Task ResetPasswordAsync(ResetPasswordRequest request) => throw new NotSupportedException();
+    }
+
+    private sealed class ThrowingFailureInjector(string targetCheckpoint) : IApplicationFailureInjector
+    {
+        public Task CheckpointAsync(string checkpoint, CancellationToken cancellationToken = default)
+        {
+            if (string.Equals(checkpoint, targetCheckpoint, StringComparison.Ordinal))
+                throw new InvalidOperationException("synthetic-application-failure");
+
+            return Task.CompletedTask;
+        }
     }
 }

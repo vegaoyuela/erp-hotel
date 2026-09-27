@@ -88,4 +88,16 @@ La segunda entrega mueve la creación de pagos, reembolsos y liquidaciones de ta
 | [p02b-qa-resumen.json](p02b-qa-resumen.json) | Resumen estructurado y hashes SHA-256 de código y evidencia. |
 | [p02b-qa.log](p02b-qa.log) | Build sin advertencias, 86 unitarias, 4 integraciones PostgreSQL, 5 pruebas N01–N06, auditoría npm, lint y frontend aprobados. |
 
-P02-01 y P02-02 continúan parciales: aún deben extraerse factura/notas, reservas, caja, compras, inventario y respaldo; también faltan pruebas explícitas de rollback con fallos inyectados.
+P02-01 y P02-02 continúan parciales: aún deben extraerse reservas, folios, caja, compras, inventario y respaldo; también faltan pruebas explícitas de rollback para los movimientos financieros de P02-B.
+
+### P02-C — emisión y ajustes fiscales
+
+La tercera entrega traslada actualización de borradores, emisión, liquidación de folio y notas de crédito/débito a `InvoiceApplicationService`. Cada flujo fiscal conserva una transacción PostgreSQL exterior. La integración inyecta un fallo posterior al asiento de factura, nota de crédito y nota de débito, y confirma que no persisten documentos, asientos, cuentas, auditorías, idempotencia, cambios de estado ni correlativos consumidos.
+
+| Archivo | Resultado |
+|---|---|
+| [p02c-modelo-ef.log](p02c-modelo-ef.log) | EF Core confirma que la extracción no requiere migración. |
+| [p02c-qa-resumen.json](p02c-qa-resumen.json) | Resumen estructurado y hashes SHA-256 de código, pruebas y evidencia. |
+| [p02c-qa.log](p02c-qa.log) | Build sin advertencias, 87 unitarias, 4 integraciones PostgreSQL con tres escenarios de rollback fiscal, 5 pruebas N01–N06, auditoría npm, lint y frontend aprobados. |
+
+P02 continúa abierta. El siguiente bloque cubre reservas, check-in/out, cargos de folio y apertura/cierre de caja.
