@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "classification": "synthetic",
+  "hotel": {
+    "legalName": "Hotel Sintético de Pruebas, S. A.",
+    "tradeName": "Hotel Laboratorio",
+    "rtn": "08011999123456",
+    "address": "Dirección sintética, Tegucigalpa, Honduras",
+    "phones": ["2200-0000"],
+    "email": "qa@example.invalid"
+  },
+  "billing": {
+    "establishmentCode": "001",
+    "emissionPointCode": "001",
+    "modality": "Modalidad sintética de laboratorio",
+    "systemRegistrationReference": "EXP-SINTETICO-001",
+    "authorizations": [
+      {
+        "documentType": "Factura",
+        "caiReferenceHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "initialRange": "001-001-01-00000001",
+        "finalRange": "001-001-01-00000100",
+        "validUntil": "2099-12-31"
+      }
+    ]
+  },
+  "obligations": [
+    {
+      "code": "OBL-SINT-01",
+      "responsible": "Contador de prueba",
+      "sourceReference": "FUENTE-SINTETICA-01",
+      "testReference": "CASO-SINTETICO-01",
+      "treatment": "Procedimiento externo simulado"
+    }
+  ],
+  "documentFormat": {
+    "sourceReference": "FORMATO-SINTETICO-01",
+    "sourceSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "signedCaseReference": "CASO-FIRMADO-SINTETICO-01"
+  },
+  "printing": {
+    "printerModel": "Impresora virtual de pruebas",
+    "paperWidthMm": 80,
+    "copies": 2,
+    "documentRetentionReference": "POLITICA-SINTETICA-01"
+  },
+  "decisions": [
+    { "code": "DEC-01", "status": "approved", "summary": "Identidad sintética revisada para pruebas.", "evidenceReferences": ["EVID-SINT-01"] },
+    { "code": "DEC-02", "status": "approved", "summary": "Facturación sintética revisada para pruebas.", "evidenceReferences": ["EVID-SINT-02"] },
+    { "code": "DEC-03", "status": "approved", "summary": "Catálogo sintético revisado para pruebas.", "evidenceReferences": ["EVID-SINT-03"] },
+    { "code": "DEC-04", "status": "approved", "summary": "Turismo sintético revisado para pruebas.", "evidenceReferences": ["EVID-SINT-04"] },
+    { "code": "DEC-05", "status": "approved", "summary": "Anticipos sintéticos revisados para pruebas.", "evidenceReferences": ["EVID-SINT-05"] },
+    { "code": "DEC-06", "status": "approved", "summary": "Descuentos sintéticos revisados para pruebas.", "evidenceReferences": ["EVID-SINT-06"] },
+    { "code": "DEC-07", "status": "approved", "summary": "Retenciones sintéticas revisadas para pruebas.", "evidenceReferences": ["EVID-SINT-07"] },
+    { "code": "DEC-08", "status": "approved", "summary": "Exoneraciones sintéticas revisadas para pruebas.", "evidenceReferences": ["EVID-SINT-08"] },
+    { "code": "DEC-09", "status": "approved", "summary": "Contabilidad sintética revisada para pruebas.", "evidenceReferences": ["EVID-SINT-09"] },
+    { "code": "DEC-10", "status": "approved", "summary": "Moneda sintética revisada para pruebas.", "evidenceReferences": ["EVID-SINT-10"] },
+    { "code": "DEC-11", "status": "approved", "summary": "Anulaciones sintéticas revisadas para pruebas.", "evidenceReferences": ["EVID-SINT-11"] },
+    { "code": "DEC-12", "status": "approved", "summary": "Conservación sintética revisada para pruebas.", "evidenceReferences": ["EVID-SINT-12"] },
+    { "code": "DEC-13", "status": "approved", "summary": "Impresión sintética revisada para pruebas.", "evidenceReferences": ["EVID-SINT-13"] },
+    { "code": "DEC-14", "status": "approved", "summary": "Infraestructura sintética revisada para pruebas.", "evidenceReferences": ["EVID-SINT-14"] },
+    { "code": "DEC-15", "status": "not_applicable", "summary": "Alcance externo sustentado solo para laboratorio.", "evidenceReferences": ["EVID-SINT-15"] }
+  ],
+  "approvals": {
+    "manager": { "reference": "ACTA-GERENCIA-SINTETICA", "approvedAt": "2026-09-27" },
+    "accountant": { "reference": "ACTA-CONTADOR-SINTETICA", "approvedAt": "2026-09-27" }
+  }
+}

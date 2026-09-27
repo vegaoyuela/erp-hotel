@@ -372,6 +372,8 @@ export interface BusinessSettings {
   fiscalRetiredAt?: string
   fiscalRetiredByUserId?: string
   fiscalRetirementReason?: string
+  fiscalDecisionManifestSha256?: string
+  fiscalEvidenceReference?: string
   printPrinterName?: string
   printWidth: number
   printLogoHeight: number
@@ -388,6 +390,22 @@ export interface BusinessSettings {
   headerAlign: string
   separatorChar: string
   marginLeft: number
+}
+
+export interface FiscalProfileRevision {
+  version: number
+  status: 'Aprobado' | 'Retirado'
+  validFrom: string
+  validUntil?: string
+  decisionManifestSha256: string
+  evidenceReference: string
+  snapshotSha256: string
+  approvedAt: string
+  approvedByUserId: string
+  approvalNote: string
+  retiredAt?: string
+  retiredByUserId?: string
+  retirementReason?: string
 }
 
 export interface InvoicePrintData {

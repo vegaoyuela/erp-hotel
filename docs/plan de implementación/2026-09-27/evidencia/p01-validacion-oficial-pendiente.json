@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-27T20:12:42.999Z",
+  "status": "failed",
+  "containsSourceValues": false,
+  "classification": "synthetic",
+  "inputSha256": "58fe83c3a9527a614911ea86b5074d46fd86abafe805e8d313ae5f343857b7b6",
+  "checks": {
+    "N01": "failed",
+    "N02": "passed",
+    "N03": "passed",
+    "N04": "passed",
+    "N05": "passed",
+    "N06": "passed"
+  },
+  "issues": [
+    {
+      "check": "N01",
+      "code": "OFFICIAL_REQUIRED",
+      "path": "classification",
+      "message": "Esta aprobación requiere el expediente oficial externo."
+    }
+  ]
+}

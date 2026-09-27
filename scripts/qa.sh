@@ -19,6 +19,9 @@ else
   echo "[QA] Integración omitida: configure HOTEL_ERP_TEST_ADMIN_CONNECTION."
 fi
 
+echo "[QA] Validando expediente fiscal N01-N06"
+node --test "$root_dir/scripts/tests/profile-dossier.test.mjs"
+
 echo "[QA] Instalando frontend desde package-lock.json"
 npm --prefix "$root_dir/frontend" ci
 

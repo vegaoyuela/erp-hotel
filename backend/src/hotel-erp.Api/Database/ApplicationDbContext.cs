@@ -58,6 +58,7 @@ namespace hotel_erp.Api.Database
 
         // Business Settings
         public DbSet<BusinessSettings> BusinessSettings => Set<BusinessSettings>();
+        public DbSet<FiscalProfileRevision> FiscalProfileRevisions => Set<FiscalProfileRevision>();
 
         // Backups
         public DbSet<BackupLog> BackupLogs => Set<BackupLog>();
@@ -679,6 +680,43 @@ namespace hotel_erp.Api.Database
                 .HasMaxLength(20);
             modelBuilder.Entity<BusinessSettings>()
                 .HasIndex(settings => settings.FiscalProfileStatus);
+            modelBuilder.Entity<BusinessSettings>()
+                .Property(settings => settings.FiscalDecisionManifestSha256)
+                .HasMaxLength(64);
+            modelBuilder.Entity<BusinessSettings>()
+                .Property(settings => settings.FiscalEvidenceReference)
+                .HasMaxLength(200);
+            modelBuilder.Entity<FiscalProfileRevision>()
+                .Property(revision => revision.Status)
+                .HasConversion<string>()
+                .HasMaxLength(20);
+            modelBuilder.Entity<FiscalProfileRevision>()
+                .Property(revision => revision.DecisionManifestSha256)
+                .HasMaxLength(64);
+            modelBuilder.Entity<FiscalProfileRevision>()
+                .Property(revision => revision.SnapshotSha256)
+                .HasMaxLength(64);
+            modelBuilder.Entity<FiscalProfileRevision>()
+                .Property(revision => revision.EvidenceReference)
+                .HasMaxLength(200);
+            modelBuilder.Entity<FiscalProfileRevision>()
+                .HasIndex(revision => new { revision.BusinessSettingsId, revision.Version })
+                .IsUnique();
+            modelBuilder.Entity<FiscalProfileRevision>()
+                .HasOne<BusinessSettings>()
+                .WithMany()
+                .HasForeignKey(revision => revision.BusinessSettingsId)
+                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<FiscalProfileRevision>()
+                .ToTable("FiscalProfileRevisions", table =>
+                {
+                    table.HasCheckConstraint("CK_FiscalProfileRevisions_Version", "\"Version\" > 0");
+                    table.HasCheckConstraint("CK_FiscalProfileRevisions_Status", "\"Status\" IN ('Aprobado', 'Retirado')");
+                    table.HasCheckConstraint("CK_FiscalProfileRevisions_Validity", "\"ValidUntil\" IS NULL OR \"ValidUntil\" >= \"ValidFrom\"");
+                    table.HasCheckConstraint("CK_FiscalProfileRevisions_DecisionHash", "\"DecisionManifestSha256\" ~ '^[0-9a-f]{64}$'");
+                    table.HasCheckConstraint("CK_FiscalProfileRevisions_SnapshotHash", "\"SnapshotSha256\" ~ '^[0-9a-f]{64}$'");
+                    table.HasCheckConstraint("CK_FiscalProfileRevisions_EvidenceReference", "length(btrim(\"EvidenceReference\")) >= 5");
+                });
 
             // BackupLog
             modelBuilder.Entity<BackupLog>()

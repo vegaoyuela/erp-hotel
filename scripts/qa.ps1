@@ -44,6 +44,10 @@ else {
     Write-Host '[QA] Integración omitida: configure HOTEL_ERP_TEST_ADMIN_CONNECTION.' -ForegroundColor Yellow
 }
 
+Invoke-QaStep 'Validando expediente fiscal N01-N06' {
+    node --test (Join-Path $rootDir 'scripts/tests/profile-dossier.test.mjs')
+}
+
 $frontendDir = Join-Path $rootDir 'frontend'
 Invoke-QaStep 'Instalando frontend desde package-lock.json' {
     npm --prefix $frontendDir ci

@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "classification": "official-external",
+  "hotel": {
+    "legalName": "",
+    "tradeName": "",
+    "rtn": "",
+    "address": "",
+    "phones": [],
+    "email": ""
+  },
+  "billing": {
+    "establishmentCode": "",
+    "emissionPointCode": "",
+    "modality": "",
+    "systemRegistrationReference": "",
+    "authorizations": []
+  },
+  "obligations": [],
+  "documentFormat": {
+    "sourceReference": "",
+    "sourceSha256": "",
+    "signedCaseReference": ""
+  },
+  "printing": {
+    "printerModel": "",
+    "paperWidthMm": 80,
+    "copies": 1,
+    "documentRetentionReference": ""
+  },
+  "decisions": [
+    { "code": "DEC-01", "status": "pending", "summary": "", "evidenceReferences": [] },
+    { "code": "DEC-02", "status": "pending", "summary": "", "evidenceReferences": [] },
+    { "code": "DEC-03", "status": "pending", "summary": "", "evidenceReferences": [] },
+    { "code": "DEC-04", "status": "pending", "summary": "", "evidenceReferences": [] },
+    { "code": "DEC-05", "status": "pending", "summary": "", "evidenceReferences": [] },
+    { "code": "DEC-06", "status": "pending", "summary": "", "evidenceReferences": [] },
+    { "code": "DEC-07", "status": "pending", "summary": "", "evidenceReferences": [] },
+    { "code": "DEC-08", "status": "pending", "summary": "", "evidenceReferences": [] },
+    { "code": "DEC-09", "status": "pending", "summary": "", "evidenceReferences": [] },
+    { "code": "DEC-10", "status": "pending", "summary": "", "evidenceReferences": [] },
+    { "code": "DEC-11", "status": "pending", "summary": "", "evidenceReferences": [] },
+    { "code": "DEC-12", "status": "pending", "summary": "", "evidenceReferences": [] },
+    { "code": "DEC-13", "status": "pending", "summary": "", "evidenceReferences": [] },
+    { "code": "DEC-14", "status": "pending", "summary": "", "evidenceReferences": [] },
+    { "code": "DEC-15", "status": "pending", "summary": "", "evidenceReferences": [] }
+  ],
+  "approvals": {
+    "manager": { "reference": "", "approvedAt": "" },
+    "accountant": { "reference": "", "approvedAt": "" }
+  }
+}

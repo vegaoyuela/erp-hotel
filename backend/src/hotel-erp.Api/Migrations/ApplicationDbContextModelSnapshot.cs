@@ -268,6 +268,14 @@ namespace hotel_erp.Api.Migrations
                     b.Property<Guid?>("FiscalApprovedByUserId")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("FiscalDecisionManifestSha256")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<string>("FiscalEvidenceReference")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
                     b.Property<string>("FiscalProfileStatus")
                         .IsRequired()
                         .HasMaxLength(20)
@@ -1001,6 +1009,104 @@ namespace hotel_erp.Api.Migrations
                     b.HasIndex("EntryId");
 
                     b.ToTable("EntryItems");
+                });
+
+            modelBuilder.Entity("hotel_erp.Api.Database.Entities.FiscalProfileRevision", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ApprovalNote")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("ApprovedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid>("ApprovedByUserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("BusinessSettingsId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp without time zone")
+                        .HasDefaultValueSql("NOW()");
+
+                    b.Property<string>("DecisionManifestSha256")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("EvidenceReference")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("RetiredAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("RetiredByUserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("RetirementReason")
+                        .HasColumnType("text");
+
+                    b.Property<string>("SnapshotJson")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("SnapshotSha256")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp without time zone")
+                        .HasDefaultValueSql("NOW()");
+
+                    b.Property<DateOnly>("ValidFrom")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly?>("ValidUntil")
+                        .HasColumnType("date");
+
+                    b.Property<int>("Version")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BusinessSettingsId", "Version")
+                        .IsUnique();
+
+                    b.ToTable("FiscalProfileRevisions", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_FiscalProfileRevisions_DecisionHash", "\"DecisionManifestSha256\" ~ '^[0-9a-f]{64}$'");
+
+                            t.HasCheckConstraint("CK_FiscalProfileRevisions_EvidenceReference", "length(btrim(\"EvidenceReference\")) >= 5");
+
+                            t.HasCheckConstraint("CK_FiscalProfileRevisions_SnapshotHash", "\"SnapshotSha256\" ~ '^[0-9a-f]{64}$'");
+
+                            t.HasCheckConstraint("CK_FiscalProfileRevisions_Status", "\"Status\" IN ('Aprobado', 'Retirado')");
+
+                            t.HasCheckConstraint("CK_FiscalProfileRevisions_Validity", "\"ValidUntil\" IS NULL OR \"ValidUntil\" >= \"ValidFrom\"");
+
+                            t.HasCheckConstraint("CK_FiscalProfileRevisions_Version", "\"Version\" > 0");
+                        });
                 });
 
             modelBuilder.Entity("hotel_erp.Api.Database.Entities.Folio", b =>
@@ -2606,6 +2712,15 @@ namespace hotel_erp.Api.Migrations
                     b.Navigation("Account");
 
                     b.Navigation("Entry");
+                });
+
+            modelBuilder.Entity("hotel_erp.Api.Database.Entities.FiscalProfileRevision", b =>
+                {
+                    b.HasOne("hotel_erp.Api.Database.Entities.BusinessSettings", null)
+                        .WithMany()
+                        .HasForeignKey("BusinessSettingsId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("hotel_erp.Api.Database.Entities.Folio", b =>

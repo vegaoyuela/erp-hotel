@@ -21,14 +21,18 @@ Evidencia de esta ejecución: [P00 — estado y resultados](evidencia/README.md)
 ## P01 — Perfil y políticas del hotel
 
 - [ ] P01-01 Completar DEC-01–DEC-15 con gerente y contador.
-- [ ] P01-02 Digitalizar/custodiar evidencia fiscal fuera del repositorio.
-- [ ] P01-03 Versionar perfil fiscal y reglas por vigencia.
+- [x] P01-02A Crear plantilla, procedimiento de custodia y referencias por hash sin PII.
+- [ ] P01-02B Digitalizar y custodiar la evidencia fiscal real fuera del repositorio.
+- [x] P01-03 Versionar perfil fiscal y reglas por vigencia mediante snapshot y SHA-256 inmutables.
 - [ ] P01-04 Completar plan de cuentas y valoración de inventario.
 - [ ] P01-05 Definir anticipos, crédito, descuentos, anulaciones y no utilizados.
 - [ ] P01-06 Definir retenciones, exoneraciones y conservación.
 - [ ] P01-07 Definir RPO/RTO, hardware, usuarios y aprobación por montos.
-- [ ] P01-08 Automatizar validaciones N01–N06.
+- [x] P01-08A Automatizar validaciones estructurales N01–N06 y cubrirlas con pruebas sintéticas.
+- [ ] P01-08B Ejecutar y aprobar N01–N06 sobre el expediente oficial externo.
 - [ ] **G1** Firmar perfil fiscal/contable y políticas.
+
+Pendientes externos: [registro único de bloqueos](08-registro-pendientes.md). Evidencia técnica: [ejecución P01](evidencia/README.md#p01--perfil-fiscal-y-expediente).
 
 ## P02 — Base técnica, contratos y seguridad
 

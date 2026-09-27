@@ -6,7 +6,7 @@
 
 ## Estado de ejecución
 
-La implementación comenzó el 27 de septiembre de 2026. El trabajo ejecutable de P00 está completado y documentado en [la evidencia de línea base](evidencia/README.md): respaldo y restauración de la base sintética, inventario, manifiesto, limpieza del repositorio y QA completa aprobada. G0 permanece abierta hasta recibir, respaldar y contrastar la base y los adjuntos oficiales del hotel.
+La implementación comenzó el 27 de septiembre de 2026. El trabajo ejecutable de P00 está completado y documentado en [la evidencia de línea base](evidencia/README.md): respaldo y restauración de la base sintética, inventario, manifiesto, limpieza del repositorio y QA completa aprobada. En P01 ya están implementados el expediente externo validable, N01–N06 automatizadas y el historial inmutable de aprobaciones fiscales. G0 permanece abierta hasta recibir la base y los adjuntos oficiales; G1 permanece abierta hasta que gerente y contador resuelvan DEC-01–DEC-15 y firmen el expediente real.
 
 ## Resultado esperado
 
@@ -85,6 +85,8 @@ No se debe adelantar una fase que pueda consumir correlativos, modificar histori
 6. [06 — Lista maestra de implementación](06-lista-maestra.md)
 7. [07 — Fuentes y decisiones que deben revalidarse](07-fuentes-y-revalidacion.md)
 8. [Registro de pruebas de factura](registro-pruebas-factura-windows.md)
+9. [Registro de pendientes y bloqueos](08-registro-pendientes.md)
+10. [Expediente P01 y validador N01–N06](p01-expediente/README.md)
 
 Este plan complementa las listas existentes de [implementación SAR](../../implementacion-sar/README.md), el [catálogo de 186 pruebas](../../plan-sar-2026-09-07/03-pruebas-y-aprobacion.md) y la [trazabilidad de 64 hallazgos](../../plan-sar-2026-09-07/04-trazabilidad.md). Si existe una diferencia, prevalece la condición más estricta hasta que se documente la decisión.
 

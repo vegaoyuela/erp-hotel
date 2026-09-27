@@ -23,6 +23,8 @@ namespace hotel_erp.Api.Database.Entities
         public DateTime? FiscalRetiredAt { get; set; }
         public Guid? FiscalRetiredByUserId { get; set; }
         public string? FiscalRetirementReason { get; set; }
+        public string? FiscalDecisionManifestSha256 { get; set; }
+        public string? FiscalEvidenceReference { get; set; }
         public string? PrintPrinterName { get; set; }
         public int PrintWidth { get; set; } = 46;
         public int PrintLogoHeight { get; set; } = 40;
@@ -49,5 +51,23 @@ namespace hotel_erp.Api.Database.Entities
         Aprobado,
         Retirado
     }
-}
 
+    public class FiscalProfileRevision : BaseEntity
+    {
+        public Guid BusinessSettingsId { get; set; }
+        public int Version { get; set; }
+        public FiscalProfileStatus Status { get; set; }
+        public DateOnly ValidFrom { get; set; }
+        public DateOnly? ValidUntil { get; set; }
+        public string DecisionManifestSha256 { get; set; } = string.Empty;
+        public string EvidenceReference { get; set; } = string.Empty;
+        public string SnapshotJson { get; set; } = string.Empty;
+        public string SnapshotSha256 { get; set; } = string.Empty;
+        public DateTime ApprovedAt { get; set; }
+        public Guid ApprovedByUserId { get; set; }
+        public string ApprovalNote { get; set; } = string.Empty;
+        public DateTime? RetiredAt { get; set; }
+        public Guid? RetiredByUserId { get; set; }
+        public string? RetirementReason { get; set; }
+    }
+}

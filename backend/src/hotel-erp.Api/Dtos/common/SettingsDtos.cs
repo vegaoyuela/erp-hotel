@@ -23,6 +23,8 @@ namespace hotel_erp.Api.Dtos.Common
         public DateTime? FiscalRetiredAt { get; set; }
         public Guid? FiscalRetiredByUserId { get; set; }
         public string? FiscalRetirementReason { get; set; }
+        public string? FiscalDecisionManifestSha256 { get; set; }
+        public string? FiscalEvidenceReference { get; set; }
         public string? PrintPrinterName { get; set; }
         public int PrintWidth { get; set; } = 46;
         public int PrintLogoHeight { get; set; } = 40;
@@ -91,7 +93,9 @@ namespace hotel_erp.Api.Dtos.Common
     public record ApproveFiscalProfileRequest(
         [Required] DateOnly ValidFrom,
         DateOnly? ValidUntil,
-        [Required, StringLength(500, MinimumLength = 10)] string ApprovalNote) : IValidatableObject
+        [Required, StringLength(500, MinimumLength = 10)] string ApprovalNote,
+        [Required, RegularExpression("^[A-Fa-f0-9]{64}$")] string DecisionManifestSha256,
+        [Required, StringLength(200, MinimumLength = 5)] string EvidenceReference) : IValidatableObject
     {
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
@@ -102,4 +106,19 @@ namespace hotel_erp.Api.Dtos.Common
 
     public record RetireFiscalProfileRequest(
         [Required, StringLength(500, MinimumLength = 10)] string Reason);
+
+    public record FiscalProfileRevisionDto(
+        int Version,
+        string Status,
+        DateOnly ValidFrom,
+        DateOnly? ValidUntil,
+        string DecisionManifestSha256,
+        string EvidenceReference,
+        string SnapshotSha256,
+        DateTime ApprovedAt,
+        Guid ApprovedByUserId,
+        string ApprovalNote,
+        DateTime? RetiredAt,
+        Guid? RetiredByUserId,
+        string? RetirementReason);
 }

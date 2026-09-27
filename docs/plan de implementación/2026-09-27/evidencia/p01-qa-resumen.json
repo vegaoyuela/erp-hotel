@@ -1,0 +1,77 @@
+{
+  "generated_at": "2026-09-27T20:16:30.716344+00:00",
+  "status": "passed",
+  "contains_secret_values": false,
+  "implementation": {
+    "fiscal_profile_revision_history": true,
+    "immutable_snapshot_sha256": true,
+    "external_dossier_hash_required": true,
+    "legacy_profiles_fail_closed_to_new_draft": true,
+    "concurrent_reapproval_returns_conflict": true,
+    "database_check_constraints": 6,
+    "n01_n06_validator": true
+  },
+  "qa": {
+    "backend_build": {
+      "warnings": 0,
+      "errors": 0
+    },
+    "unit_tests": {
+      "passed": 77,
+      "skipped": 0,
+      "total": 77
+    },
+    "postgresql_integration_tests": {
+      "passed": 4,
+      "skipped": 0,
+      "total": 4
+    },
+    "dossier_validator_tests": {
+      "passed": 5,
+      "total": 5
+    },
+    "frontend": {
+      "npm_audit_vulnerabilities": 0,
+      "lint": "passed",
+      "production_build": "passed"
+    },
+    "ef_pending_model_changes": false
+  },
+  "qa_database": {
+    "restored_from_p00": true,
+    "table_counts_match": true,
+    "table_count": 42,
+    "total_rows": 345,
+    "temporary_databases_remaining": 0
+  },
+  "official_approval": {
+    "status": "blocked",
+    "reason": "Faltan DEC-01–DEC-15, expediente oficial y firmas de gerente y contador."
+  },
+  "evidence": {
+    "qa": {
+      "path": "docs/plan de implementación/2026-09-27/evidencia/p01-qa.log",
+      "sha256": "aa2d5897c227a381d907aa334bbbe2d16b7f6116a4ded9474c7f1db721963fd2"
+    },
+    "ef_model": {
+      "path": "docs/plan de implementación/2026-09-27/evidencia/p01-modelo-ef.log",
+      "sha256": "815c5cd494b61a9d8737ba7653cd05fb05926e7b40a924683fa4eef4ca87566c"
+    },
+    "upgrade_migration": {
+      "path": "docs/plan de implementación/2026-09-27/evidencia/p01-migracion-actualizacion.json",
+      "sha256": "ce037ff77d366e8ea539b77855ad9ae5ed07d93788b35d0b8dbe9bb014d6dd2a"
+    },
+    "synthetic_validation": {
+      "path": "docs/plan de implementación/2026-09-27/evidencia/p01-validacion-sintetica.json",
+      "sha256": "98658302b5870586d38e3a89aa1038c02bf958559b0144110a48baf810345e60"
+    },
+    "official_rejection": {
+      "path": "docs/plan de implementación/2026-09-27/evidencia/p01-validacion-oficial-pendiente.json",
+      "sha256": "362037d7bc51eab97ff9e4bf04586d9dbfa4f45aa1bfcd8ff98bc893460b0184"
+    },
+    "migration_source": {
+      "path": "backend/src/hotel-erp.Api/Migrations/20260927200021_AddFiscalProfileRevisionHistory.cs",
+      "sha256": "473e11f8eb92064ef4872bbf0f1b343ddc5fea4a1f4a6a9fa765a06972809eaf"
+    }
+  }
+}

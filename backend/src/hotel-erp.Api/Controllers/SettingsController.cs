@@ -37,6 +37,31 @@ namespace hotel_erp.Api.Controllers
             return Ok(_mapper.Map<BusinessSettingsDto>(settings));
         }
 
+        [HttpGet("business/history")]
+        [Authorize(Policy = PermissionNames.ManageTaxes)]
+        public async Task<ActionResult<IReadOnlyList<FiscalProfileRevisionDto>>> GetFiscalProfileHistory()
+        {
+            var revisions = await _context.FiscalProfileRevisions
+                .AsNoTracking()
+                .OrderByDescending(revision => revision.Version)
+                .Select(revision => new FiscalProfileRevisionDto(
+                    revision.Version,
+                    revision.Status.ToString(),
+                    revision.ValidFrom,
+                    revision.ValidUntil,
+                    revision.DecisionManifestSha256,
+                    revision.EvidenceReference,
+                    revision.SnapshotSha256,
+                    revision.ApprovedAt,
+                    revision.ApprovedByUserId,
+                    revision.ApprovalNote,
+                    revision.RetiredAt,
+                    revision.RetiredByUserId,
+                    revision.RetirementReason))
+                .ToListAsync();
+            return Ok(revisions);
+        }
+
         [HttpPut("business")]
         [Authorize(Policy = PermissionNames.ManageSettings)]
         public async Task<ActionResult<BusinessSettingsDto>> Update([FromBody] UpdateBusinessSettingsRequest request)
@@ -48,6 +73,8 @@ namespace hotel_erp.Api.Controllers
                 (request.BusinessName != null && request.BusinessName.Trim() != existing.BusinessName)
                 || (request.RTN != null && request.RTN.Trim() != existing.RTN)
                 || (request.Address != null && request.Address.Trim() != existing.Address)
+                || (request.Phone != null && request.Phone.Trim() != existing.Phone)
+                || (request.Email != null && request.Email.Trim().ToLowerInvariant() != existing.Email)
                 || (request.IsvRate.HasValue && request.IsvRate.Value != existing.IsvRate)
                 || (request.TouristTaxRate.HasValue && request.TouristTaxRate.Value != existing.TouristTaxRate)
                 || (request.FiscalValidFrom.HasValue && request.FiscalValidFrom != existing.FiscalValidFrom)
@@ -83,14 +110,17 @@ namespace hotel_erp.Api.Controllers
 
             if (fiscalChanged)
             {
+                if (existing.FiscalProfileStatus != FiscalProfileStatus.Borrador)
+                    existing.FiscalProfileVersion++;
                 existing.FiscalProfileStatus = FiscalProfileStatus.Borrador;
-                existing.FiscalProfileVersion++;
                 existing.FiscalApprovedAt = null;
                 existing.FiscalApprovedByUserId = null;
                 existing.FiscalApprovalNote = null;
                 existing.FiscalRetiredAt = null;
                 existing.FiscalRetiredByUserId = null;
                 existing.FiscalRetirementReason = null;
+                existing.FiscalDecisionManifestSha256 = null;
+                existing.FiscalEvidenceReference = null;
             }
 
             await _repo.UpdateAsync(existing);
@@ -115,8 +145,25 @@ namespace hotel_erp.Api.Controllers
 
             await using var transaction = await _context.Database.BeginTransactionAsync();
 
+            if (settings.FiscalProfileStatus == FiscalProfileStatus.Retirado)
+                settings.FiscalProfileVersion++;
+
+            var revisionExists = await _context.FiscalProfileRevisions
+                .AnyAsync(revision => revision.BusinessSettingsId == settings.Id
+                    && revision.Version == settings.FiscalProfileVersion);
+            if (revisionExists)
+                return Conflict(new ProblemDetails
+                {
+                    Type = "https://httpstatuses.com/409",
+                    Title = "Versión fiscal inmutable",
+                    Status = StatusCodes.Status409Conflict,
+                    Detail = "Esta versión ya fue aprobada. Modifique los datos fiscales para crear un nuevo borrador."
+                });
+
             settings.FiscalValidFrom = request.ValidFrom;
             settings.FiscalValidUntil = request.ValidUntil;
+            settings.FiscalDecisionManifestSha256 = request.DecisionManifestSha256.ToLowerInvariant();
+            settings.FiscalEvidenceReference = request.EvidenceReference.Trim();
             var validationErrors = FiscalProfileService.ValidateForApproval(settings);
             if (validationErrors.Count > 0)
                 return BadRequest(new { message = "El perfil fiscal está incompleto", errors = validationErrors });
@@ -129,13 +176,30 @@ namespace hotel_erp.Api.Controllers
             settings.FiscalRetiredAt = null;
             settings.FiscalRetiredByUserId = null;
             settings.FiscalRetirementReason = null;
-            await _repo.UpdateAsync(settings);
+            _context.FiscalProfileRevisions.Add(FiscalProfileService.CreateRevision(settings, actorId));
+            try
+            {
+                await _repo.UpdateAsync(settings);
+            }
+            catch (DbUpdateException)
+            {
+                await transaction.RollbackAsync();
+                return Conflict(new ProblemDetails
+                {
+                    Type = "https://httpstatuses.com/409",
+                    Title = "Aprobación fiscal concurrente",
+                    Status = StatusCodes.Status409Conflict,
+                    Detail = "Otro proceso aprobó esta versión. Recargue el perfil antes de continuar."
+                });
+            }
             await _auditService.LogAsync(actorId, "ApproveFiscalProfile", nameof(BusinessSettings), settings.Id, new
             {
                 settings.FiscalProfileVersion,
                 settings.FiscalValidFrom,
                 settings.FiscalValidUntil,
-                settings.FiscalApprovalNote
+                settings.FiscalApprovalNote,
+                settings.FiscalDecisionManifestSha256,
+                settings.FiscalEvidenceReference
             });
             await transaction.CommitAsync();
             return Ok(_mapper.Map<BusinessSettingsDto>(settings));
@@ -151,11 +215,36 @@ namespace hotel_erp.Api.Controllers
 
             await using var transaction = await _context.Database.BeginTransactionAsync();
 
+            if (settings.FiscalProfileStatus != FiscalProfileStatus.Aprobado)
+                return Conflict(new ProblemDetails
+                {
+                    Type = "https://httpstatuses.com/409",
+                    Title = "Perfil fiscal no aprobado",
+                    Status = StatusCodes.Status409Conflict,
+                    Detail = "Solo una versión aprobada puede retirarse."
+                });
+
+            var revision = await _context.FiscalProfileRevisions
+                .SingleOrDefaultAsync(candidate => candidate.BusinessSettingsId == settings.Id
+                    && candidate.Version == settings.FiscalProfileVersion);
+            if (revision is null)
+                return Conflict(new ProblemDetails
+                {
+                    Type = "https://httpstatuses.com/409",
+                    Title = "Historial fiscal incompleto",
+                    Status = StatusCodes.Status409Conflict,
+                    Detail = "La versión aprobada no tiene snapshot histórico; registre nuevamente su aprobación antes de retirarla."
+                });
+
             var actorId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             settings.FiscalProfileStatus = FiscalProfileStatus.Retirado;
             settings.FiscalRetiredAt = DateTime.UtcNow;
             settings.FiscalRetiredByUserId = actorId;
             settings.FiscalRetirementReason = request.Reason.Trim();
+            revision.Status = FiscalProfileStatus.Retirado;
+            revision.RetiredAt = settings.FiscalRetiredAt;
+            revision.RetiredByUserId = actorId;
+            revision.RetirementReason = settings.FiscalRetirementReason;
             await _repo.UpdateAsync(settings);
             await _auditService.LogAsync(actorId, "RetireFiscalProfile", nameof(BusinessSettings), settings.Id, new
             {

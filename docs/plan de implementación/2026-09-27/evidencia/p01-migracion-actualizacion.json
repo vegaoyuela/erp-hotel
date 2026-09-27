@@ -1,0 +1,19 @@
+{
+  "generated_at": "2026-09-27T20:07:53.864099+00:00",
+  "status": "passed",
+  "contains_secret_values": false,
+  "source_classification": "synthetic-qa",
+  "backup_sha256": "ac377234683bcee061212fdcbf8ebc8ac317037d8952bb197d856d69c0cbfbd2",
+  "temporary_database": "hotel_erp_p01_upgrade_529756",
+  "original_data_table_counts_match": true,
+  "mismatches": {},
+  "migration_history_rows_before": 11,
+  "migration_history_rows_after": 12,
+  "legacy_profiles_moved_to_revalidation": 1,
+  "approved_profiles_after_migration": 0,
+  "draft_profiles_after_migration": 1,
+  "fiscal_profile_revision_rows": 0,
+  "database_check_constraints": 6,
+  "latest_migration": "20260927200021_AddFiscalProfileRevisionHistory",
+  "log_sha256": "ca170f400119daae4793058bbfe99dc187303da0d5489bd7ea301b2e659fe6f4"
+}

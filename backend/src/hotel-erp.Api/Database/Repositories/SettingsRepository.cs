@@ -42,6 +42,8 @@ namespace hotel_erp.Api.Database.Repositories
                 existing.FiscalRetiredAt = settings.FiscalRetiredAt;
                 existing.FiscalRetiredByUserId = settings.FiscalRetiredByUserId;
                 existing.FiscalRetirementReason = settings.FiscalRetirementReason;
+                existing.FiscalDecisionManifestSha256 = settings.FiscalDecisionManifestSha256;
+                existing.FiscalEvidenceReference = settings.FiscalEvidenceReference;
                 existing.PrintPrinterName = settings.PrintPrinterName;
                 existing.PrintWidth = settings.PrintWidth;
                 existing.PrintLogoHeight = settings.PrintLogoHeight;

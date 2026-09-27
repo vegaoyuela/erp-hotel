@@ -342,12 +342,35 @@ public class AuthenticationFlowTests
         approvalRequest.Content = JsonContent.Create(new
         {
             validFrom = HondurasToday(),
-            approvalNote = "Perfil sintético aprobado por prueba automatizada"
+            approvalNote = "Perfil sintético aprobado por prueba automatizada",
+            decisionManifestSha256 = new string('a', 64),
+            evidenceReference = "EXP-SINTETICO-INTEGRACION-001"
         });
         var approvalResponse = await client.SendAsync(approvalRequest);
         Assert.Equal(HttpStatusCode.OK, approvalResponse.StatusCode);
         var approvedProfile = (await approvalResponse.Content.ReadFromJsonAsync<BusinessSettingsDto>())!;
         Assert.Equal(FiscalProfileStatus.Aprobado.ToString(), approvedProfile.FiscalProfileStatus);
+        Assert.Equal(new string('a', 64), approvedProfile.FiscalDecisionManifestSha256);
+
+        using var repeatedApprovalRequest = Authorized(HttpMethod.Post, "/api/settings/business/approve", currentSession.AccessToken!);
+        repeatedApprovalRequest.Content = JsonContent.Create(new
+        {
+            validFrom = HondurasToday(),
+            approvalNote = "Intento de alterar una versión fiscal ya aprobada",
+            decisionManifestSha256 = new string('b', 64),
+            evidenceReference = "EXP-SINTETICO-INTEGRACION-002"
+        });
+        var repeatedApprovalResponse = await client.SendAsync(repeatedApprovalRequest);
+        Assert.Equal(HttpStatusCode.Conflict, repeatedApprovalResponse.StatusCode);
+
+        using var historyRequest = Authorized(HttpMethod.Get, "/api/settings/business/history", currentSession.AccessToken!);
+        var historyResponse = await client.SendAsync(historyRequest);
+        Assert.Equal(HttpStatusCode.OK, historyResponse.StatusCode);
+        var approvalHistory = (await historyResponse.Content.ReadFromJsonAsync<List<FiscalProfileRevisionDto>>())!;
+        var approvedRevision = Assert.Single(approvalHistory);
+        Assert.Equal(approvedProfile.FiscalProfileVersion, approvedRevision.Version);
+        Assert.Equal(FiscalProfileStatus.Aprobado.ToString(), approvedRevision.Status);
+        Assert.Equal(64, approvedRevision.SnapshotSha256.Length);
 
         var caiId = await CreateActiveCaiAsync(factory.Services);
         var invoiceIdempotencyKey = Guid.NewGuid().ToString("D");
@@ -500,6 +523,21 @@ public class AuthenticationFlowTests
         Assert.Equal(HttpStatusCode.OK, retirementResponse.StatusCode);
         var retiredProfile = (await retirementResponse.Content.ReadFromJsonAsync<BusinessSettingsDto>())!;
         Assert.Equal(FiscalProfileStatus.Retirado.ToString(), retiredProfile.FiscalProfileStatus);
+
+        using var retiredHistoryRequest = Authorized(HttpMethod.Get, "/api/settings/business/history", currentSession.AccessToken!);
+        var retiredHistoryResponse = await client.SendAsync(retiredHistoryRequest);
+        Assert.Equal(HttpStatusCode.OK, retiredHistoryResponse.StatusCode);
+        var retiredHistory = (await retiredHistoryResponse.Content.ReadFromJsonAsync<List<FiscalProfileRevisionDto>>())!;
+        Assert.Equal(FiscalProfileStatus.Retirado.ToString(), Assert.Single(retiredHistory).Status);
+
+        using var newDraftRequest = Authorized(HttpMethod.Put, "/api/settings/business", currentSession.AccessToken!);
+        newDraftRequest.Content = JsonContent.Create(new { phone = "2200-0001" });
+        var newDraftResponse = await client.SendAsync(newDraftRequest);
+        Assert.Equal(HttpStatusCode.OK, newDraftResponse.StatusCode);
+        var newDraft = (await newDraftResponse.Content.ReadFromJsonAsync<BusinessSettingsDto>())!;
+        Assert.Equal(FiscalProfileStatus.Borrador.ToString(), newDraft.FiscalProfileStatus);
+        Assert.Equal(retiredProfile.FiscalProfileVersion + 1, newDraft.FiscalProfileVersion);
+        Assert.Null(newDraft.FiscalDecisionManifestSha256);
 
         using var repeatedInvoiceAfterRetirementRequest = InvoiceRequest(currentSession.AccessToken!, caiId, invoiceIdempotencyKey);
         var repeatedInvoiceAfterRetirementResponse = await client.SendAsync(repeatedInvoiceAfterRetirementRequest);

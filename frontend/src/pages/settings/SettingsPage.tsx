@@ -69,6 +69,8 @@ const fiscalSignature = (settings: BusinessSettings) => JSON.stringify([
   settings.businessName.trim(),
   settings.rtn.trim(),
   settings.address.trim(),
+  settings.phone.trim(),
+  settings.email.trim().toLowerCase(),
   settings.isvRate,
   settings.touristTaxRate,
 ])
@@ -91,6 +93,8 @@ export default function SettingsPage() {
   const [validFrom, setValidFrom] = useState(todayInHonduras())
   const [validUntil, setValidUntil] = useState('')
   const [approvalNote, setApprovalNote] = useState('')
+  const [decisionManifestSha256, setDecisionManifestSha256] = useState('')
+  const [evidenceReference, setEvidenceReference] = useState('')
   const [retirementReason, setRetirementReason] = useState('')
   const [fiscalActionLoading, setFiscalActionLoading] = useState(false)
   const [confirmRetirement, setConfirmRetirement] = useState(false)
@@ -111,6 +115,8 @@ export default function SettingsPage() {
       setValidFrom(data.fiscalValidFrom || todayInHonduras())
       setValidUntil(data.fiscalValidUntil || '')
       setApprovalNote(data.fiscalApprovalNote || '')
+      setDecisionManifestSha256(data.fiscalDecisionManifestSha256 || '')
+      setEvidenceReference(data.fiscalEvidenceReference || '')
       setRetirementReason(data.fiscalRetirementReason || '')
       setCustomSlider(!PAPER_PRESETS.some(p => p.width === (data.printWidth ?? 46)))
     } catch (error: unknown) {
@@ -197,6 +203,14 @@ export default function SettingsPage() {
       setOperationAlert({ variant: 'error', message: 'La nota de aprobación debe explicar la revisión realizada (mínimo 10 caracteres).' })
       return
     }
+    if (!/^[a-f0-9]{64}$/i.test(decisionManifestSha256.trim())) {
+      setOperationAlert({ variant: 'error', message: 'Ingrese el SHA-256 de 64 caracteres generado al validar el expediente DEC-01–DEC-15.' })
+      return
+    }
+    if (evidenceReference.trim().length < 5) {
+      setOperationAlert({ variant: 'error', message: 'Indique la referencia externa donde se custodia el expediente aprobado.' })
+      return
+    }
 
     setFiscalActionLoading(true)
     setOperationAlert(null)
@@ -205,6 +219,8 @@ export default function SettingsPage() {
         validFrom,
         validUntil: validUntil || null,
         approvalNote: approvalNote.trim(),
+        decisionManifestSha256: decisionManifestSha256.trim().toLowerCase(),
+        evidenceReference: evidenceReference.trim(),
       })
       setS(prev => ({ ...prev, ...data }))
       setOperationAlert({ variant: 'success', message: `Perfil fiscal v${data.fiscalProfileVersion} aprobado. La emisión fiscal está habilitada durante su vigencia.` })
@@ -241,6 +257,7 @@ export default function SettingsPage() {
   const canManageTaxes = hasPermission('manage_taxes')
   const fiscalApproved = s.fiscalProfileStatus === 'Aprobado'
   const fiscalHasUnsavedChanges = savedFiscalSignature !== fiscalSignature(s)
+  const fiscalApprovalEvidenceReady = /^[a-f0-9]{64}$/i.test(decisionManifestSha256.trim()) && evidenceReference.trim().length >= 5
   const fiscalMissingFields = [
     !s.businessName.trim() && 'nombre del negocio',
     !/^\d{14}$/.test(s.rtn.trim()) && 'RTN de 14 dígitos',
@@ -329,15 +346,45 @@ export default function SettingsPage() {
             />
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
+          <div className="grid grid-cols-1 gap-3">
+            <div>
+              <label htmlFor="fiscal-evidence-reference" className="text-sm font-medium">Referencia externa del expediente</label>
+              <Input
+                id="fiscal-evidence-reference"
+                value={evidenceReference}
+                onChange={event => setEvidenceReference(event.target.value)}
+                disabled={!canManageTaxes || fiscalActionLoading || fiscalApproved}
+                maxLength={200}
+                placeholder="Ej.: EXP-FISCAL-2026-01"
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <label htmlFor="fiscal-decision-hash" className="text-sm font-medium">SHA-256 del expediente validado</label>
+              <Input
+                id="fiscal-decision-hash"
+                value={decisionManifestSha256}
+                onChange={event => setDecisionManifestSha256(event.target.value.trim())}
+                disabled={!canManageTaxes || fiscalActionLoading || fiscalApproved}
+                maxLength={64}
+                spellCheck={false}
+                autoComplete="off"
+                placeholder="64 caracteres hexadecimales"
+                className="mt-1 font-mono text-xs"
+              />
+              <p className="text-xs text-muted-foreground mt-1">Se guarda la referencia y el hash; los documentos fiscales permanecen fuera del sistema.</p>
+            </div>
+          </div>
+
+          {!fiscalApproved && <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
             <Button
               type="button"
               onClick={approveFiscalProfile}
-              disabled={!canManageTaxes || fiscalActionLoading || saving || fiscalHasUnsavedChanges || fiscalMissingFields.length > 0}
+              disabled={!canManageTaxes || fiscalActionLoading || saving || fiscalHasUnsavedChanges || fiscalMissingFields.length > 0 || !fiscalApprovalEvidenceReady}
               className="gap-2"
             >
               {fiscalActionLoading ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle2 size={16} />}
-              {fiscalApproved ? 'Renovar aprobación' : 'Aprobar perfil fiscal'}
+              Aprobar perfil fiscal
             </Button>
             {!canManageTaxes && (
               <p className="text-xs text-muted-foreground">Su usuario puede consultar el estado, pero no aprobarlo.</p>
@@ -348,7 +395,10 @@ export default function SettingsPage() {
             {canManageTaxes && !fiscalHasUnsavedChanges && fiscalMissingFields.length > 0 && (
               <p className="text-xs text-amber-700 dark:text-amber-300">Complete {fiscalMissingFields.join(', ')} para habilitar la aprobación.</p>
             )}
-          </div>
+            {canManageTaxes && !fiscalHasUnsavedChanges && fiscalMissingFields.length === 0 && !fiscalApprovalEvidenceReady && (
+              <p className="text-xs text-amber-700 dark:text-amber-300">Valide el expediente DEC-01–DEC-15 e ingrese su referencia y SHA-256.</p>
+            )}
+          </div>}
 
           {fiscalApproved && canManageTaxes && (
             <div className="pt-4 border-t border-border space-y-3">
