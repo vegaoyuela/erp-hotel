@@ -9,6 +9,7 @@ using hotel_erp.Api.Database.Entities;
 using hotel_erp.Api.Database.Repositories;
 using hotel_erp.Api.Services;
 using hotel_erp.Api.Services.Interfaces;
+using hotel_erp.Api.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
@@ -93,6 +94,9 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<TaxService>();
 builder.Services.AddScoped<AuditService>();
+builder.Services.AddScoped<AuditChainService>();
+builder.Services.AddSingleton(TimeProvider.System);
+builder.Services.AddSingleton<IHotelClock, HotelClock>();
 builder.Services.AddScoped<IBusinessSettingsRepository, BusinessSettingsRepository>();
 builder.Services.AddScoped<IDiscountRepository, DiscountRepository>();
 builder.Services.AddScoped<ISupplierRepository, SupplierRepository>();
@@ -105,7 +109,7 @@ builder.Services.AddScoped<IdempotencyService>();
 builder.Services.AddScoped<DatabaseBackupService>();
 builder.Services.AddHostedService<BackupHostedService>();
 
-builder.Services.AddControllers()
+builder.Services.AddControllers(options => options.Filters.Add<ApiProblemDetailsFilter>())
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
@@ -119,6 +123,7 @@ builder.Services.AddProblemDetails(options =>
     {
         context.ProblemDetails.Instance = context.HttpContext.Request.Path;
         context.ProblemDetails.Extensions["traceId"] = context.HttpContext.TraceIdentifier;
+        context.ProblemDetails.Extensions["code"] = $"HTTP_{context.ProblemDetails.Status ?? StatusCodes.Status500InternalServerError}";
     };
 });
 
@@ -141,6 +146,7 @@ builder.Services.AddRateLimiter(options =>
             Instance = context.HttpContext.Request.Path
         };
         problem.Extensions["traceId"] = context.HttpContext.TraceIdentifier;
+        problem.Extensions["code"] = "HTTP_429";
 
         if (context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter))
         {
@@ -318,7 +324,7 @@ app.UseAuthorization();
 app.MapControllers();
 
 // Health check
-app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = DateTime.UtcNow }))
+app.MapGet("/health", (IHotelClock clock) => Results.Ok(new { status = "healthy", timestamp = clock.UtcNow }))
     .AllowAnonymous();
 
 if (!app.Environment.IsDevelopment() && !string.IsNullOrWhiteSpace(app.Environment.WebRootPath) && Directory.Exists(app.Environment.WebRootPath))

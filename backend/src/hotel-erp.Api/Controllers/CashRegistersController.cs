@@ -19,17 +19,20 @@ namespace hotel_erp.Api.Controllers
         private readonly ApplicationDbContext _context;
         private readonly AuditService _auditService;
         private readonly IdempotencyService _idempotencyService;
+        private readonly IHotelClock _clock;
         private readonly IMapper _mapper;
 
         public CashRegistersController(
             ApplicationDbContext context,
             AuditService auditService,
             IdempotencyService idempotencyService,
+            IHotelClock clock,
             IMapper mapper)
         {
             _context = context;
             _auditService = auditService;
             _idempotencyService = idempotencyService;
+            _clock = clock;
             _mapper = mapper;
         }
 
@@ -135,7 +138,7 @@ namespace hotel_erp.Api.Controllers
                 MovementType = CashMovementType.Apertura,
                 Amount = initialAmount,
                 Description = "Apertura de caja",
-                MovementDate = HondurasTime.Now,
+                MovementDate = _clock.HondurasNow,
                 BalanceAfter = initialAmount
             };
             _context.CashMovements.Add(movement);
@@ -220,7 +223,7 @@ namespace hotel_erp.Api.Controllers
                 Description = difference == 0m
                     ? "Cierre de caja sin diferencia"
                     : $"Cierre de caja. Diferencia: L {difference:0.00}",
-                MovementDate = HondurasTime.Now,
+                MovementDate = _clock.HondurasNow,
                 BalanceAfter = 0m,
                 ExpectedAmount = expectedAmount,
                 CountedAmount = countedAmount,

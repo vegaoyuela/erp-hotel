@@ -10,6 +10,7 @@ using hotel_erp.Api.Dtos.Cash;
 using hotel_erp.Api.Dtos.Common;
 using hotel_erp.Api.Dtos.Payments;
 using hotel_erp.Api.Services.Interfaces;
+using hotel_erp.Api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -310,6 +311,10 @@ public class AuthenticationFlowTests
         using var missingIdempotencyKeyRequest = InvoiceRequest(currentSession.AccessToken!);
         var missingIdempotencyKeyResponse = await client.SendAsync(missingIdempotencyKeyRequest);
         Assert.Equal(HttpStatusCode.BadRequest, missingIdempotencyKeyResponse.StatusCode);
+        await AssertSafeProblemDetailsAsync(
+            missingIdempotencyKeyResponse,
+            HttpStatusCode.BadRequest,
+            "Clave de idempotencia inválida");
 
         using var invoiceRequest = InvoiceRequest(currentSession.AccessToken!, idempotencyKey: Guid.NewGuid().ToString("D"));
         var invoiceResponse = await client.SendAsync(invoiceRequest);
@@ -573,6 +578,22 @@ public class AuthenticationFlowTests
         Assert.Equal(HttpStatusCode.Unauthorized, accessAfterReplay.StatusCode);
 
         currentSession = await LoginAsync(client, "Integration!567");
+
+        using var auditIntegrityRequest = Authorized(HttpMethod.Get, "/api/audit-logs/verify-integrity", currentSession.AccessToken!);
+        using var auditIntegrityResponse = await client.SendAsync(auditIntegrityRequest);
+        Assert.Equal(HttpStatusCode.OK, auditIntegrityResponse.StatusCode);
+        var auditIntegrity = (await auditIntegrityResponse.Content.ReadFromJsonAsync<AuditIntegrityResult>())!;
+        Assert.True(auditIntegrity.IsValid, auditIntegrity.ErrorMessage);
+        Assert.True(auditIntegrity.TotalRecordsVerified > 0);
+
+        using var auditExportRequest = Authorized(HttpMethod.Get, "/api/audit-logs/export-integrity", currentSession.AccessToken!);
+        using var auditExportResponse = await client.SendAsync(auditExportRequest);
+        Assert.Equal(HttpStatusCode.OK, auditExportResponse.StatusCode);
+        Assert.Equal("application/json", auditExportResponse.Content.Headers.ContentType?.MediaType);
+        Assert.Contains("hotel-erp-audit-chain-", auditExportResponse.Content.Headers.ContentDisposition?.FileNameStar);
+        var auditExport = (await auditExportResponse.Content.ReadFromJsonAsync<AuditChainExport>())!;
+        Assert.True(auditExport.Integrity.IsValid);
+        Assert.Equal(auditIntegrity.TotalRecordsVerified, auditExport.Records.Count);
 
         using var logoutRequest = Authorized(HttpMethod.Post, "/api/auth/logout", currentSession.AccessToken!);
         var logoutResponse = await client.SendAsync(logoutRequest);
@@ -2706,6 +2727,7 @@ public class AuthenticationFlowTests
         }
 
         Assert.True(json.RootElement.TryGetProperty("traceId", out _));
+        Assert.Equal($"HTTP_{(int)expectedStatus}", json.RootElement.GetProperty("code").GetString());
         Assert.DoesNotContain("unknown_operator", body, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("Incorrect!", body, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("synthetic-database-failure", body, StringComparison.OrdinalIgnoreCase);

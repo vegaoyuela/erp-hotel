@@ -15,6 +15,7 @@ import {
   Loader2,
   X,
   Hash,
+  Download,
 } from 'lucide-react'
 
 interface AuditLog {
@@ -39,6 +40,7 @@ interface IntegrityResult {
   totalRecordsVerified: number
   verifiedAt: string
   errorMessage?: string | null
+  errorCode?: string | null
   brokenLogId?: string | null
 }
 
@@ -46,6 +48,7 @@ export default function AuditLogsPage() {
   const [logs, setLogs] = useState<AuditLog[]>([])
   const [loading, setLoading] = useState(true)
   const [verifying, setVerifying] = useState(false)
+  const [exporting, setExporting] = useState(false)
   const [integrityResult, setIntegrityResult] = useState<IntegrityResult | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedAction, setSelectedAction] = useState('')
@@ -93,6 +96,30 @@ export default function AuditLogsPage() {
       setAlertInfo({ variant: 'error', message: 'No se pudo completar la verificación criptográfica.' })
     } finally {
       setVerifying(false)
+    }
+  }
+
+  const exportIntegrity = async () => {
+    setExporting(true)
+    try {
+      const response = await api.get<Blob>('/audit-logs/export-integrity', { responseType: 'blob' })
+      const disposition = response.headers['content-disposition'] as string | undefined
+      const encodedName = disposition?.match(/filename\*=UTF-8''([^;]+)/i)?.[1]
+      const plainName = disposition?.match(/filename="?([^";]+)"?/i)?.[1]
+      const fileName = encodedName ? decodeURIComponent(encodedName) : plainName || 'hotel-erp-audit-chain.json'
+      const url = window.URL.createObjectURL(response.data)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = fileName
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      window.URL.revokeObjectURL(url)
+      setAlertInfo({ variant: 'success', message: 'Expediente de integridad exportado correctamente.' })
+    } catch {
+      setAlertInfo({ variant: 'error', message: 'No se pudo exportar el expediente de integridad.' })
+    } finally {
+      setExporting(false)
     }
   }
 
@@ -146,7 +173,7 @@ export default function AuditLogsPage() {
             Registro inmutable de transacciones, eventos del sistema y verificación de integridad criptográfica SHA-256.
           </p>
         </div>
-        <div className="flex items-center gap-2.5">
+        <div className="flex flex-wrap items-center gap-2.5 sm:justify-end">
           <Button variant="outline" onClick={loadLogs} disabled={loading} className="gap-1.5">
             <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
             Actualizar
@@ -158,6 +185,10 @@ export default function AuditLogsPage() {
           >
             {verifying ? <Loader2 size={14} className="animate-spin" /> : <Hash size={14} />}
             Verificar Integridad SHA-256
+          </Button>
+          <Button variant="outline" onClick={exportIntegrity} disabled={exporting} className="gap-1.5">
+            {exporting ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />}
+            Exportar evidencia
           </Button>
         </div>
       </div>

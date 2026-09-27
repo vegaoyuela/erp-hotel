@@ -87,6 +87,7 @@ No se debe adelantar una fase que pueda consumir correlativos, modificar histori
 8. [Registro de pruebas de factura](registro-pruebas-factura-windows.md)
 9. [Registro de pendientes y bloqueos](08-registro-pendientes.md)
 10. [Expediente P01 y validador N01–N06](p01-expediente/README.md)
+11. [P02 — Ejecución de base técnica](p02-base-tecnica/README.md)
 
 Este plan complementa las listas existentes de [implementación SAR](../../implementacion-sar/README.md), el [catálogo de 186 pruebas](../../plan-sar-2026-09-07/03-pruebas-y-aprobacion.md) y la [trazabilidad de 64 hallazgos](../../plan-sar-2026-09-07/04-trazabilidad.md). Si existe una diferencia, prevalece la condición más estricta hasta que se documente la decisión.
 

@@ -53,15 +53,18 @@ namespace hotel_erp.Api.Controllers
         private readonly IInvoiceRepository _invoiceRepo;
         private readonly IPurchaseInvoiceRepository _purchaseRepo;
         private readonly IAccountingRepository _accountingRepo;
+        private readonly IHotelClock _clock;
 
         public ReportsController(
             IInvoiceRepository invoiceRepo,
             IPurchaseInvoiceRepository purchaseRepo,
-            IAccountingRepository accountingRepo)
+            IAccountingRepository accountingRepo,
+            IHotelClock clock)
         {
             _invoiceRepo = invoiceRepo;
             _purchaseRepo = purchaseRepo;
             _accountingRepo = accountingRepo;
+            _clock = clock;
         }
 
         [HttpGet("tax-summary")]
@@ -133,7 +136,7 @@ namespace hotel_erp.Api.Controllers
         [HttpGet("financial/balance-sheet")]
         public async Task<ActionResult<BalanceSheetDto>> GetBalanceSheet([FromQuery] DateTime? asOfDate)
         {
-            var date = asOfDate ?? DateTime.UtcNow;
+            var date = asOfDate ?? _clock.HondurasNow;
             var asOf = DateOnly.FromDateTime(date);
             var accounts = await _accountingRepo.GetAllAccountsAsync();
             var assets = new List<FinancialStatementLineDto>();

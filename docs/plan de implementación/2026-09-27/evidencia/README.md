@@ -62,3 +62,18 @@ Al actualizar desde el esquema anterior, cualquier perfil marcado como aprobado 
 La base sintética se restauró desde el dump P00 después de que una invocación de mantenimiento de EF apuntara a su última migración aplicada; la restauración volvió a coincidir exactamente en 42 tablas y 345 filas antes de continuar. No existió intervención sobre datos oficiales.
 
 P01 no está aprobada para producción. Faltan el expediente oficial externo, DEC-01–DEC-15, las firmas de gerente y contador y la ejecución de N01–N06 con `--require-official`.
+
+## P02 — base técnica, primera entrega
+
+La primera entrega de P02 reemplaza la fecha global estática por un reloj inyectable en los flujos operativos, normaliza los errores 4xx de controladores y consolida la generación, verificación y exportación de la cadena de auditoría. El frontend incorpora la descarga del expediente de integridad.
+
+La comprobación de compatibilidad encontró que el formato histórico calculaba el hash antes de que PostgreSQL redujera el timestamp de ticks de 100 ns a microsegundos. La cadena sintética conserva una raíz y 73 enlaces válidos. Seis hashes coinciden directamente y 67 se validan recuperando una de las diez variantes posibles del tick perdido; ningún registro fue reescrito. Los eventos nuevos se firman con precisión normalizada a microsegundos.
+
+| Archivo | Resultado |
+|---|---|
+| [p02-auditoria-compatibilidad.json](p02-auditoria-compatibilidad.json) | Los 73 registros sintéticos existentes validan; una raíz, sin bifurcaciones ni enlaces ausentes. |
+| [p02-modelo-ef.log](p02-modelo-ef.log) | EF Core confirma que el modelo no requiere una migración adicional. |
+| [p02-qa-resumen.json](p02-qa-resumen.json) | Resumen estructurado, estado de G2 y hashes SHA-256 de esta entrega. |
+| [p02-qa.log](p02-qa.log) | Build sin advertencias, 83 unitarias, 4 integraciones PostgreSQL, 5 pruebas N01–N06, auditoría npm, lint y frontend aprobados. |
+
+P02 continúa abierta. Faltan la extracción de casos de uso, la unidad de trabajo, las interfaces restantes, la descripción OpenAPI completa, la validación automática de tipos TypeScript, la matriz formal API/DAT/SEC y la revisión técnica independiente. El estado preciso se mantiene en [P02 — ejecución de base técnica](../p02-base-tecnica/README.md).

@@ -6,6 +6,7 @@ using hotel_erp.Api.Dtos.Cash;
 using hotel_erp.Api.Dtos.Accounting;
 using hotel_erp.Api.Dtos.Payments;
 using AutoMapper;
+using hotel_erp.Api.Services;
 using CustomerDto = hotel_erp.Api.Dtos.Customer.CustomerDto;
 using CreateCustomerRequest = hotel_erp.Api.Dtos.Customer.CreateCustomerRequest;
 using UpdateCustomerRequest = hotel_erp.Api.Dtos.Customer.UpdateCustomerRequest;
@@ -63,11 +64,11 @@ namespace hotel_erp.Api.Dtos.Mappings
             // Invoice
             CreateMap<CAI, CAIDto>()
                 .ForMember(d => d.Status, o => o.MapFrom(s => s.Status.ToString()))
-                .ForMember(d => d.IsExpiringSoon, o => o.MapFrom(s => s.DueDate <= DateOnly.FromDateTime(DateTime.UtcNow.AddDays(30))));
+                .ForMember(d => d.IsExpiringSoon, o => o.MapFrom<CaiExpiringSoonResolver>());
             CreateMap<DocumentAuthorization, DocumentAuthorizationDto>()
                 .ForMember(d => d.DocumentType, o => o.MapFrom(s => s.DocumentType.ToString()))
                 .ForMember(d => d.Status, o => o.MapFrom(s => s.Status.ToString()))
-                .ForMember(d => d.IsExpiringSoon, o => o.MapFrom(s => s.DueDate <= DateOnly.FromDateTime(DateTime.UtcNow.AddDays(30))))
+                .ForMember(d => d.IsExpiringSoon, o => o.MapFrom<DocumentAuthorizationExpiringSoonResolver>())
                 .ForMember(d => d.HasAttachment, o => o.MapFrom(s => !string.IsNullOrEmpty(s.AttachmentPath)));
             CreateMap<Invoice, InvoiceDto>()
                 .ForMember(d => d.CAINumber, o => o.MapFrom(s => s.CAINumberSnapshot ?? s.CAI.CAINumber))
@@ -196,5 +197,21 @@ namespace hotel_erp.Api.Dtos.Mappings
                 .ForMember(d => d.AccountNumber, o => o.MapFrom(s => s.Account.AccountNumber))
                 .ForMember(d => d.AccountName, o => o.MapFrom(s => s.Account.AccountName));
         }
+    }
+
+    public sealed class CaiExpiringSoonResolver(IHotelClock clock) : IValueResolver<CAI, CAIDto, bool>
+    {
+        public bool Resolve(CAI source, CAIDto destination, bool destinationMember, ResolutionContext context) =>
+            source.DueDate <= clock.Today.AddDays(30);
+    }
+
+    public sealed class DocumentAuthorizationExpiringSoonResolver(IHotelClock clock)
+        : IValueResolver<DocumentAuthorization, DocumentAuthorizationDto, bool>
+    {
+        public bool Resolve(
+            DocumentAuthorization source,
+            DocumentAuthorizationDto destination,
+            bool destinationMember,
+            ResolutionContext context) => source.DueDate <= clock.Today.AddDays(30);
     }
 }

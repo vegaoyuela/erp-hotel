@@ -13,7 +13,7 @@ namespace hotel_erp.Api.Services
 
     internal static class PostgresCorrelativeLock
     {
-        public static async Task<T> ExecuteAsync<T>(ApplicationDbContext context, string lockName, Func<Task<T>> action, CancellationToken cancellationToken = default)
+        public static async Task<T> ExecuteAsync<T>(ApplicationDbContext context, IHotelClock clock, string lockName, Func<Task<T>> action, CancellationToken cancellationToken = default)
         {
             await using var ownedTransaction = context.Database.CurrentTransaction is null
                 ? await context.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted, cancellationToken)
@@ -22,7 +22,7 @@ namespace hotel_erp.Api.Services
             // PostgreSQL Transaction Advisory Lock ensures single-worker execution per lockName across all nodes/threads
             await context.Database.ExecuteSqlInterpolatedAsync($"SELECT pg_advisory_xact_lock(hashtext({lockName}));", cancellationToken);
 
-            var now = DateTime.UtcNow;
+            var now = clock.UtcNow;
             await context.Database.ExecuteSqlInterpolatedAsync(
                 $"INSERT INTO \"CorrelativeLocks\" (\"LockName\", \"UpdatedAt\") VALUES ({lockName}, {now}) ON CONFLICT (\"LockName\") DO UPDATE SET \"UpdatedAt\" = {now};", 
                 cancellationToken);

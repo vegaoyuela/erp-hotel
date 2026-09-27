@@ -21,6 +21,7 @@ namespace hotel_erp.Api.Controllers
         private readonly IAccountingService _accountingService;
         private readonly AuditService _auditService;
         private readonly IdempotencyService _idempotencyService;
+        private readonly IHotelClock _clock;
         private readonly IMapper _mapper;
 
         public CardSettlementsController(
@@ -28,12 +29,14 @@ namespace hotel_erp.Api.Controllers
             IAccountingService accountingService,
             AuditService auditService,
             IdempotencyService idempotencyService,
+            IHotelClock clock,
             IMapper mapper)
         {
             _context = context;
             _accountingService = accountingService;
             _auditService = auditService;
             _idempotencyService = idempotencyService;
+            _clock = clock;
             _mapper = mapper;
         }
 
@@ -114,7 +117,7 @@ namespace hotel_erp.Api.Controllers
                 return BadRequest("Idempotency-Key debe ser un UUID válido");
             if (request.SettlementDate == default)
                 return BadRequest("La fecha de liquidación es obligatoria");
-            if (request.SettlementDate > HondurasTime.Today)
+            if (request.SettlementDate > _clock.Today)
                 return BadRequest("La fecha de liquidación no puede estar en el futuro");
 
             var grossAmount = TaxService.RoundCurrency(request.GrossAmount);

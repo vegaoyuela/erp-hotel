@@ -5,7 +5,14 @@ namespace hotel_erp.Api.Database
 {
     public class ApplicationDbContext : DbContext
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
+        private readonly TimeProvider _timeProvider;
+
+        public ApplicationDbContext(
+            DbContextOptions<ApplicationDbContext> options,
+            TimeProvider? timeProvider = null) : base(options)
+        {
+            _timeProvider = timeProvider ?? TimeProvider.System;
+        }
 
         // Auth & Security
         public DbSet<User> Users => Set<User>();
@@ -753,17 +760,18 @@ namespace hotel_erp.Api.Database
 
         private void UpdateTimestamps()
         {
+            var utcNow = _timeProvider.GetUtcNow().UtcDateTime;
             var entries = ChangeTracker
                 .Entries()
                 .Where(e => e.Entity is BaseEntity && (e.State == EntityState.Added || e.State == EntityState.Modified));
 
             foreach (var entityEntry in entries)
             {
-                ((BaseEntity)entityEntry.Entity).UpdatedAt = DateTime.UtcNow;
+                ((BaseEntity)entityEntry.Entity).UpdatedAt = utcNow;
 
                 if (entityEntry.State == EntityState.Added)
                 {
-                    ((BaseEntity)entityEntry.Entity).CreatedAt = DateTime.UtcNow;
+                    ((BaseEntity)entityEntry.Entity).CreatedAt = utcNow;
                 }
 
                 if (entityEntry.State == EntityState.Modified)
@@ -771,7 +779,7 @@ namespace hotel_erp.Api.Database
                     var entity = (BaseEntity)entityEntry.Entity;
                     if (entity.IsDeleted && entity.DeletedAt == null)
                     {
-                        entity.DeletedAt = DateTime.UtcNow;
+                        entity.DeletedAt = utcNow;
                     }
                 }
             }

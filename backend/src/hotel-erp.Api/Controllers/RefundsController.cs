@@ -21,6 +21,7 @@ namespace hotel_erp.Api.Controllers
         private readonly IAccountingService _accountingService;
         private readonly AuditService _auditService;
         private readonly IdempotencyService _idempotencyService;
+        private readonly IHotelClock _clock;
         private readonly IMapper _mapper;
 
         public RefundsController(
@@ -28,12 +29,14 @@ namespace hotel_erp.Api.Controllers
             IAccountingService accountingService,
             AuditService auditService,
             IdempotencyService idempotencyService,
+            IHotelClock clock,
             IMapper mapper)
         {
             _context = context;
             _accountingService = accountingService;
             _auditService = auditService;
             _idempotencyService = idempotencyService;
+            _clock = clock;
             _mapper = mapper;
         }
 
@@ -264,7 +267,7 @@ namespace hotel_erp.Api.Controllers
                     return BadRequest("La devolución por tarjeta o transferencia requiere una referencia de al menos 3 caracteres");
             }
 
-            var now = HondurasTime.Now;
+            var now = _clock.HondurasNow;
             var refundId = Guid.CreateVersion7();
             var recordedBy = await _context.Users.SingleAsync(user => user.Id == userId);
             var refund = new Refund

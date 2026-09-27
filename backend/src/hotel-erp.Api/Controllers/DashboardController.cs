@@ -14,17 +14,19 @@ namespace hotel_erp.Api.Controllers
     public class DashboardController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IHotelClock _clock;
 
-        public DashboardController(ApplicationDbContext context)
+        public DashboardController(ApplicationDbContext context, IHotelClock clock)
         {
             _context = context;
+            _clock = clock;
         }
 
         [HttpGet("summary")]
         public async Task<ActionResult<DashboardSummaryDto>> GetSummary()
         {
-            var today = HondurasTime.Today;
-            var todayStart = HondurasTime.Now.Date;
+            var today = _clock.Today;
+            var todayStart = _clock.HondurasNow.Date;
             var todayEnd = todayStart.AddDays(1);
 
             var occupiedStatuses = new[] { RoomStatus.Ocupada };
@@ -106,12 +108,12 @@ namespace hotel_erp.Api.Controllers
                     Severity = "warning"
                 });
             }
-            if (activeDocAuth.Any(d => d.DueDate <= DateOnly.FromDateTime(DateTime.UtcNow.AddDays(30))))
+            if (activeDocAuth.Any(d => d.DueDate <= _clock.Today.AddDays(30)))
             {
                 alerts.Add(new DashboardAlertDto
                 {
                     Title = "Autorización fiscal próxima a vencer",
-                    Description = $"{activeDocAuth.Count(d => d.DueDate <= DateOnly.FromDateTime(DateTime.UtcNow.AddDays(30)))} autorización(es) requieren revisión.",
+                    Description = $"{activeDocAuth.Count(d => d.DueDate <= _clock.Today.AddDays(30))} autorización(es) requieren revisión.",
                     Severity = "warning"
                 });
             }

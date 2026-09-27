@@ -97,7 +97,6 @@ namespace hotel_erp.Api.Controllers
             if (request.IsActive.HasValue)
                 account.IsActive = request.IsActive.Value;
 
-            account.UpdatedAt = DateTime.UtcNow;
             await _repo.UpdateAccountAsync(account);
             return NoContent();
         }
@@ -112,7 +111,6 @@ namespace hotel_erp.Api.Controllers
             if (movements.Any())
             {
                 account.IsActive = false;
-                account.UpdatedAt = DateTime.UtcNow;
                 await _repo.UpdateAccountAsync(account);
                 return Ok(new { message = "Cuenta desactivada (tiene movimientos)" });
             }

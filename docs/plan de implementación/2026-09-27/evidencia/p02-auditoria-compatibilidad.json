@@ -1,0 +1,15 @@
+{
+  "generated_at": "2026-09-27T22:08:41.768313+00:00",
+  "source_classification": "synthetic-qa-baseline",
+  "contains_source_values": false,
+  "algorithm": "legacy SHA-256 with PostgreSQL sub-microsecond recovery",
+  "records": 73,
+  "hashes_valid": 73,
+  "exact_microsecond_hashes": 6,
+  "recovered_lost_tick_hashes": 67,
+  "roots": 1,
+  "forks": 0,
+  "missing_links": 0,
+  "records_reached_from_root": 73,
+  "valid": true
+}

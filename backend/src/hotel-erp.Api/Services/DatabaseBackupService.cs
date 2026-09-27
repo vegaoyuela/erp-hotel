@@ -12,22 +12,24 @@ namespace hotel_erp.Api.Services
         private readonly ApplicationDbContext _context;
         private readonly IConfiguration _configuration;
         private readonly BackupOptions _options;
+        private readonly IHotelClock _clock;
 
-        public DatabaseBackupService(ApplicationDbContext context, IConfiguration configuration, IOptions<BackupOptions> options)
+        public DatabaseBackupService(ApplicationDbContext context, IConfiguration configuration, IOptions<BackupOptions> options, IHotelClock clock)
         {
             _context = context;
             _configuration = configuration;
             _options = options.Value;
+            _clock = clock;
         }
 
         public async Task RunLocalBackupAsync(CancellationToken cancellationToken = default)
         {
             Directory.CreateDirectory(_options.LocalPath);
-            var fileName = $"hotel_erp_{DateTime.UtcNow:yyyyMMdd_HHmmss}.sql";
+            var fileName = $"hotel_erp_{_clock.UtcNow:yyyyMMdd_HHmmss}.sql";
             var fullPath = Path.Combine(_options.LocalPath, fileName);
             var log = new BackupLog
             {
-                StartedAt = DateTime.UtcNow,
+                StartedAt = _clock.UtcNow,
                 LocalPath = fullPath,
                 FileName = fileName,
                 Status = BackupStatus.CreatedLocal
@@ -39,14 +41,14 @@ namespace hotel_erp.Api.Services
                 var info = new FileInfo(fullPath);
                 log.SizeBytes = info.Length;
                 log.Sha256Hash = await ComputeSha256Async(fullPath, cancellationToken);
-                log.CompletedAt = DateTime.UtcNow;
+                log.CompletedAt = _clock.UtcNow;
                 log.Status = BackupStatus.PendingUpload;
             }
             catch (Exception ex)
             {
                 log.Status = BackupStatus.Failed;
                 log.ErrorMessage = ex.Message;
-                log.CompletedAt = DateTime.UtcNow;
+                log.CompletedAt = _clock.UtcNow;
             }
 
             await _context.BackupLogs.AddAsync(log, cancellationToken);
@@ -77,7 +79,7 @@ namespace hotel_erp.Api.Services
                 {
                     await ExecuteUploadCommandAsync(backup.LocalPath, cancellationToken);
                     backup.Status = BackupStatus.UploadedToDrive;
-                    backup.UploadedAt = DateTime.UtcNow;
+                    backup.UploadedAt = _clock.UtcNow;
                     backup.ErrorMessage = null;
                 }
                 catch (Exception ex)

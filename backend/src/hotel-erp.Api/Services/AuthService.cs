@@ -23,19 +23,22 @@ namespace hotel_erp.Api.Services
         private readonly IMapper _mapper;
         private readonly IConfiguration _configuration;
         private readonly ApplicationDbContext _context;
+        private readonly IHotelClock _clock;
 
         public AuthService(
             IUserRepository userRepository,
             IJwtService jwtService,
             IMapper mapper,
             IConfiguration configuration,
-            ApplicationDbContext context)
+            ApplicationDbContext context,
+            IHotelClock clock)
         {
             _userRepository = userRepository;
             _jwtService = jwtService;
             _mapper = mapper;
             _configuration = configuration;
             _context = context;
+            _clock = clock;
         }
 
         public async Task<AuthResponse> LoginAsync(LoginRequest request)
@@ -44,7 +47,7 @@ namespace hotel_erp.Api.Services
             if (user == null)
                 return new AuthResponse { Success = false, Message = "Credenciales inválidas" };
 
-            if (user.LockoutEnd.HasValue && user.LockoutEnd > DateTime.UtcNow)
+            if (user.LockoutEnd.HasValue && user.LockoutEnd > _clock.UtcNow)
                 return new AuthResponse { Success = false, Message = "Credenciales inválidas" };
 
             if (!user.IsActive)
@@ -54,14 +57,14 @@ namespace hotel_erp.Api.Services
             {
                 user.FailedLoginAttempts++;
                 if (user.FailedLoginAttempts >= 5)
-                    user.LockoutEnd = DateTime.UtcNow.AddMinutes(15);
+                    user.LockoutEnd = _clock.UtcNow.AddMinutes(15);
                 await _userRepository.UpdateAsync(user);
                 return new AuthResponse { Success = false, Message = "Credenciales inválidas" };
             }
 
             user.FailedLoginAttempts = 0;
             user.LockoutEnd = null;
-            user.LastLogin = DateTime.UtcNow;
+            user.LastLogin = _clock.UtcNow;
             await _userRepository.UpdateAsync(user);
 
             return await _jwtService.GenerateTokensAsync(user.Id);
@@ -182,7 +185,7 @@ namespace hotel_erp.Api.Services
             {
                 UserId = user.Id,
                 Token = $"RESET:{Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(token)))}",
-                ExpiresAt = DateTime.UtcNow.AddHours(1),
+                ExpiresAt = _clock.UtcNow.AddHours(1),
                 IsRevoked = false
             });
             await _context.SaveChangesAsync();
@@ -195,7 +198,7 @@ namespace hotel_erp.Api.Services
 
             var tokenHash = $"RESET:{Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(request.Token)))}";
             var resetToken = await _context.RefreshTokens
-                .FirstOrDefaultAsync(rt => rt.UserId == user.Id && rt.Token == tokenHash && !rt.IsRevoked && rt.ExpiresAt > DateTime.UtcNow);
+                .FirstOrDefaultAsync(rt => rt.UserId == user.Id && rt.Token == tokenHash && !rt.IsRevoked && rt.ExpiresAt > _clock.UtcNow);
 
             if (resetToken == null)
                 throw new UnauthorizedAccessException("Token inválido o expirado");
@@ -204,7 +207,7 @@ namespace hotel_erp.Api.Services
             user.MustChangePassword = false;
             user.SecurityVersion++;
             resetToken.IsRevoked = true;
-            resetToken.RevokedAt = DateTime.UtcNow;
+            resetToken.RevokedAt = _clock.UtcNow;
             await _userRepository.UpdateAsync(user);
             await _context.SaveChangesAsync();
             await _jwtService.RevokeAllRefreshTokensAsync(user.Id);
@@ -217,13 +220,15 @@ namespace hotel_erp.Api.Services
         private readonly IMapper _mapper;
         private readonly IConfiguration _configuration;
         private readonly ApplicationDbContext _context;
+        private readonly IHotelClock _clock;
 
-        public JwtService(IUserRepository userRepository, IMapper mapper, IConfiguration configuration, ApplicationDbContext context)
+        public JwtService(IUserRepository userRepository, IMapper mapper, IConfiguration configuration, ApplicationDbContext context, IHotelClock clock)
         {
             _userRepository = userRepository;
             _mapper = mapper;
             _configuration = configuration;
             _context = context;
+            _clock = clock;
         }
 
         public async Task<AuthResponse> GenerateTokensAsync(Guid userId)
@@ -254,7 +259,7 @@ namespace hotel_erp.Api.Services
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            var expires = DateTime.UtcNow.AddMinutes(expirationMinutes);
+            var expires = _clock.UtcNow.AddMinutes(expirationMinutes);
 
             var token = new JwtSecurityToken(
                 issuer: jwtSettings["Issuer"],
@@ -274,7 +279,7 @@ namespace hotel_erp.Api.Services
             {
                 UserId = userId,
                 Token = refreshTokenHash,
-                ExpiresAt = DateTime.UtcNow.AddDays(refreshExpirationDays),
+                ExpiresAt = _clock.UtcNow.AddDays(refreshExpirationDays),
                 IsRevoked = false
             });
             await _context.SaveChangesAsync();
@@ -301,7 +306,7 @@ namespace hotel_erp.Api.Services
                 .FirstOrDefaultAsync(refreshTokenEntity => refreshTokenEntity.Token == tokenHash);
 
             if (token is null
-                || token.ExpiresAt <= DateTime.UtcNow
+                || token.ExpiresAt <= _clock.UtcNow
                 || !token.User.IsActive
                 || token.User.IsDeleted)
                 return null;
@@ -312,7 +317,7 @@ namespace hotel_erp.Api.Services
                 return null;
             }
 
-            var consumedAt = DateTime.UtcNow;
+            var consumedAt = _clock.UtcNow;
             var affected = await _context.RefreshTokens
                 .Where(refreshTokenEntity => refreshTokenEntity.Id == token.Id && !refreshTokenEntity.IsRevoked)
                 .ExecuteUpdateAsync(setters => setters
@@ -339,7 +344,7 @@ namespace hotel_erp.Api.Services
             foreach (var token in activeTokens)
             {
                 token.IsRevoked = true;
-                token.RevokedAt = DateTime.UtcNow;
+                token.RevokedAt = _clock.UtcNow;
             }
 
             await _context.SaveChangesAsync();
@@ -352,7 +357,7 @@ namespace hotel_erp.Api.Services
                 .Where(refreshTokenEntity => refreshTokenEntity.UserId == user.Id && !refreshTokenEntity.IsRevoked)
                 .ExecuteUpdateAsync(setters => setters
                     .SetProperty(refreshTokenEntity => refreshTokenEntity.IsRevoked, true)
-                    .SetProperty(refreshTokenEntity => refreshTokenEntity.RevokedAt, DateTime.UtcNow));
+                    .SetProperty(refreshTokenEntity => refreshTokenEntity.RevokedAt, _clock.UtcNow));
             await _context.SaveChangesAsync();
         }
 

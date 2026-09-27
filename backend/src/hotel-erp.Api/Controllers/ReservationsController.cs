@@ -23,6 +23,7 @@ namespace hotel_erp.Api.Controllers
         private readonly TaxService _taxService;
         private readonly ApplicationDbContext _context;
         private readonly AuditService _auditService;
+        private readonly IHotelClock _clock;
         private readonly IMapper _mapper;
 
         public ReservationsController(
@@ -32,6 +33,7 @@ namespace hotel_erp.Api.Controllers
             TaxService taxService,
             ApplicationDbContext context,
             AuditService auditService,
+            IHotelClock clock,
             IMapper mapper)
         {
             _repo = repo;
@@ -40,6 +42,7 @@ namespace hotel_erp.Api.Controllers
             _taxService = taxService;
             _context = context;
             _auditService = auditService;
+            _clock = clock;
             _mapper = mapper;
         }
 
@@ -66,8 +69,8 @@ namespace hotel_erp.Api.Controllers
         [HttpGet("calendar")]
         public async Task<ActionResult<IEnumerable<ReservationDto>>> GetCalendar([FromQuery] DateOnly? start, [FromQuery] DateOnly? end)
         {
-            var from = start ?? DateOnly.FromDateTime(DateTime.UtcNow.AddMonths(-1));
-            var to = end ?? DateOnly.FromDateTime(DateTime.UtcNow.AddMonths(1));
+            var from = start ?? _clock.Today.AddMonths(-1);
+            var to = end ?? _clock.Today.AddMonths(1);
             return Ok(_mapper.Map<IEnumerable<ReservationDto>>(await _repo.GetByDateRangeAsync(from, to)));
         }
 
@@ -335,7 +338,7 @@ namespace hotel_erp.Api.Controllers
                 ReservationId = reservation.Id,
                 GuestId = reservation.GuestId,
                 RoomId = request.RoomId,
-                OpeningDate = HondurasTime.Now,
+                OpeningDate = _clock.HondurasNow,
                 Status = FolioStatus.Abierto,
                 TotalAmount = taxResult.Total
             };
@@ -415,7 +418,7 @@ namespace hotel_erp.Api.Controllers
             if (reservation.Status != ReservationStatus.CheckIn || reservation.Folio.Status != FolioStatus.Abierto)
                 return Conflict("La reserva y su folio no están abiertos para check-out");
 
-            reservation.Folio.ClosingDate = HondurasTime.Now;
+            reservation.Folio.ClosingDate = _clock.HondurasNow;
             reservation.Folio.Status = FolioStatus.Cerrado;
             reservation.Room.Status = RoomStatus.Limpieza;
             reservation.Status = ReservationStatus.CheckOut;

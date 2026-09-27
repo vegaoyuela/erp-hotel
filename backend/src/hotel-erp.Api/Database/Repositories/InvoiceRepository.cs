@@ -22,7 +22,12 @@ namespace hotel_erp.Api.Database.Repositories
     public class InvoiceRepository : IInvoiceRepository
     {
         private readonly ApplicationDbContext _context;
-        public InvoiceRepository(ApplicationDbContext context) => _context = context;
+        private readonly IHotelClock _clock;
+        public InvoiceRepository(ApplicationDbContext context, IHotelClock clock)
+        {
+            _context = context;
+            _clock = clock;
+        }
 
         public async Task<Invoice?> GetByIdAsync(Guid id) => await _context.Invoices
             .Include(invoice => invoice.InvoiceItems)
@@ -76,11 +81,11 @@ namespace hotel_erp.Api.Database.Repositories
 
         public async Task<string> GetNextCorrelativeAsync(Guid caiId)
         {
-            return await PostgresCorrelativeLock.ExecuteAsync(_context, $"cai:{caiId}", async () =>
+            return await PostgresCorrelativeLock.ExecuteAsync(_context, _clock, $"cai:{caiId}", async () =>
             {
                 var cai = await _context.CAIs.FirstOrDefaultAsync(c => c.Id == caiId) ?? throw new InvalidOperationException("CAI no encontrado");
                 if (cai.Status != CAIStatus.Activo) throw new InvalidOperationException("El CAI no está activo");
-                if (cai.DueDate < HondurasTime.Today) throw new InvalidOperationException("El CAI está vencido");
+                if (cai.DueDate < _clock.Today) throw new InvalidOperationException("El CAI está vencido");
 
                 var parts = cai.CurrentCorrelative.Split('-');
                 if (parts.Length != 4) throw new InvalidOperationException("Formato de correlativo inválido");

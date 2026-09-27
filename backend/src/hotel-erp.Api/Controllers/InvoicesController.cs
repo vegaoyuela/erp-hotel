@@ -29,6 +29,7 @@ namespace hotel_erp.Api.Controllers
         private readonly IdempotencyService _idempotencyService;
         private readonly ApplicationDbContext _context;
         private readonly AuditService _auditService;
+        private readonly IHotelClock _clock;
         private readonly IMapper _mapper;
 
         public InvoicesController(
@@ -41,6 +42,7 @@ namespace hotel_erp.Api.Controllers
             IdempotencyService idempotencyService,
             ApplicationDbContext context,
             AuditService auditService,
+            IHotelClock clock,
             IMapper mapper)
         {
             _repo = repo;
@@ -52,6 +54,7 @@ namespace hotel_erp.Api.Controllers
             _idempotencyService = idempotencyService;
             _context = context;
             _auditService = auditService;
+            _clock = clock;
             _mapper = mapper;
         }
 
@@ -263,7 +266,7 @@ namespace hotel_erp.Api.Controllers
             var cai = await _caiRepo.GetByIdAsync(request.CAIId);
             if (cai == null) return BadRequest("CAI no encontrado");
             if (cai.Status != CAIStatus.Activo) return BadRequest("El CAI no está activo");
-            if (cai.DueDate < HondurasTime.Today) return BadRequest("El CAI está vencido");
+            if (cai.DueDate < _clock.Today) return BadRequest("El CAI está vencido");
 
             const InvoiceDocumentType documentType = InvoiceDocumentType.Factura;
             FiscalCorrelativeResult? authorizationResult = null;
@@ -395,7 +398,7 @@ namespace hotel_erp.Api.Controllers
                 Reason = request.Reason,
                 DocumentType = documentType,
                 Status = settlementFolio is not null ? InvoiceStatus.Pagada : InvoiceStatus.Emitida,
-                InvoiceDate = HondurasTime.Now,
+                InvoiceDate = _clock.HondurasNow,
                 CashReceived = settlementFolio is not null && request.PaymentMethod == "Efectivo"
                     ? request.CashReceived
                     : null,
@@ -424,7 +427,7 @@ namespace hotel_erp.Api.Controllers
                     ExternalReference = request.PaymentMethod == "Efectivo"
                         ? string.Empty
                         : request.PaymentReference!.Trim(),
-                    PaymentDate = HondurasTime.Now,
+                    PaymentDate = _clock.HondurasNow,
                     Status = PaymentStatus.Confirmado,
                     CashRegisterId = request.PaymentMethod == "Efectivo" ? request.CashRegisterId : null
                 };
@@ -442,7 +445,7 @@ namespace hotel_erp.Api.Controllers
             if (settlementFolio is not null)
             {
                 settlementFolio.TotalAmount = calculation.TotalAmount;
-                settlementFolio.ClosingDate = HondurasTime.Now;
+                settlementFolio.ClosingDate = _clock.HondurasNow;
                 settlementFolio.Status = FolioStatus.Cerrado;
                 settlementFolio.Reservation.Status = ReservationStatus.CheckOut;
                 settlementFolio.Reservation.Version++;
@@ -461,7 +464,7 @@ namespace hotel_erp.Api.Controllers
                     MovementType = CashMovementType.Ingreso,
                     Amount = calculation.TotalAmount,
                     Description = $"Cobro {settlementPayment!.PaymentNumber} - Factura {invoice.CorrelativeNumber}",
-                    MovementDate = HondurasTime.Now,
+                    MovementDate = _clock.HondurasNow,
                     BalanceAfter = cashBalanceAfter!.Value,
                     ReferenceId = settlementPayment!.Id
                 });
@@ -671,7 +674,7 @@ namespace hotel_erp.Api.Controllers
                 IsTouristTaxExempt = original.IsTouristTaxExempt,
                 DocumentType = InvoiceDocumentType.NotaCredito,
                 Status = InvoiceStatus.Emitida,
-                InvoiceDate = HondurasTime.Now,
+                InvoiceDate = _clock.HondurasNow,
                 InvoiceItems = calculation.Items.ToList()
             };
 
@@ -804,7 +807,7 @@ namespace hotel_erp.Api.Controllers
                 IsTouristTaxExempt = original.IsTouristTaxExempt,
                 DocumentType = InvoiceDocumentType.NotaDebito,
                 Status = InvoiceStatus.Emitida,
-                InvoiceDate = HondurasTime.Now,
+                InvoiceDate = _clock.HondurasNow,
                 InvoiceItems = calculation.Items.ToList()
             };
 
@@ -835,7 +838,7 @@ namespace hotel_erp.Api.Controllers
             var cai = await _caiRepo.GetByIdAsync(caiId);
             if (cai is null) return BadRequest("CAI no encontrado");
             if (cai.Status != CAIStatus.Activo) return BadRequest("El CAI no está activo");
-            if (cai.DueDate < HondurasTime.Today) return BadRequest("El CAI está vencido");
+            if (cai.DueDate < _clock.Today) return BadRequest("El CAI está vencido");
             return null;
         }
 

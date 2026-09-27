@@ -1,0 +1,87 @@
+{
+  "generated_at": "2026-09-27T22:09:25.214520+00:00",
+  "status": "passed",
+  "contains_secret_values": false,
+  "scope": "P02-A clock, ProblemDetails and audit chain",
+  "implementation": {
+    "injected_honduras_clock": true,
+    "controller_4xx_problem_details": true,
+    "stable_http_code_and_trace_id": true,
+    "audit_chain_order_independent_verifier": true,
+    "audit_chain_json_export": true,
+    "audit_export_frontend_action": true,
+    "legacy_submicrosecond_recovery": true
+  },
+  "qa": {
+    "backend_build": {
+      "warnings": 0,
+      "errors": 0
+    },
+    "unit_tests": {
+      "passed": 83,
+      "skipped": 0,
+      "total": 83
+    },
+    "postgresql_integration_tests": {
+      "passed": 4,
+      "skipped": 0,
+      "total": 4
+    },
+    "dossier_validator_tests": {
+      "passed": 5,
+      "total": 5
+    },
+    "frontend": {
+      "npm_audit_vulnerabilities": 0,
+      "lint": "passed",
+      "production_build": "passed"
+    },
+    "ef_pending_model_changes": false
+  },
+  "audit_compatibility": {
+    "records": 73,
+    "valid": 73,
+    "direct": 6,
+    "recovered_lost_tick": 67,
+    "roots": 1,
+    "forks": 0,
+    "missing_links": 0
+  },
+  "qa_database": {
+    "table_count": 42,
+    "total_rows": 345,
+    "migration_count": 11,
+    "temporary_databases_remaining": 0,
+    "unchanged_from_p00": true
+  },
+  "gate_g2": {
+    "status": "open",
+    "reason": "P02-01/02, remaining P02-03/04, P02-05/06/07/09 and independent review P02-10 are pending."
+  },
+  "evidence": {
+    "qa": {
+      "path": "docs/plan de implementación/2026-09-27/evidencia/p02-qa.log",
+      "sha256": "b7afd3a74ec8810af2f8dffb4ee94b88d337c6176d318bec5bec89062fe76f01"
+    },
+    "ef_model": {
+      "path": "docs/plan de implementación/2026-09-27/evidencia/p02-modelo-ef.log",
+      "sha256": "815c5cd494b61a9d8737ba7653cd05fb05926e7b40a924683fa4eef4ca87566c"
+    },
+    "audit_compatibility": {
+      "path": "docs/plan de implementación/2026-09-27/evidencia/p02-auditoria-compatibilidad.json",
+      "sha256": "0c0862fb5f7662e67011506ba2ca5a4c6f8d9785d76c09bb8a148726d0cff6fe"
+    },
+    "audit_chain_service": {
+      "path": "backend/src/hotel-erp.Api/Services/AuditChainService.cs",
+      "sha256": "ae91a74ea3b890bfdd51089158e07f9dd423ae3e6ecf55277278cce0737e9df1"
+    },
+    "problem_details_filter": {
+      "path": "backend/src/hotel-erp.Api/Infrastructure/ApiProblemDetailsFilter.cs",
+      "sha256": "84e09ae2d3f3a6b724ad6c9d49b1acc729a42cd5c61fb5a9597d5ff969e147d6"
+    },
+    "hotel_clock": {
+      "path": "backend/src/hotel-erp.Api/Services/HondurasTime.cs",
+      "sha256": "fd8df03ac1a313718cd34afa435bdb3f7b0215f787e99ead5d60bbba974a2303"
+    }
+  }
+}

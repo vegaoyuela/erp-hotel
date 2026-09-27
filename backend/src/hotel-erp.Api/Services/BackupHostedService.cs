@@ -8,33 +8,35 @@ namespace hotel_erp.Api.Services
     {
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly BackupOptions _options;
+        private readonly IHotelClock _clock;
 
-        public BackupHostedService(IServiceScopeFactory scopeFactory, IOptions<BackupOptions> options)
+        public BackupHostedService(IServiceScopeFactory scopeFactory, IOptions<BackupOptions> options, IHotelClock clock)
         {
             _scopeFactory = scopeFactory;
             _options = options.Value;
+            _clock = clock;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             if (!_options.Enabled) return;
 
-            var nextBackup = GetNextRun(DateTime.Now);
-            var nextUploadSync = DateTime.Now.AddHours(_options.PendingUploadIntervalHours);
+            var nextBackup = GetNextRun(_clock.HondurasNow);
+            var nextUploadSync = _clock.HondurasNow.AddHours(_options.PendingUploadIntervalHours);
 
             while (!stoppingToken.IsCancellationRequested)
             {
-                var now = DateTime.Now;
+                var now = _clock.HondurasNow;
                 if (now >= nextBackup)
                 {
                     await RunScopedAsync(s => s.RunLocalBackupAsync(stoppingToken));
-                    nextBackup = GetNextRun(DateTime.Now.AddMinutes(1));
+                    nextBackup = GetNextRun(_clock.HondurasNow.AddMinutes(1));
                 }
 
                 if (now >= nextUploadSync)
                 {
                     await RunScopedAsync(s => s.SyncPendingUploadsAsync(stoppingToken));
-                    nextUploadSync = DateTime.Now.AddHours(_options.PendingUploadIntervalHours);
+                    nextUploadSync = _clock.HondurasNow.AddHours(_options.PendingUploadIntervalHours);
                 }
 
                 await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
@@ -55,4 +57,3 @@ namespace hotel_erp.Api.Services
         }
     }
 }
-

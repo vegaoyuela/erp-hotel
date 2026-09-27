@@ -16,15 +16,18 @@ namespace hotel_erp.Api.Controllers
         private readonly IInvoiceRepository _invoiceRepo;
         private readonly IBusinessSettingsRepository _settingsRepo;
         private readonly EscPosService _escPosService;
+        private readonly IHotelClock _clock;
 
         public PrintController(
             IInvoiceRepository invoiceRepo,
             IBusinessSettingsRepository settingsRepo,
-            EscPosService escPosService)
+            EscPosService escPosService,
+            IHotelClock clock)
         {
             _invoiceRepo = invoiceRepo;
             _settingsRepo = settingsRepo;
             _escPosService = escPosService;
+            _clock = clock;
         }
 
         [HttpGet("printers")]
@@ -102,7 +105,7 @@ namespace hotel_erp.Api.Controllers
             catch (Exception ex) { return BadRequest(new { message = ex.Message }); }
         }
 
-        private static Invoice BuildFakeInvoice(BusinessSettings settings)
+        private Invoice BuildFakeInvoice(BusinessSettings settings)
         {
             return new Invoice
             {
@@ -111,11 +114,11 @@ namespace hotel_erp.Api.Controllers
                     CAINumber = "A1B2-C3D4-E5F6-G7H8",
                     InitialRange = "001-001-01-00000001",
                     FinalRange = "001-001-01-00005000",
-                    DueDate = DateOnly.FromDateTime(DateTime.UtcNow.AddYears(2)),
+                    DueDate = _clock.Today.AddYears(2),
                     Status = CAIStatus.Activo
                 },
                 CorrelativeNumber = "001-001-01-00000001",
-                InvoiceDate = HondurasTime.Now,
+                InvoiceDate = _clock.HondurasNow,
                 CustomerName = "Juan Perez - Factura de Prueba",
                 RTNCliente = "08019012345678",
                 SubTotal = 840.34m,

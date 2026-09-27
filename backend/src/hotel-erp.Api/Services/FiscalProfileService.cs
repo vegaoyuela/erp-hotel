@@ -6,7 +6,7 @@ using System.Text.Json;
 
 namespace hotel_erp.Api.Services;
 
-public sealed class FiscalProfileService(IBusinessSettingsRepository settingsRepository)
+public sealed class FiscalProfileService(IBusinessSettingsRepository settingsRepository, IHotelClock clock)
 {
     public async Task<string?> GetOperationBlockReasonAsync()
     {
@@ -14,7 +14,7 @@ public sealed class FiscalProfileService(IBusinessSettingsRepository settingsRep
         if (settings is null || settings.FiscalProfileStatus != FiscalProfileStatus.Aprobado)
             return "El perfil fiscal está en borrador o retirado y todavía no permite emitir documentos fiscales.";
 
-        var today = HondurasTime.Today;
+        var today = clock.Today;
         if (!settings.FiscalValidFrom.HasValue || settings.FiscalValidFrom.Value > today)
             return "El perfil fiscal aprobado aún no está vigente.";
 

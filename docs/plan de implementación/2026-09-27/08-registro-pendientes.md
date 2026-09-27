@@ -48,3 +48,7 @@ Este registro separa lo que depende del código de aquello que requiere informac
 ## Regla de custodia
 
 La plantilla puede copiarse desde [expediente P01](p01-expediente/README.md), pero el archivo completado, las autorizaciones, RTN, CAI, firmas y documentos deben permanecer fuera de Git. El validador produce un reporte con hash, estados y rutas de campos; no replica los valores del expediente.
+
+## Pendientes técnicos abiertos de P02
+
+La primera entrega de P02 completó el reloj determinista, la normalización inicial de errores y el verificador/exportador de auditoría. Permanecen abiertos P02-01, P02-02, la parte restante de P02-03 y P02-04, P02-05, P02-06, la rotación de P02-07, la matriz completa P02-09 y la revisión independiente P02-10. El detalle y el orden de la siguiente entrega están en [P02 — base técnica](p02-base-tecnica/README.md).

@@ -38,15 +38,17 @@ Pendientes externos: [registro único de bloqueos](08-registro-pendientes.md). E
 
 - [ ] P02-01 Extraer casos de uso críticos de controladores.
 - [ ] P02-02 Unificar unidad de trabajo y retirar guardados parciales.
-- [ ] P02-03 Inyectar reloj, cálculo, correlativo, auditoría, impresión y respaldo.
-- [ ] P02-04 Completar OpenAPI, `ProblemDetails`, paginación, fechas y enums.
+- [ ] P02-03 Inyectar reloj, cálculo, correlativo, auditoría, impresión y respaldo. **Parcial:** reloj inyectado en flujos operativos; faltan las demás interfaces.
+- [ ] P02-04 Completar OpenAPI, `ProblemDetails`, paginación, fechas y enums. **Parcial:** errores 4xx normalizados con código y `traceId`.
 - [ ] P02-05 Generar/validar tipos frontend desde el contrato.
 - [ ] P02-06 Completar permisos y motivos/aprobaciones sensibles.
 - [ ] P02-07 Rotar secretos y separar migrador/aplicación/respaldo/bootstrap.
-- [ ] P02-08 Crear verificador/exportador de cadena de auditoría.
-- [ ] P02-09 Ejecutar API01–API05, DAT01–DAT03 y SEC01–SEC11.
+- [x] P02-08 Crear verificador/exportador de cadena de auditoría.
+- [ ] P02-09 Ejecutar API01–API05, DAT01–DAT03 y SEC01–SEC11. **Parcial:** regresión base aprobada; falta matriz formal completa.
 - [ ] P02-10 Registrar revisión técnica independiente.
 - [ ] **G2** Aprobar base técnica y seguridad.
+
+Seguimiento detallado: [ejecución P02](p02-base-tecnica/README.md).
 
 ## P03 — Núcleo fiscal, monetario y contable
 

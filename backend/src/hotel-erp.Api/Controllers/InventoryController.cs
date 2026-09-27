@@ -3,6 +3,7 @@ using hotel_erp.Api.Authorization;
 using hotel_erp.Api.Database;
 using hotel_erp.Api.Database.Entities;
 using hotel_erp.Api.Dtos.Inventory;
+using hotel_erp.Api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -15,10 +16,12 @@ namespace hotel_erp.Api.Controllers
     public class InventoryController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IHotelClock _clock;
 
-        public InventoryController(ApplicationDbContext context)
+        public InventoryController(ApplicationDbContext context, IHotelClock clock)
         {
             _context = context;
+            _clock = clock;
         }
 
         [HttpGet("categories")]
@@ -201,7 +204,7 @@ namespace hotel_erp.Api.Controllers
                 NewStock = newStock,
                 ReferenceId = request.ReferenceId,
                 UserId = userId,
-                MovementDate = DateTime.UtcNow
+                MovementDate = _clock.HondurasNow
             };
 
             await _context.InventoryMovements.AddAsync(movement);

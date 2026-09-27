@@ -9,15 +9,17 @@ namespace hotel_erp.Api.Services
     public class FiscalAuthorizationService : IFiscalAuthorizationService
     {
         private readonly ApplicationDbContext _context;
+        private readonly IHotelClock _clock;
 
-        public FiscalAuthorizationService(ApplicationDbContext context)
+        public FiscalAuthorizationService(ApplicationDbContext context, IHotelClock clock)
         {
             _context = context;
+            _clock = clock;
         }
 
         public async Task<FiscalCorrelativeResult> GetNextCorrelativeAsync(InvoiceDocumentType documentType, Guid? authorizationId = null)
         {
-            return await PostgresCorrelativeLock.ExecuteAsync(_context, $"auth:{documentType}", async () =>
+            return await PostgresCorrelativeLock.ExecuteAsync(_context, _clock, $"auth:{documentType}", async () =>
             {
                 var query = _context.DocumentAuthorizations.Where(a => a.DocumentType == documentType && a.Status == CAIStatus.Activo);
                 var authorization = authorizationId.HasValue
@@ -27,7 +29,7 @@ namespace hotel_erp.Api.Services
                 if (authorization == null)
                     throw new InvalidOperationException($"No hay autorización fiscal activa para {documentType}");
 
-                var now = DateOnly.FromDateTime(HondurasTime.Now);
+                var now = _clock.Today;
                 if (authorization.DueDate < now)
                 {
                     authorization.Status = CAIStatus.Vencido;

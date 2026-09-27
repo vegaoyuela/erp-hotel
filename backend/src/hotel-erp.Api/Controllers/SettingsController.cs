@@ -21,13 +21,15 @@ namespace hotel_erp.Api.Controllers
         private readonly IMapper _mapper;
         private readonly AuditService _auditService;
         private readonly ApplicationDbContext _context;
+        private readonly IHotelClock _clock;
 
-        public SettingsController(IBusinessSettingsRepository repo, IMapper mapper, AuditService auditService, ApplicationDbContext context)
+        public SettingsController(IBusinessSettingsRepository repo, IMapper mapper, AuditService auditService, ApplicationDbContext context, IHotelClock clock)
         {
             _repo = repo;
             _mapper = mapper;
             _auditService = auditService;
             _context = context;
+            _clock = clock;
         }
 
         [HttpGet("business")]
@@ -170,7 +172,7 @@ namespace hotel_erp.Api.Controllers
 
             var actorId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             settings.FiscalProfileStatus = FiscalProfileStatus.Aprobado;
-            settings.FiscalApprovedAt = DateTime.UtcNow;
+            settings.FiscalApprovedAt = _clock.UtcNow;
             settings.FiscalApprovedByUserId = actorId;
             settings.FiscalApprovalNote = request.ApprovalNote.Trim();
             settings.FiscalRetiredAt = null;
@@ -238,7 +240,7 @@ namespace hotel_erp.Api.Controllers
 
             var actorId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             settings.FiscalProfileStatus = FiscalProfileStatus.Retirado;
-            settings.FiscalRetiredAt = DateTime.UtcNow;
+            settings.FiscalRetiredAt = _clock.UtcNow;
             settings.FiscalRetiredByUserId = actorId;
             settings.FiscalRetirementReason = request.Reason.Trim();
             revision.Status = FiscalProfileStatus.Retirado;

@@ -1,6 +1,4 @@
 using System.Text.Json;
-using System.Security.Cryptography;
-using System.Text;
 using hotel_erp.Api.Services.Interfaces;
 using hotel_erp.Api.Database.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -12,22 +10,26 @@ namespace hotel_erp.Api.Services
     {
         private readonly IAuditLogRepository _auditLogRepository;
         private readonly ApplicationDbContext _context;
+        private readonly IHotelClock _clock;
 
-        public AuditService(IAuditLogRepository auditLogRepository, ApplicationDbContext context)
+        public AuditService(IAuditLogRepository auditLogRepository, ApplicationDbContext context, IHotelClock clock)
         {
             _auditLogRepository = auditLogRepository;
             _context = context;
+            _clock = clock;
         }
 
         public async Task LogAsync(Guid? userId, string action, string? entityName, Guid? entityId, object? changes = null, string? correlativeNumber = null, string? paymentMethod = null)
         {
-            await PostgresCorrelativeLock.ExecuteAsync(_context, "audit-chain", async () =>
+            await PostgresCorrelativeLock.ExecuteAsync(_context, _clock, "audit-chain", async () =>
             {
                 var previousHash = await _context.AuditLogs
-                    .OrderByDescending(a => a.Timestamp)
-                    .Select(a => a.Hash)
-                    .FirstOrDefaultAsync();
+                    .Where(candidate => candidate.Hash != null
+                        && !_context.AuditLogs.Any(next => next.PreviousHash == candidate.Hash))
+                    .Select(candidate => candidate.Hash)
+                    .SingleOrDefaultAsync();
                 var serializedChanges = changes != null ? JsonSerializer.Serialize(changes) : null;
+                var utcNow = _clock.UtcNow;
                 var auditLog = new AuditLog
                 {
                     UserId = userId,
@@ -37,21 +39,16 @@ namespace hotel_erp.Api.Services
                     CorrelativeNumber = correlativeNumber,
                     PaymentMethod = paymentMethod,
                     Changes = serializedChanges,
-                    Timestamp = DateTime.UtcNow,
-                    HondurasTimestamp = DateTime.UtcNow.AddHours(-6),
+                    Timestamp = utcNow,
+                    HondurasTimestamp = _clock.HondurasNow,
                     PreviousHash = previousHash
                 };
-                auditLog.Hash = ComputeHash($"{auditLog.PreviousHash}|{auditLog.UserId}|{auditLog.Action}|{auditLog.EntityName}|{auditLog.EntityId}|{auditLog.CorrelativeNumber}|{auditLog.PaymentMethod}|{auditLog.Changes}|{auditLog.Timestamp:O}");
+                auditLog.Hash = AuditChainService.ComputeHash(auditLog);
 
                 await _auditLogRepository.AddAsync(auditLog);
                 return true;
             });
         }
 
-        private static string ComputeHash(string value)
-        {
-            var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(value));
-            return Convert.ToHexString(bytes);
-        }
     }
 }

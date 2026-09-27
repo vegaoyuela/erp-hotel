@@ -1,8 +1,7 @@
-using System.Security.Cryptography;
-using System.Text;
 using hotel_erp.Api.Database;
 using hotel_erp.Api.Authorization;
 using hotel_erp.Api.Database.Entities;
+using hotel_erp.Api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -27,25 +26,21 @@ namespace hotel_erp.Api.Controllers
         public DateTime HondurasTimestamp { get; set; }
     }
 
-    public record AuditIntegrityResultDto
-    {
-        public bool IsValid { get; set; }
-        public int TotalRecordsVerified { get; set; }
-        public DateTime VerifiedAt { get; set; }
-        public string? ErrorMessage { get; set; }
-        public Guid? BrokenLogId { get; set; }
-    }
-
     [ApiController]
     [Route("api/audit-logs")]
     [Authorize(Policy = PermissionNames.ViewAudit)]
+    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
     public class AuditLogsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly AuditChainService _auditChain;
+        private readonly IHotelClock _clock;
 
-        public AuditLogsController(ApplicationDbContext context)
+        public AuditLogsController(ApplicationDbContext context, AuditChainService auditChain, IHotelClock clock)
         {
             _context = context;
+            _auditChain = auditChain;
+            _clock = clock;
         }
 
         [HttpGet]
@@ -109,70 +104,17 @@ namespace hotel_erp.Api.Controllers
         }
 
         [HttpGet("verify-integrity")]
-        public async Task<ActionResult<AuditIntegrityResultDto>> VerifyIntegrity()
+        public async Task<ActionResult<AuditIntegrityResult>> VerifyIntegrity(CancellationToken cancellationToken)
         {
-            var logs = await _context.AuditLogs
-                .AsNoTracking()
-                .OrderBy(a => a.Timestamp)
-                .ToListAsync();
-
-            if (logs.Count == 0)
-            {
-                return Ok(new AuditIntegrityResultDto
-                {
-                    IsValid = true,
-                    TotalRecordsVerified = 0,
-                    VerifiedAt = DateTime.UtcNow,
-                    ErrorMessage = null
-                });
-            }
-
-            string? expectedPreviousHash = null;
-            for (int i = 0; i < logs.Count; i++)
-            {
-                var log = logs[i];
-
-                if (i > 0 && log.PreviousHash != expectedPreviousHash)
-                {
-                    return Ok(new AuditIntegrityResultDto
-                    {
-                        IsValid = false,
-                        TotalRecordsVerified = i,
-                        VerifiedAt = DateTime.UtcNow,
-                        ErrorMessage = $"Discrepancia en la cadena de hashes previa en el registro #{i + 1}",
-                        BrokenLogId = log.Id
-                    });
-                }
-
-                var calculatedHash = ComputeHash($"{log.PreviousHash}|{log.UserId}|{log.Action}|{log.EntityName}|{log.EntityId}|{log.CorrelativeNumber}|{log.PaymentMethod}|{log.Changes}|{log.Timestamp:O}");
-                if (log.Hash != calculatedHash)
-                {
-                    return Ok(new AuditIntegrityResultDto
-                    {
-                        IsValid = false,
-                        TotalRecordsVerified = i,
-                        VerifiedAt = DateTime.UtcNow,
-                        ErrorMessage = $"Firma de integridad manipulada o corrupta en el registro {log.Id}",
-                        BrokenLogId = log.Id
-                    });
-                }
-
-                expectedPreviousHash = log.Hash;
-            }
-
-            return Ok(new AuditIntegrityResultDto
-            {
-                IsValid = true,
-                TotalRecordsVerified = logs.Count,
-                VerifiedAt = DateTime.UtcNow,
-                ErrorMessage = null
-            });
+            return Ok(await _auditChain.VerifyAsync(cancellationToken));
         }
 
-        private static string ComputeHash(string value)
+        [HttpGet("export-integrity")]
+        public async Task<IActionResult> ExportIntegrity(CancellationToken cancellationToken)
         {
-            var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(value));
-            return Convert.ToHexString(bytes);
+            var export = await _auditChain.ExportAsync(cancellationToken);
+            var fileName = $"hotel-erp-audit-chain-{_clock.UtcNow:yyyyMMddTHHmmssZ}.json";
+            return File(AuditChainService.SerializeExport(export), "application/json", fileName);
         }
     }
 }
