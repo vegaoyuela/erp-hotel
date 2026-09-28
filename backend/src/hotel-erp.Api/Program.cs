@@ -113,8 +113,11 @@ builder.Services.AddScoped<InvoiceApplicationService>();
 builder.Services.AddScoped<ReservationApplicationService>();
 builder.Services.AddScoped<FolioApplicationService>();
 builder.Services.AddScoped<CashRegisterApplicationService>();
+builder.Services.AddScoped<PurchaseInvoiceApplicationService>();
+builder.Services.AddScoped<InventoryApplicationService>();
 builder.Services.AddSingleton<IApplicationFailureInjector, NoOpApplicationFailureInjector>();
-builder.Services.AddScoped<DatabaseBackupService>();
+builder.Services.AddSingleton<IPostgresDumpExecutor, PostgresDumpExecutor>();
+builder.Services.AddScoped<IDatabaseBackupService, DatabaseBackupService>();
 builder.Services.AddHostedService<BackupHostedService>();
 
 builder.Services.AddControllers(options => options.Filters.Add<ApiProblemDetailsFilter>())

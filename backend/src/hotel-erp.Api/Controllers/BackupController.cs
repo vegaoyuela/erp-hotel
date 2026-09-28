@@ -12,10 +12,10 @@ namespace hotel_erp.Api.Controllers
     [Authorize(Policy = PermissionNames.ManageBackups)]
     public class BackupController : ControllerBase
     {
-        private readonly DatabaseBackupService _backupService;
+        private readonly IDatabaseBackupService _backupService;
         private readonly ApplicationDbContext _context;
 
-        public BackupController(DatabaseBackupService backupService, ApplicationDbContext context)
+        public BackupController(IDatabaseBackupService backupService, ApplicationDbContext context)
         {
             _backupService = backupService;
             _context = context;
@@ -24,14 +24,10 @@ namespace hotel_erp.Api.Controllers
         [HttpPost("manual")]
         public async Task<IActionResult> CreateManualBackup()
         {
-            await _backupService.RunLocalBackupAsync();
+            var last = await _backupService.RunLocalBackupAsync(HttpContext.RequestAborted);
 
-            var last = await _context.BackupLogs
-                .OrderByDescending(b => b.StartedAt)
-                .FirstOrDefaultAsync();
-
-            if (last == null || last.Status == hotel_erp.Api.Database.Entities.BackupStatus.Failed)
-                return BadRequest(new { message = "Error al crear el respaldo", error = last?.ErrorMessage });
+            if (last.Status == hotel_erp.Api.Database.Entities.BackupStatus.Failed)
+                return BadRequest(new { message = "Error al crear el respaldo" });
 
             if (!System.IO.File.Exists(last.LocalPath))
                 return NotFound(new { message = "Archivo de respaldo no encontrado en disco" });
@@ -65,4 +61,3 @@ namespace hotel_erp.Api.Controllers
         }
     }
 }
-

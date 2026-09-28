@@ -8,248 +8,204 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace hotel_erp.Api.Controllers
+namespace hotel_erp.Api.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+[Authorize(Policy = PermissionNames.ManageInventory)]
+public class InventoryController(
+    ApplicationDbContext context,
+    InventoryApplicationService inventoryService) : ControllerBase
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    [Authorize(Policy = PermissionNames.ManageInventory)]
-    public class InventoryController : ControllerBase
+    [HttpGet("categories")]
+    public async Task<ActionResult<IEnumerable<CategoryDto>>> GetCategories()
+        => Ok(await context.Categories
+            .AsNoTracking()
+            .OrderBy(category => category.Name)
+            .Select(category => new CategoryDto
+            {
+                Id = category.Id,
+                Name = category.Name,
+                Description = category.Description
+            })
+            .ToListAsync(HttpContext.RequestAborted));
+
+    [HttpPost("categories")]
+    public async Task<ActionResult<CategoryDto>> CreateCategory([FromBody] CreateCategoryRequest request)
     {
-        private readonly ApplicationDbContext _context;
-        private readonly IHotelClock _clock;
+        var result = await inventoryService.CreateCategoryAsync(
+            CurrentUserId(),
+            request,
+            HttpContext.RequestAborted);
+        if (!result.Succeeded)
+            return Failure(result);
 
-        public InventoryController(ApplicationDbContext context, IHotelClock clock)
+        return Ok(new CategoryDto
         {
-            _context = context;
-            _clock = clock;
-        }
-
-        [HttpGet("categories")]
-        public async Task<ActionResult<IEnumerable<CategoryDto>>> GetCategories()
-            => Ok(await _context.Categories
-                .OrderBy(c => c.Name)
-                .Select(c => new CategoryDto { Id = c.Id, Name = c.Name, Description = c.Description })
-                .ToListAsync());
-
-        [HttpPost("categories")]
-        public async Task<ActionResult<CategoryDto>> CreateCategory([FromBody] CreateCategoryRequest request)
-        {
-            if (string.IsNullOrWhiteSpace(request.Name)) return BadRequest("El nombre es obligatorio");
-            var entity = new Category { Name = request.Name.Trim(), Description = request.Description };
-            await _context.Categories.AddAsync(entity);
-            await _context.SaveChangesAsync();
-            return Ok(new CategoryDto { Id = entity.Id, Name = entity.Name, Description = entity.Description });
-        }
-
-        [HttpPut("categories/{id}")]
-        public async Task<ActionResult> UpdateCategory(Guid id, [FromBody] UpdateCategoryRequest request)
-        {
-            var entity = await _context.Categories.FirstOrDefaultAsync(c => c.Id == id);
-            if (entity == null) return NotFound();
-            if (!string.IsNullOrWhiteSpace(request.Name)) entity.Name = request.Name.Trim();
-            if (request.Description != null) entity.Description = request.Description;
-            await _context.SaveChangesAsync();
-            return NoContent();
-        }
-
-        [HttpDelete("categories/{id}")]
-        public async Task<ActionResult> DeleteCategory(Guid id)
-        {
-            var entity = await _context.Categories.FirstOrDefaultAsync(c => c.Id == id);
-            if (entity == null) return NotFound();
-            entity.IsDeleted = true;
-            await _context.SaveChangesAsync();
-            return NoContent();
-        }
-
-        [HttpGet("products")]
-        public async Task<ActionResult<IEnumerable<ProductDto>>> GetProducts([FromQuery] string? search)
-        {
-            var query = _context.Products.Include(p => p.Category).AsQueryable();
-            if (!string.IsNullOrWhiteSpace(search))
-            {
-                query = query.Where(p => p.Name.Contains(search) || (p.SKU != null && p.SKU.Contains(search)) || (p.Category != null && p.Category.Name.Contains(search)));
-            }
-
-            return Ok(await query
-                .OrderBy(p => p.Name)
-                .Select(p => new ProductDto
-                {
-                    Id = p.Id,
-                    Name = p.Name,
-                    Description = p.Description,
-                    SKU = p.SKU,
-                    CategoryId = p.CategoryId,
-                    CategoryName = p.Category != null ? p.Category.Name : null,
-                    UnitPrice = p.UnitPrice,
-                    CurrentStock = p.CurrentStock,
-                    MinStockLevel = p.MinStockLevel,
-                    IsActive = p.IsActive
-                })
-                .ToListAsync());
-        }
-
-        [HttpPost("products")]
-        public async Task<ActionResult<ProductDto>> CreateProduct([FromBody] CreateProductRequest request)
-        {
-            if (string.IsNullOrWhiteSpace(request.Name)) return BadRequest("El nombre es obligatorio");
-
-            var entity = new Product
-            {
-                Name = request.Name.Trim(),
-                Description = request.Description,
-                SKU = request.SKU,
-                CategoryId = request.CategoryId,
-                UnitPrice = request.UnitPrice,
-                CurrentStock = request.CurrentStock,
-                MinStockLevel = request.MinStockLevel,
-                IsActive = request.IsActive
-            };
-
-            await _context.Products.AddAsync(entity);
-            await _context.SaveChangesAsync();
-            return Ok(await MapProductAsync(entity.Id));
-        }
-
-        [HttpPut("products/{id}")]
-        public async Task<ActionResult> UpdateProduct(Guid id, [FromBody] UpdateProductRequest request)
-        {
-            var entity = await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
-            if (entity == null) return NotFound();
-
-            if (request.Name != null) entity.Name = request.Name.Trim();
-            if (request.Description != null) entity.Description = request.Description;
-            if (request.SKU != null) entity.SKU = request.SKU;
-            if (request.CategoryId.HasValue) entity.CategoryId = request.CategoryId;
-            if (request.UnitPrice.HasValue) entity.UnitPrice = request.UnitPrice.Value;
-            if (request.CurrentStock.HasValue) entity.CurrentStock = request.CurrentStock.Value;
-            if (request.MinStockLevel.HasValue) entity.MinStockLevel = request.MinStockLevel.Value;
-            if (request.IsActive.HasValue) entity.IsActive = request.IsActive.Value;
-
-            await _context.SaveChangesAsync();
-            return NoContent();
-        }
-
-        [HttpDelete("products/{id}")]
-        public async Task<ActionResult> DeleteProduct(Guid id)
-        {
-            var entity = await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
-            if (entity == null) return NotFound();
-            entity.IsDeleted = true;
-            await _context.SaveChangesAsync();
-            return NoContent();
-        }
-
-        [HttpGet("movements")]
-        public async Task<ActionResult<IEnumerable<InventoryMovementDto>>> GetMovements([FromQuery] Guid? productId)
-        {
-            var query = _context.InventoryMovements.Include(m => m.Product).Include(m => m.User).AsQueryable();
-            if (productId.HasValue)
-                query = query.Where(m => m.ProductId == productId.Value);
-
-            return Ok(await query
-                .OrderByDescending(m => m.MovementDate)
-                .ThenByDescending(m => m.CreatedAt)
-                .Select(m => new InventoryMovementDto
-                {
-                    Id = m.Id,
-                    ProductId = m.ProductId,
-                    ProductName = m.Product.Name,
-                    MovementType = m.MovementType.ToString(),
-                    Quantity = m.Quantity,
-                    MovementDate = m.MovementDate,
-                    UnitPrice = m.UnitPrice,
-                    TotalValue = m.TotalValue,
-                    NewStock = m.NewStock,
-                    ReferenceId = m.ReferenceId,
-                    UserName = m.User != null ? m.User.FirstName + " " + m.User.LastName : null
-                })
-                .ToListAsync());
-        }
-
-        [HttpPost("movements")]
-        public async Task<ActionResult<InventoryMovementDto>> CreateMovement([FromBody] CreateInventoryMovementRequest request)
-        {
-            var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == request.ProductId);
-            if (product == null) return NotFound("Producto no encontrado");
-            if (!Enum.TryParse<InventoryMovementType>(request.MovementType, out var movementType))
-                return BadRequest("Tipo de movimiento inválido");
-            if (request.Quantity <= 0) return BadRequest("La cantidad debe ser mayor que cero");
-
-            var currentStock = product.CurrentStock;
-            var newStock = movementType switch
-            {
-                InventoryMovementType.Entrada or InventoryMovementType.Compra => currentStock + request.Quantity,
-                InventoryMovementType.Salida or InventoryMovementType.Venta => currentStock - request.Quantity,
-                InventoryMovementType.Ajuste => request.TargetStock ?? currentStock,
-                _ => currentStock
-            };
-
-            if (newStock < 0) return BadRequest("El inventario no puede quedar negativo");
-
-            var effectiveQuantity = movementType == InventoryMovementType.Ajuste && request.TargetStock.HasValue
-                ? Math.Abs(request.TargetStock.Value - currentStock)
-                : request.Quantity;
-
-            product.CurrentStock = newStock;
-
-            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            var movement = new InventoryMovement
-            {
-                ProductId = product.Id,
-                MovementType = movementType,
-                Quantity = effectiveQuantity,
-                UnitPrice = request.UnitPrice,
-                TotalValue = request.UnitPrice.HasValue ? request.UnitPrice.Value * effectiveQuantity : null,
-                NewStock = newStock,
-                ReferenceId = request.ReferenceId,
-                UserId = userId,
-                MovementDate = _clock.HondurasNow
-            };
-
-            await _context.InventoryMovements.AddAsync(movement);
-            await _context.SaveChangesAsync();
-            return Ok(await MapMovementAsync(movement.Id));
-        }
-
-        private async Task<ProductDto?> MapProductAsync(Guid id)
-            => await _context.Products
-                .Include(p => p.Category)
-                .Where(p => p.Id == id)
-                .Select(p => new ProductDto
-                {
-                    Id = p.Id,
-                    Name = p.Name,
-                    Description = p.Description,
-                    SKU = p.SKU,
-                    CategoryId = p.CategoryId,
-                    CategoryName = p.Category != null ? p.Category.Name : null,
-                    UnitPrice = p.UnitPrice,
-                    CurrentStock = p.CurrentStock,
-                    MinStockLevel = p.MinStockLevel,
-                    IsActive = p.IsActive
-                })
-                .FirstOrDefaultAsync();
-
-        private async Task<InventoryMovementDto?> MapMovementAsync(Guid id)
-            => await _context.InventoryMovements
-                .Include(m => m.Product)
-                .Include(m => m.User)
-                .Where(m => m.Id == id)
-                .Select(m => new InventoryMovementDto
-                {
-                    Id = m.Id,
-                    ProductId = m.ProductId,
-                    ProductName = m.Product.Name,
-                    MovementType = m.MovementType.ToString(),
-                    Quantity = m.Quantity,
-                    MovementDate = m.MovementDate,
-                    UnitPrice = m.UnitPrice,
-                    TotalValue = m.TotalValue,
-                    NewStock = m.NewStock,
-                    ReferenceId = m.ReferenceId,
-                    UserName = m.User != null ? m.User.FirstName + " " + m.User.LastName : null
-                })
-                .FirstOrDefaultAsync();
+            Id = result.Value!.Id,
+            Name = result.Value.Name,
+            Description = result.Value.Description
+        });
     }
+
+    [HttpPut("categories/{id}")]
+    public async Task<ActionResult> UpdateCategory(Guid id, [FromBody] UpdateCategoryRequest request)
+    {
+        var result = await inventoryService.UpdateCategoryAsync(
+            id,
+            CurrentUserId(),
+            request,
+            HttpContext.RequestAborted);
+        return result.Succeeded ? NoContent() : Failure(result);
+    }
+
+    [HttpDelete("categories/{id}")]
+    public async Task<ActionResult> DeleteCategory(Guid id)
+    {
+        var result = await inventoryService.DeleteCategoryAsync(id, CurrentUserId(), HttpContext.RequestAborted);
+        return result.Succeeded ? NoContent() : Failure(result);
+    }
+
+    [HttpGet("products")]
+    public async Task<ActionResult<IEnumerable<ProductDto>>> GetProducts([FromQuery] string? search)
+    {
+        var query = context.Products.AsNoTracking().Include(product => product.Category).AsQueryable();
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            query = query.Where(product => product.Name.Contains(search)
+                || (product.SKU != null && product.SKU.Contains(search))
+                || (product.Category != null && product.Category.Name.Contains(search)));
+        }
+
+        return Ok(await query
+            .OrderBy(product => product.Name)
+            .Select(product => new ProductDto
+            {
+                Id = product.Id,
+                Name = product.Name,
+                Description = product.Description,
+                SKU = product.SKU,
+                CategoryId = product.CategoryId,
+                CategoryName = product.Category != null ? product.Category.Name : null,
+                UnitPrice = product.UnitPrice,
+                CurrentStock = product.CurrentStock,
+                MinStockLevel = product.MinStockLevel,
+                IsActive = product.IsActive
+            })
+            .ToListAsync(HttpContext.RequestAborted));
+    }
+
+    [HttpPost("products")]
+    public async Task<ActionResult<ProductDto>> CreateProduct([FromBody] CreateProductRequest request)
+    {
+        var result = await inventoryService.CreateProductAsync(
+            CurrentUserId(),
+            request,
+            HttpContext.RequestAborted);
+        if (!result.Succeeded)
+            return Failure(result);
+
+        return Ok(await MapProductAsync(result.Value!.Id));
+    }
+
+    [HttpPut("products/{id}")]
+    public async Task<ActionResult> UpdateProduct(Guid id, [FromBody] UpdateProductRequest request)
+    {
+        var result = await inventoryService.UpdateProductAsync(
+            id,
+            CurrentUserId(),
+            request,
+            HttpContext.RequestAborted);
+        return result.Succeeded ? NoContent() : Failure(result);
+    }
+
+    [HttpDelete("products/{id}")]
+    public async Task<ActionResult> DeleteProduct(Guid id)
+    {
+        var result = await inventoryService.DeleteProductAsync(id, CurrentUserId(), HttpContext.RequestAborted);
+        return result.Succeeded ? NoContent() : Failure(result);
+    }
+
+    [HttpGet("movements")]
+    public async Task<ActionResult<IEnumerable<InventoryMovementDto>>> GetMovements([FromQuery] Guid? productId)
+    {
+        var query = context.InventoryMovements
+            .AsNoTracking()
+            .Include(movement => movement.Product)
+            .Include(movement => movement.User)
+            .AsQueryable();
+        if (productId.HasValue)
+            query = query.Where(movement => movement.ProductId == productId.Value);
+
+        return Ok(await query
+            .OrderByDescending(movement => movement.MovementDate)
+            .ThenByDescending(movement => movement.CreatedAt)
+            .Select(movement => ToMovementDto(movement))
+            .ToListAsync(HttpContext.RequestAborted));
+    }
+
+    [HttpPost("movements")]
+    public async Task<ActionResult<InventoryMovementDto>> CreateMovement(
+        [FromBody] CreateInventoryMovementRequest request)
+    {
+        var result = await inventoryService.CreateMovementAsync(
+            CurrentUserId(),
+            request,
+            HttpContext.RequestAborted);
+        if (!result.Succeeded)
+            return Failure(result);
+
+        return Ok(await MapMovementAsync(result.Value!.Id));
+    }
+
+    private Task<ProductDto?> MapProductAsync(Guid id)
+        => context.Products
+            .AsNoTracking()
+            .Where(product => product.Id == id)
+            .Select(product => new ProductDto
+            {
+                Id = product.Id,
+                Name = product.Name,
+                Description = product.Description,
+                SKU = product.SKU,
+                CategoryId = product.CategoryId,
+                CategoryName = product.Category != null ? product.Category.Name : null,
+                UnitPrice = product.UnitPrice,
+                CurrentStock = product.CurrentStock,
+                MinStockLevel = product.MinStockLevel,
+                IsActive = product.IsActive
+            })
+            .FirstOrDefaultAsync(HttpContext.RequestAborted);
+
+    private Task<InventoryMovementDto?> MapMovementAsync(Guid id)
+        => context.InventoryMovements
+            .AsNoTracking()
+            .Include(movement => movement.Product)
+            .Include(movement => movement.User)
+            .Where(movement => movement.Id == id)
+            .Select(movement => ToMovementDto(movement))
+            .FirstOrDefaultAsync(HttpContext.RequestAborted);
+
+    private static InventoryMovementDto ToMovementDto(InventoryMovement movement)
+        => new()
+        {
+            Id = movement.Id,
+            ProductId = movement.ProductId,
+            ProductName = movement.Product.Name,
+            MovementType = movement.MovementType.ToString(),
+            Quantity = movement.Quantity,
+            MovementDate = movement.MovementDate,
+            UnitPrice = movement.UnitPrice,
+            TotalValue = movement.TotalValue,
+            NewStock = movement.NewStock,
+            ReferenceId = movement.ReferenceId,
+            UserName = movement.User != null ? movement.User.FirstName + " " + movement.User.LastName : null
+        };
+
+    private Guid CurrentUserId()
+        => Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+    private ObjectResult Failure<T>(ApplicationMutationResult<T> result)
+        where T : class
+        => StatusCode(result.FailureStatus!.Value, result.FailureDetail);
 }

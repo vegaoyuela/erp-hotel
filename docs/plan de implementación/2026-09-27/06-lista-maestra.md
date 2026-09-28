@@ -36,9 +36,9 @@ Pendientes externos: [registro único de bloqueos](08-registro-pendientes.md). E
 
 ## P02 — Base técnica, contratos y seguridad
 
-- [ ] P02-01 Extraer casos de uso críticos de controladores. **Parcial:** ya se extrajeron finanzas, documentos fiscales, reservas, check-in/out, folios y caja; faltan compras, inventario y respaldo.
-- [ ] P02-02 Unificar unidad de trabajo y retirar guardados parciales. **Parcial:** los casos extraídos tienen transacción exterior y pruebas de rollback fiscal/operativo; falta retirar persistencia implícita de repositorios y cubrir los casos restantes.
-- [ ] P02-03 Inyectar reloj, cálculo, correlativo, auditoría, impresión y respaldo. **Parcial:** reloj inyectado en flujos operativos; faltan las demás interfaces.
+- [x] P02-01 Extraer casos de uso críticos de controladores. Finanzas, documentos fiscales, reservas, check-in/out, folios, caja, compras, inventario y respaldo delegan su mutación a servicios.
+- [ ] P02-02 Unificar unidad de trabajo y retirar guardados parciales. **Parcial:** los casos extraídos tienen transacción exterior y pruebas de rollback fiscal/operativo/compras/inventario; faltan los fallos P02-B y retirar 56 guardados implícitos distribuidos en 11 archivos de repositorio.
+- [ ] P02-03 Inyectar reloj, cálculo, correlativo, auditoría, impresión y respaldo. **Parcial:** reloj y ejecución de respaldo tienen contrato; faltan las interfaces restantes.
 - [ ] P02-04 Completar OpenAPI, `ProblemDetails`, paginación, fechas y enums. **Parcial:** errores 4xx normalizados con código y `traceId`.
 - [ ] P02-05 Generar/validar tipos frontend desde el contrato.
 - [ ] P02-06 Completar permisos y motivos/aprobaciones sensibles.

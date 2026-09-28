@@ -35,4 +35,9 @@ public static class ApplicationFailureCheckpoints
     public const string CashRegisterCreateAfterPersistence = "cash-register:create:after-persistence";
     public const string CashRegisterOpenAfterPersistence = "cash-register:open:after-persistence";
     public const string CashRegisterCloseAfterPersistence = "cash-register:close:after-persistence";
+    public const string PurchaseCreateAfterPersistence = "purchase:create:after-persistence";
+    public const string PurchaseCreateAfterAccounting = "purchase:create:after-accounting";
+    public const string PurchasePayAfterPersistence = "purchase:pay:after-persistence";
+    public const string PurchaseDeleteAfterPersistence = "purchase:delete:after-persistence";
+    public const string InventoryMovementAfterPersistence = "inventory:movement:after-persistence";
 }

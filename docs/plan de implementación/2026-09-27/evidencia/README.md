@@ -112,4 +112,16 @@ La cuarta entrega traslada reservas, check-in/out, cargos de folio y ciclo de ca
 | [p02d-qa-resumen.json](p02d-qa-resumen.json) | Resumen estructurado y hashes SHA-256 de código, pruebas y evidencia. |
 | [p02d-qa.log](p02d-qa.log) | Build sin advertencias, 90 unitarias, 4 integraciones PostgreSQL con cuatro rollbacks operativos nuevos, 5 pruebas N01–N06, auditoría npm, lint y frontend aprobados. |
 
-P02-01 y P02-02 siguen parciales por compras, inventario, respaldos, repositorios con `SaveChanges` propio y fallos pendientes de P02-B.
+Al cierre de P02-D, P02-01 y P02-02 seguían parciales por compras, inventario, respaldos, repositorios con `SaveChanges` propio y fallos pendientes de P02-B.
+
+### P02-E — compras, inventario y respaldo
+
+La quinta entrega cierra P02-01. La compra y su asiento contable comparten transacción; los movimientos de inventario bloquean por producto; el respaldo manual se ejecuta mediante un contrato y un proceso `pg_dump` con argumentos separados. La prueba de integración valida rollback de compra e inventario, concurrencia de existencias y un archivo SQL real mediante tamaño y SHA-256.
+
+| Archivo | Resultado |
+|---|---|
+| [p02e-modelo-ef.log](p02e-modelo-ef.log) | EF Core confirma que la extracción no requiere migración. |
+| [p02e-qa-resumen.json](p02e-qa-resumen.json) | Resumen estructurado y hashes SHA-256 de código, pruebas y evidencia. |
+| [p02e-qa.log](p02e-qa.log) | Build sin advertencias, 93 unitarias, 4 integraciones PostgreSQL, 5 pruebas N01–N06, auditoría npm, lint y frontend aprobados. |
+
+P02 continúa abierta. P02-F cubrirá 56 guardados implícitos en 11 archivos de repositorio y los fallos inyectados pendientes de pagos, reembolsos y liquidaciones.

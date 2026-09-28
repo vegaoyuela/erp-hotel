@@ -2,7 +2,7 @@
 
 **Inicio:** 27 de septiembre de 2026
 
-**Estado:** en ejecución; entregas P02-A a P02-D aprobadas por pruebas automáticas
+**Estado:** en ejecución; entregas P02-A a P02-E aprobadas por pruebas automáticas
 
 Este registro divide P02 en entregas comprobables. No se declara G2 mientras queden controladores con lógica de negocio, repositorios que confirman cambios por su cuenta o contratos sin prueba.
 
@@ -28,9 +28,9 @@ La versión anterior calculaba el hash con ticks de 100 ns antes de guardar un `
 
 | Tarea | Estado verificable | Trabajo restante |
 |---|---|---|
-| P02-01 | Parcial | Finanzas, factura/notas, reservas, check-in/out, folios y caja ya están en servicios de aplicación; faltan compras, inventario y respaldos. |
-| P02-02 | Parcial | Los casos extraídos son dueños de su transacción exterior y los flujos fiscales/operativos tienen pruebas de rollback; faltan los demás casos, las pruebas de fallo P02-B y retirar confirmaciones implícitas de repositorios. |
-| P02-03 | Parcial | Reloj completado; faltan interfaces para cálculo, correlativo, impresión y respaldo, y mover su orquestación a servicios de aplicación. |
+| P02-01 | Completada | Finanzas, factura/notas, reservas, check-in/out, folios, caja, compras, inventario y respaldo delegan sus mutaciones a servicios. |
+| P02-02 | Parcial | Los flujos fiscales, operativos, compra e inventario tienen transacción exterior y pruebas de rollback; faltan fallos P02-B y retirar 56 confirmaciones implícitas en 11 archivos de repositorio. |
+| P02-03 | Parcial | Reloj y ejecución de respaldo tienen contrato inyectable; faltan interfaces para cálculo, correlativo e impresión. |
 | P02-04 | Parcial | `ProblemDetails`, código y `traceId` completados; faltan paginación general, convenciones de fechas/enums y descripción OpenAPI por respuesta. |
 | P02-05 | Pendiente | Generar o validar tipos TypeScript desde OpenAPI en QA. |
 | P02-06 | Parcial previo | Existe matriz de permisos y prueba reflectiva; faltan motivos/aprobaciones por monto y revalidar todas las lecturas sensibles. |
@@ -57,8 +57,16 @@ Los tres flujos fiscales incorporan puntos de fallo de prueba después de persis
 
 La integración conserva las pruebas de concurrencia para reserva, check-in y caja. Además inyecta fallos después de persistir check-in, cargo de folio, apertura y cierre de caja, y confirma que no sobreviven folios, cargos, movimientos, cambios de habitación/reserva, auditorías ni registros idempotentes.
 
+## Entrega P02-E — compras, inventario y respaldo
+
+`PurchaseInvoiceApplicationService` une factura de compra, asiento, auditoría y estado dentro de una transacción exterior. Valida líneas, separa ISV 15 % e ISV 18 %, rechaza duplicados del mismo proveedor y prueba que un fallo posterior al asiento no conserva compra, contabilidad, cuentas ni auditoría.
+
+`InventoryApplicationService` concentra catálogos, productos y movimientos. Cada movimiento toma un lock transaccional por producto antes de leer existencias. La integración provoca un fallo posterior a la persistencia y dos salidas simultáneas: el fallo revierte producto, movimiento y auditoría; de dos salidas que excederían el saldo combinado, una finaliza y la otra recibe conflicto.
+
+`IDatabaseBackupService` e `IPostgresDumpExecutor` separan la orquestación y el proceso externo. El ejecutor usa `ArgumentList`, conserva la contraseña fuera de los argumentos, registra el intento antes de ejecutar, elimina archivos parciales y devuelve un respaldo cuyo tamaño y SHA-256 se verifican contra una descarga real.
+
 ## Criterio para la siguiente entrega
 
-P02-E extraerá compras, movimientos de inventario y ejecución de respaldos. Después retirará las confirmaciones implícitas de los repositorios que todavía las conservan y añadirá pruebas de rollback a pagos, reembolsos y liquidaciones.
+P02-F retirará las confirmaciones implícitas de los repositorios que todavía las conservan y añadirá pruebas de rollback a pagos, reembolsos y liquidaciones. Después continuará con contratos de cálculo, correlativo e impresión, OpenAPI y tipos frontend.
 
 La evidencia de QA y compatibilidad se conserva en el [expediente general](../evidencia/README.md#p02--base-técnica-primera-entrega).

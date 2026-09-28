@@ -1,0 +1,132 @@
+{
+  "generated_at": "2026-09-28T03:39:21.387632+00:00",
+  "status": "passed",
+  "contains_secret_values": false,
+  "scope": "P02-E purchases, inventory and database backups",
+  "implementation": {
+    "critical_mutation_extraction_p02_01_complete": true,
+    "purchase_controller_delegates_mutations": true,
+    "purchase_and_accounting_share_outer_transaction": true,
+    "purchase_isv_15_and_18_separated": true,
+    "inventory_controller_delegates_mutations": true,
+    "inventory_product_transaction_lock": true,
+    "backup_contract_injected": true,
+    "pg_dump_uses_argument_list": true,
+    "pg_password_excluded_from_process_arguments": true,
+    "architecture_boundary_tests": true
+  },
+  "rollback_and_concurrency_proof": {
+    "purchase_failure_after_accounting": true,
+    "asserted_no_residual_purchase_accounting_accounts_or_audit": true,
+    "inventory_failure_after_persistence": true,
+    "asserted_no_residual_stock_movement_or_audit": true,
+    "concurrent_oversell_rejected": true,
+    "manual_pg_dump_downloaded": true,
+    "backup_size_and_sha256_verified": true
+  },
+  "qa": {
+    "backend_build": {
+      "warnings": 0,
+      "errors": 0
+    },
+    "unit_tests": {
+      "passed": 93,
+      "skipped": 0,
+      "total": 93
+    },
+    "postgresql_integration_tests": {
+      "passed": 4,
+      "skipped": 0,
+      "total": 4
+    },
+    "new_p02e_scenarios": {
+      "passed": 4,
+      "total": 4
+    },
+    "dossier_validator_tests": {
+      "passed": 5,
+      "total": 5
+    },
+    "frontend": {
+      "npm_audit_vulnerabilities": 0,
+      "lint": "passed",
+      "production_build": "passed"
+    },
+    "ef_pending_model_changes": false
+  },
+  "qa_database": {
+    "table_count": 42,
+    "total_rows": 345,
+    "migration_count": 11,
+    "temporary_databases_remaining": 0,
+    "unchanged_from_p00": true
+  },
+  "remaining": {
+    "p02_02": [
+      "remove 56 repository-owned save operations across 11 repository files",
+      "rollback injection tests for P02-B payment, refund and settlement workflows"
+    ],
+    "p02_03": [
+      "calculation contract",
+      "correlative contract",
+      "printing contract"
+    ],
+    "later_p02": [
+      "OpenAPI and pagination",
+      "generated frontend types",
+      "security headers",
+      "performance matrix",
+      "independent review"
+    ]
+  },
+  "evidence": {
+    "qa": {
+      "path": "docs/plan de implementación/2026-09-27/evidencia/p02e-qa.log",
+      "sha256": "ab7978c1ee6328d40c601c96eb8c0b5f3b9f8b9b794b7c3e01f7685230dda526"
+    },
+    "ef_model": {
+      "path": "docs/plan de implementación/2026-09-27/evidencia/p02e-modelo-ef.log",
+      "sha256": "17b4b833624d8f2c98eab351da13397451ba99c9f7501023a3a4f1f5f49d22a3"
+    },
+    "failure_injection": {
+      "path": "backend/src/hotel-erp.Api/Services/ApplicationFailureInjection.cs",
+      "sha256": "76313d619265547c5b40f8d1894638ef727fd5bbb99797e0fc938ef8d3d2c480"
+    },
+    "purchase_service": {
+      "path": "backend/src/hotel-erp.Api/Services/PurchaseInvoiceApplicationService.cs",
+      "sha256": "c062ca52da04ee6b600a45697028b0485370f49a225a46ff3916c061f4c63e07"
+    },
+    "inventory_service": {
+      "path": "backend/src/hotel-erp.Api/Services/InventoryApplicationService.cs",
+      "sha256": "08ba2b82a9158366b413661e8dcd733bf9ec768ae589d975ad4fecad5bb21bb0"
+    },
+    "backup_service": {
+      "path": "backend/src/hotel-erp.Api/Services/DatabaseBackupService.cs",
+      "sha256": "4ca6b88fbf6d8193aed6359b4f391a9330d5af7152cba936960219b6c683c881"
+    },
+    "dump_executor": {
+      "path": "backend/src/hotel-erp.Api/Services/PostgresDumpExecutor.cs",
+      "sha256": "a05b7cecf311a7a7b958f4ccb682a787ea7643c7dcd301e26da84ee8b406d4b6"
+    },
+    "purchase_controller": {
+      "path": "backend/src/hotel-erp.Api/Controllers/PurchaseInvoicesController.cs",
+      "sha256": "69ddea300183cbda5152b8c449fff1ec842587df226d18acc732c29601c708a8"
+    },
+    "inventory_controller": {
+      "path": "backend/src/hotel-erp.Api/Controllers/InventoryController.cs",
+      "sha256": "f7daf1f430b8d833cd93060f21444a8e24466c930e0c7a71f90370964834d010"
+    },
+    "backup_controller": {
+      "path": "backend/src/hotel-erp.Api/Controllers/BackupController.cs",
+      "sha256": "0cae0bb9ff12fd80976bb5a9624746c2370b0201ffe7f4081afe801e28f56c80"
+    },
+    "architecture_test": {
+      "path": "backend/tests/hotel-erp.UnitTests/ApplicationServiceArchitectureTests.cs",
+      "sha256": "671ea0cf1625c59b711649fa8d901b2ccb25faab43778fb0582b1d39a9ef1016"
+    },
+    "integration_test": {
+      "path": "backend/tests/hotel-erp.IntegrationTests/AuthenticationFlowTests.cs",
+      "sha256": "6774401e76cfd4d1e138de9d194db0d0094f726ce0b6931aed4bda59ddf81230"
+    }
+  }
+}

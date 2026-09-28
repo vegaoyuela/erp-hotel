@@ -29,7 +29,10 @@ namespace hotel_erp.Api.Services
                 var now = _clock.HondurasNow;
                 if (now >= nextBackup)
                 {
-                    await RunScopedAsync(s => s.RunLocalBackupAsync(stoppingToken));
+                    await RunScopedAsync(async service =>
+                    {
+                        await service.RunLocalBackupAsync(stoppingToken);
+                    });
                     nextBackup = GetNextRun(_clock.HondurasNow.AddMinutes(1));
                 }
 
@@ -43,10 +46,10 @@ namespace hotel_erp.Api.Services
             }
         }
 
-        private async Task RunScopedAsync(Func<DatabaseBackupService, Task> action)
+        private async Task RunScopedAsync(Func<IDatabaseBackupService, Task> action)
         {
             using var scope = _scopeFactory.CreateScope();
-            await action(scope.ServiceProvider.GetRequiredService<DatabaseBackupService>());
+            await action(scope.ServiceProvider.GetRequiredService<IDatabaseBackupService>());
         }
 
         private DateTime GetNextRun(DateTime from)

@@ -541,6 +541,12 @@ public class AuthenticationFlowTests
             caiId,
             database.ConnectionString);
 
+        await AssertPurchaseInventoryAndBackupAsync(
+            client,
+            factory.Services,
+            currentSession.AccessToken!,
+            database.ConnectionString);
+
         using var retirementRequest = Authorized(HttpMethod.Post, "/api/settings/business/retire", currentSession.AccessToken!);
         retirementRequest.Content = JsonContent.Create(new
         {
@@ -1278,6 +1284,277 @@ public class AuthenticationFlowTests
             await assertContext.CashMovements.CountAsync(movement => movement.CashRegisterId == cashRegisterId));
         Assert.Equal(auditsBefore, await assertContext.AuditLogs.CountAsync());
         Assert.Equal(idempotencyBefore, await assertContext.IdempotencyRecords.CountAsync());
+    }
+
+    private static async Task AssertPurchaseInventoryAndBackupAsync(
+        HttpClient client,
+        IServiceProvider services,
+        string accessToken,
+        string connectionString)
+    {
+        Guid supplierId;
+        Guid productId;
+        using (var seedScope = services.CreateScope())
+        {
+            var context = seedScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            var supplier = new Supplier
+            {
+                Id = Guid.NewGuid(),
+                Name = "Proveedor integración",
+                RTN = "08011999123457",
+                IsActive = true
+            };
+            var product = new Product
+            {
+                Id = Guid.NewGuid(),
+                Name = "Insumo integración",
+                SKU = $"QA-{Guid.NewGuid():N}"[..18],
+                UnitPrice = 25m,
+                CurrentStock = 10,
+                MinStockLevel = 2,
+                IsActive = true
+            };
+            context.AddRange(supplier, product);
+            await context.SaveChangesAsync();
+            supplierId = supplier.Id;
+            productId = product.Id;
+        }
+
+        int purchasesBefore;
+        int entriesBefore;
+        int accountsBefore;
+        int auditsBefore;
+        using (var beforeScope = services.CreateScope())
+        {
+            var context = beforeScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            purchasesBefore = await context.PurchaseInvoices.CountAsync();
+            entriesBefore = await context.AccountingEntries.CountAsync();
+            accountsBefore = await context.AccountingAccounts.CountAsync();
+            auditsBefore = await context.AuditLogs.CountAsync();
+        }
+
+        var failedPurchaseNumber = $"QA-FALLA-{Guid.NewGuid():N}";
+        await using (var failingFactory = new HotelErpWebApplicationFactory(
+            connectionString,
+            collection =>
+            {
+                collection.RemoveAll<IApplicationFailureInjector>();
+                collection.AddSingleton<IApplicationFailureInjector>(new ThrowingFailureInjector(
+                    ApplicationFailureCheckpoints.PurchaseCreateAfterAccounting));
+            }))
+        using (var failingClient = failingFactory.CreateClient(new WebApplicationFactoryClientOptions
+        {
+            AllowAutoRedirect = false
+        }))
+        using (var failedPurchaseRequest = PurchaseRequest(
+            accessToken,
+            supplierId,
+            failedPurchaseNumber))
+        using (var failedPurchaseResponse = await failingClient.SendAsync(failedPurchaseRequest))
+        {
+            await AssertSafeProblemDetailsAsync(failedPurchaseResponse, HttpStatusCode.InternalServerError);
+        }
+
+        using (var rollbackScope = services.CreateScope())
+        {
+            var context = rollbackScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            Assert.Equal(purchasesBefore, await context.PurchaseInvoices.CountAsync());
+            Assert.Equal(entriesBefore, await context.AccountingEntries.CountAsync());
+            Assert.Equal(accountsBefore, await context.AccountingAccounts.CountAsync());
+            Assert.Equal(auditsBefore, await context.AuditLogs.CountAsync());
+            Assert.False(await context.PurchaseInvoices.IgnoreQueryFilters().AnyAsync(
+                purchase => purchase.InvoiceNumber == failedPurchaseNumber));
+        }
+
+        var purchaseNumber = $"QA-COMPRA-{Guid.NewGuid():N}";
+        using var purchaseRequest = PurchaseRequest(accessToken, supplierId, purchaseNumber);
+        using var purchaseResponse = await client.SendAsync(purchaseRequest);
+        Assert.Equal(HttpStatusCode.Created, purchaseResponse.StatusCode);
+        var purchase = (await purchaseResponse.Content.ReadFromJsonAsync<PurchaseInvoiceDto>())!;
+        Assert.Equal(200m, purchase.SubTotal);
+        Assert.Equal(15m, purchase.ISV15Amount);
+        Assert.Equal(18m, purchase.ISV18Amount);
+        Assert.Equal(33m, purchase.ISVAmount);
+        Assert.Equal(233m, purchase.TotalAmount);
+
+        using (var purchaseAssertScope = services.CreateScope())
+        {
+            var context = purchaseAssertScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            var entry = await context.AccountingEntries
+                .Include(candidate => candidate.EntryItems)
+                .SingleAsync(candidate => candidate.ReferenceId == purchase.Id);
+            Assert.Equal(entry.EntryItems.Sum(item => item.Debit), entry.EntryItems.Sum(item => item.Credit));
+            Assert.Single(await context.AuditLogs.Where(log =>
+                log.Action == "CreatePurchaseInvoice" && log.EntityId == purchase.Id).ToListAsync());
+        }
+
+        int movementsBefore;
+        using (var movementBeforeScope = services.CreateScope())
+        {
+            var context = movementBeforeScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            movementsBefore = await context.InventoryMovements.CountAsync(
+                movement => movement.ProductId == productId);
+            auditsBefore = await context.AuditLogs.CountAsync();
+        }
+
+        await using (var failingFactory = new HotelErpWebApplicationFactory(
+            connectionString,
+            collection =>
+            {
+                collection.RemoveAll<IApplicationFailureInjector>();
+                collection.AddSingleton<IApplicationFailureInjector>(new ThrowingFailureInjector(
+                    ApplicationFailureCheckpoints.InventoryMovementAfterPersistence));
+            }))
+        using (var failingClient = failingFactory.CreateClient(new WebApplicationFactoryClientOptions
+        {
+            AllowAutoRedirect = false
+        }))
+        using (var failedMovementRequest = InventoryMovementRequest(accessToken, productId, 3))
+        using (var failedMovementResponse = await failingClient.SendAsync(failedMovementRequest))
+        {
+            await AssertSafeProblemDetailsAsync(failedMovementResponse, HttpStatusCode.InternalServerError);
+        }
+
+        using (var movementRollbackScope = services.CreateScope())
+        {
+            var context = movementRollbackScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            Assert.Equal(10, await context.Products
+                .Where(product => product.Id == productId)
+                .Select(product => product.CurrentStock)
+                .SingleAsync());
+            Assert.Equal(movementsBefore, await context.InventoryMovements.CountAsync(
+                movement => movement.ProductId == productId));
+            Assert.Equal(auditsBefore, await context.AuditLogs.CountAsync());
+        }
+
+        using var firstMovementRequest = InventoryMovementRequest(accessToken, productId, 7);
+        using var secondMovementRequest = InventoryMovementRequest(accessToken, productId, 7);
+        var movementResponses = await Task.WhenAll(
+            client.SendAsync(firstMovementRequest),
+            client.SendAsync(secondMovementRequest));
+        try
+        {
+            Assert.Single(movementResponses, response => response.StatusCode == HttpStatusCode.OK);
+            Assert.Single(movementResponses, response => response.StatusCode == HttpStatusCode.Conflict);
+        }
+        finally
+        {
+            foreach (var response in movementResponses) response.Dispose();
+        }
+
+        using (var concurrencyAssertScope = services.CreateScope())
+        {
+            var context = concurrencyAssertScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            Assert.Equal(3, await context.Products
+                .Where(product => product.Id == productId)
+                .Select(product => product.CurrentStock)
+                .SingleAsync());
+            Assert.Equal(movementsBefore + 1, await context.InventoryMovements.CountAsync(
+                movement => movement.ProductId == productId));
+            Assert.Single(await context.AuditLogs.Where(log =>
+                log.Action == "CreateInventoryMovement" && log.EntityId != null).ToListAsync());
+        }
+
+        await AssertManualBackupAsync(connectionString, accessToken, services);
+    }
+
+    private static HttpRequestMessage PurchaseRequest(
+        string accessToken,
+        Guid supplierId,
+        string invoiceNumber)
+    {
+        var request = Authorized(HttpMethod.Post, "/api/purchase-invoices", accessToken);
+        request.Content = JsonContent.Create(new
+        {
+            invoiceNumber,
+            supplierId,
+            invoiceDate = DateTime.UtcNow,
+            caiNumber = "CAI-COMPRA-QA",
+            supplierRtn = "08011999123457",
+            notes = "Compra sintética para validar atomicidad",
+            items = new object[]
+            {
+                new
+                {
+                    description = "Suministro gravado 15 %",
+                    quantity = 1,
+                    unitPrice = 100m,
+                    lineTotal = 0m,
+                    isExempt = false,
+                    isvRate = 0.15m
+                },
+                new
+                {
+                    description = "Suministro gravado 18 %",
+                    quantity = 2,
+                    unitPrice = 50m,
+                    lineTotal = 0m,
+                    isExempt = false,
+                    isvRate = 0.18m
+                }
+            }
+        });
+        return request;
+    }
+
+    private static HttpRequestMessage InventoryMovementRequest(
+        string accessToken,
+        Guid productId,
+        int quantity)
+    {
+        var request = Authorized(HttpMethod.Post, "/api/inventory/movements", accessToken);
+        request.Content = JsonContent.Create(new
+        {
+            productId,
+            movementType = "Salida",
+            quantity,
+            unitPrice = 25m
+        });
+        return request;
+    }
+
+    private static async Task AssertManualBackupAsync(
+        string connectionString,
+        string accessToken,
+        IServiceProvider services)
+    {
+        var backupDirectory = Path.Combine(Path.GetTempPath(), $"hotel-erp-it-backup-{Guid.NewGuid():N}");
+        try
+        {
+            await using var backupFactory = new HotelErpWebApplicationFactory(
+                connectionString,
+                configureSettings: new Dictionary<string, string?>
+                {
+                    ["Backup:LocalPath"] = backupDirectory,
+                    ["Backup:Enabled"] = "false"
+                });
+            using var backupClient = backupFactory.CreateClient(new WebApplicationFactoryClientOptions
+            {
+                AllowAutoRedirect = false
+            });
+            using var request = Authorized(HttpMethod.Post, "/api/backup/manual", accessToken);
+            using var response = await backupClient.SendAsync(request);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var payload = await response.Content.ReadAsByteArrayAsync();
+            Assert.NotEmpty(payload);
+
+            using var scope = services.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            var log = await context.BackupLogs
+                .OrderByDescending(candidate => candidate.StartedAt)
+                .FirstAsync(candidate => candidate.LocalPath.StartsWith(backupDirectory));
+            Assert.Equal(BackupStatus.PendingUpload, log.Status);
+            Assert.Equal(payload.LongLength, log.SizeBytes);
+            Assert.Equal(
+                Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(payload)),
+                log.Sha256Hash);
+            Assert.True(File.Exists(log.LocalPath));
+        }
+        finally
+        {
+            if (Directory.Exists(backupDirectory))
+                Directory.Delete(backupDirectory, recursive: true);
+        }
     }
 
     private static async Task AssertPaymentLifecycleAsync(

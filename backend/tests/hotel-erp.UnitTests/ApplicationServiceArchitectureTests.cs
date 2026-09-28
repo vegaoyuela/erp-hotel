@@ -40,4 +40,30 @@ public class ApplicationServiceArchitectureTests
         Assert.DoesNotContain(typeof(AuditService), dependencies);
         Assert.DoesNotContain(typeof(IdempotencyService), dependencies);
     }
+
+    [Theory]
+    [InlineData(typeof(PurchaseInvoicesController), typeof(PurchaseInvoiceApplicationService))]
+    [InlineData(typeof(InventoryController), typeof(InventoryApplicationService))]
+    public void StockMutationController_DelegatesToExpectedApplicationService(
+        Type controllerType,
+        Type applicationServiceType)
+    {
+        var constructor = Assert.Single(controllerType.GetConstructors());
+        var dependencies = constructor.GetParameters().Select(parameter => parameter.ParameterType).ToHashSet();
+
+        Assert.Contains(applicationServiceType, dependencies);
+        Assert.DoesNotContain(typeof(IAccountingService), dependencies);
+        Assert.DoesNotContain(typeof(AuditService), dependencies);
+        Assert.DoesNotContain(typeof(IHotelClock), dependencies);
+    }
+
+    [Fact]
+    public void BackupController_DependsOnBackupContract()
+    {
+        var constructor = Assert.Single(typeof(BackupController).GetConstructors());
+        var dependencies = constructor.GetParameters().Select(parameter => parameter.ParameterType).ToHashSet();
+
+        Assert.Contains(typeof(IDatabaseBackupService), dependencies);
+        Assert.DoesNotContain(typeof(DatabaseBackupService), dependencies);
+    }
 }
