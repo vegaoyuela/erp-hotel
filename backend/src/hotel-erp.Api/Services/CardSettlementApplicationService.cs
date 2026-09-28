@@ -23,7 +23,8 @@ public sealed class CardSettlementApplicationService(
     IAccountingService accountingService,
     AuditService auditService,
     IdempotencyService idempotencyService,
-    IHotelClock clock)
+    IHotelClock clock,
+    IApplicationFailureInjector failureInjector)
 {
     public async Task<CardSettlementCreationResult> CreateAsync(
         Guid userId,
@@ -173,6 +174,9 @@ public sealed class CardSettlementApplicationService(
         context.CardSettlements.Add(settlement);
         await context.SaveChangesAsync(cancellationToken);
         await accountingService.CreateCardSettlementEntryAsync(settlement);
+        await failureInjector.CheckpointAsync(
+            ApplicationFailureCheckpoints.CardSettlementAfterAccounting,
+            cancellationToken);
         await auditService.LogAsync(
             userId,
             "CreateCardSettlement",

@@ -1,0 +1,101 @@
+{
+  "generated_at": "2026-09-28T03:47:24.413234+00:00",
+  "status": "passed",
+  "contains_secret_values": false,
+  "scope": "P02-F1 financial workflow rollback proof",
+  "implementation": {
+    "payment_failure_checkpoint_after_accounting": true,
+    "refund_failure_checkpoint_after_accounting": true,
+    "card_settlement_failure_checkpoint_after_accounting": true
+  },
+  "rollback_proof": {
+    "payment_document_application_cash_invoice_and_accounting_reverted": true,
+    "refund_document_application_cash_payment_status_and_accounting_reverted": true,
+    "settlement_document_application_and_accounting_reverted": true,
+    "audit_and_idempotency_reverted_in_all_scenarios": true
+  },
+  "qa": {
+    "backend_build": {
+      "warnings": 0,
+      "errors": 0
+    },
+    "unit_tests": {
+      "passed": 93,
+      "skipped": 0,
+      "total": 93
+    },
+    "postgresql_integration_tests": {
+      "passed": 4,
+      "skipped": 0,
+      "total": 4
+    },
+    "new_financial_rollback_scenarios": {
+      "passed": 3,
+      "total": 3
+    },
+    "dossier_validator_tests": {
+      "passed": 5,
+      "total": 5
+    },
+    "frontend": {
+      "npm_audit_vulnerabilities": 0,
+      "lint": "passed",
+      "production_build": "passed"
+    },
+    "ef_pending_model_changes": false
+  },
+  "qa_database": {
+    "table_count": 42,
+    "total_rows": 345,
+    "migration_count": 11,
+    "temporary_databases_remaining": 0,
+    "unchanged_from_p00": true
+  },
+  "remaining": {
+    "p02_02": [
+      "remove 56 repository-owned save operations across 11 repository files"
+    ],
+    "p02_03": [
+      "calculation contract",
+      "correlative contract",
+      "printing contract"
+    ],
+    "later_p02": [
+      "OpenAPI and pagination",
+      "generated frontend types",
+      "security headers",
+      "performance matrix",
+      "independent review"
+    ]
+  },
+  "evidence": {
+    "qa": {
+      "path": "docs/plan de implementación/2026-09-27/evidencia/p02f-qa.log",
+      "sha256": "f27dec946aae358d53632b07c74a451912fa7c0a174fe21164836cf255032e8a"
+    },
+    "ef_model": {
+      "path": "docs/plan de implementación/2026-09-27/evidencia/p02f-modelo-ef.log",
+      "sha256": "17b4b833624d8f2c98eab351da13397451ba99c9f7501023a3a4f1f5f49d22a3"
+    },
+    "failure_injection": {
+      "path": "backend/src/hotel-erp.Api/Services/ApplicationFailureInjection.cs",
+      "sha256": "670136b09ffc111e761fc3c69709cbf86c7b87b360bac719032828a5f981d166"
+    },
+    "payment_service": {
+      "path": "backend/src/hotel-erp.Api/Services/PaymentApplicationService.cs",
+      "sha256": "0db202d4297c0edf8150bdaf2fb260f0a0eb22edbfa384cd2dc8609da04c24a5"
+    },
+    "refund_service": {
+      "path": "backend/src/hotel-erp.Api/Services/RefundApplicationService.cs",
+      "sha256": "c3a943dbff2683bae7a9d9aa6bef0c3a7bec868db91ed399618e0f6995099955"
+    },
+    "card_settlement_service": {
+      "path": "backend/src/hotel-erp.Api/Services/CardSettlementApplicationService.cs",
+      "sha256": "bb717a1fc374aed8d9543e19446e86c5276cf24ed20d5495ac1a9cbf790b1fdc"
+    },
+    "integration_test": {
+      "path": "backend/tests/hotel-erp.IntegrationTests/AuthenticationFlowTests.cs",
+      "sha256": "666c234031c581aff9f757dd63659b7949821dd7fc4f4aeb1ae72a1ef2dd085d"
+    }
+  }
+}

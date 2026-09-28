@@ -21,7 +21,8 @@ public sealed class RefundApplicationService(
     IAccountingService accountingService,
     AuditService auditService,
     IdempotencyService idempotencyService,
-    IHotelClock clock)
+    IHotelClock clock,
+    IApplicationFailureInjector failureInjector)
 {
     public async Task<RefundCreationResult> CreateAsync(
         Guid userId,
@@ -279,6 +280,9 @@ public sealed class RefundApplicationService(
 
         await context.SaveChangesAsync(cancellationToken);
         await accountingService.CreateRefundEntryAsync(refund);
+        await failureInjector.CheckpointAsync(
+            ApplicationFailureCheckpoints.RefundAfterAccounting,
+            cancellationToken);
         await auditService.LogAsync(
             userId,
             "CreateRefund",

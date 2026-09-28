@@ -20,7 +20,8 @@ public sealed class PaymentApplicationService(
     IAccountingService accountingService,
     AuditService auditService,
     IdempotencyService idempotencyService,
-    IHotelClock clock)
+    IHotelClock clock,
+    IApplicationFailureInjector failureInjector)
 {
     public async Task<PaymentCreationResult> CreateAsync(
         Guid userId,
@@ -248,6 +249,9 @@ public sealed class PaymentApplicationService(
 
         await context.SaveChangesAsync(cancellationToken);
         await accountingService.CreatePaymentEntryAsync(payment);
+        await failureInjector.CheckpointAsync(
+            ApplicationFailureCheckpoints.PaymentAfterAccounting,
+            cancellationToken);
         await auditService.LogAsync(
             userId,
             "CreatePayment",

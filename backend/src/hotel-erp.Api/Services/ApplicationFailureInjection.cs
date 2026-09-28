@@ -40,4 +40,7 @@ public static class ApplicationFailureCheckpoints
     public const string PurchasePayAfterPersistence = "purchase:pay:after-persistence";
     public const string PurchaseDeleteAfterPersistence = "purchase:delete:after-persistence";
     public const string InventoryMovementAfterPersistence = "inventory:movement:after-persistence";
+    public const string PaymentAfterAccounting = "payment:create:after-accounting";
+    public const string RefundAfterAccounting = "refund:create:after-accounting";
+    public const string CardSettlementAfterAccounting = "card-settlement:create:after-accounting";
 }

@@ -518,21 +518,24 @@ public class AuthenticationFlowTests
             client,
             factory.Services,
             currentSession.AccessToken!,
-            caiId);
+            caiId,
+            database.ConnectionString);
 
         await AssertRefundLifecycleAsync(
             client,
             factory.Services,
             currentSession.AccessToken!,
             caiId,
-            creditAuthorizationId);
+            creditAuthorizationId,
+            database.ConnectionString);
 
         await AssertCardSettlementLifecycleAsync(
             client,
             factory.Services,
             currentSession.AccessToken!,
             caiId,
-            creditAuthorizationId);
+            creditAuthorizationId,
+            database.ConnectionString);
 
         await AssertConcurrentCheckInAndAtomicCheckoutAsync(
             client,
@@ -1557,11 +1560,185 @@ public class AuthenticationFlowTests
         }
     }
 
+    private static async Task AssertPaymentRollbackAfterAccountingAsync(
+        IServiceProvider services,
+        string connectionString,
+        string accessToken,
+        Guid invoiceId,
+        Guid cashRegisterId)
+    {
+        int paymentsBefore;
+        int entriesBefore;
+        int movementsBefore;
+        int auditsBefore;
+        int idempotencyBefore;
+        InvoiceStatus invoiceStatusBefore;
+        using (var beforeScope = services.CreateScope())
+        {
+            var context = beforeScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            paymentsBefore = await context.Payments.CountAsync();
+            entriesBefore = await context.AccountingEntries.CountAsync();
+            movementsBefore = await context.CashMovements.CountAsync();
+            auditsBefore = await context.AuditLogs.CountAsync();
+            idempotencyBefore = await context.IdempotencyRecords.CountAsync();
+            invoiceStatusBefore = await context.Invoices
+                .Where(invoice => invoice.Id == invoiceId)
+                .Select(invoice => invoice.Status)
+                .SingleAsync();
+        }
+
+        await using var factory = FailureFactory(
+            connectionString,
+            ApplicationFailureCheckpoints.PaymentAfterAccounting);
+        using var client = factory.CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
+        using var request = PaymentRequest(
+            accessToken,
+            Guid.NewGuid().ToString("D"),
+            PaymentMethod.Efectivo.ToString(),
+            100m,
+            invoiceId,
+            cashRegisterId,
+            cashReceived: 200m);
+        using var response = await client.SendAsync(request);
+        await AssertSafeProblemDetailsAsync(response, HttpStatusCode.InternalServerError);
+
+        using var assertScope = services.CreateScope();
+        var assertContext = assertScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        Assert.Equal(paymentsBefore, await assertContext.Payments.CountAsync());
+        Assert.Equal(entriesBefore, await assertContext.AccountingEntries.CountAsync());
+        Assert.Equal(movementsBefore, await assertContext.CashMovements.CountAsync());
+        Assert.Equal(auditsBefore, await assertContext.AuditLogs.CountAsync());
+        Assert.Equal(idempotencyBefore, await assertContext.IdempotencyRecords.CountAsync());
+        Assert.Equal(
+            invoiceStatusBefore,
+            await assertContext.Invoices
+                .Where(invoice => invoice.Id == invoiceId)
+                .Select(invoice => invoice.Status)
+                .SingleAsync());
+    }
+
+    private static async Task AssertRefundRollbackAfterAccountingAsync(
+        IServiceProvider services,
+        string connectionString,
+        string accessToken,
+        Guid paymentId,
+        Guid creditNoteId,
+        Guid cashRegisterId)
+    {
+        int refundsBefore;
+        int entriesBefore;
+        int movementsBefore;
+        int auditsBefore;
+        int idempotencyBefore;
+        PaymentStatus paymentStatusBefore;
+        using (var beforeScope = services.CreateScope())
+        {
+            var context = beforeScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            refundsBefore = await context.Refunds.CountAsync();
+            entriesBefore = await context.AccountingEntries.CountAsync();
+            movementsBefore = await context.CashMovements.CountAsync();
+            auditsBefore = await context.AuditLogs.CountAsync();
+            idempotencyBefore = await context.IdempotencyRecords.CountAsync();
+            paymentStatusBefore = await context.Payments
+                .Where(payment => payment.Id == paymentId)
+                .Select(payment => payment.Status)
+                .SingleAsync();
+        }
+
+        await using var factory = FailureFactory(
+            connectionString,
+            ApplicationFailureCheckpoints.RefundAfterAccounting);
+        using var client = factory.CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
+        using var request = RefundRequest(
+            accessToken,
+            paymentId,
+            Guid.NewGuid().ToString("D"),
+            119m,
+            creditNoteId,
+            cashRegisterId,
+            "Fallo sintético posterior al asiento");
+        using var response = await client.SendAsync(request);
+        await AssertSafeProblemDetailsAsync(response, HttpStatusCode.InternalServerError);
+
+        using var assertScope = services.CreateScope();
+        var assertContext = assertScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        Assert.Equal(refundsBefore, await assertContext.Refunds.CountAsync());
+        Assert.Equal(entriesBefore, await assertContext.AccountingEntries.CountAsync());
+        Assert.Equal(movementsBefore, await assertContext.CashMovements.CountAsync());
+        Assert.Equal(auditsBefore, await assertContext.AuditLogs.CountAsync());
+        Assert.Equal(idempotencyBefore, await assertContext.IdempotencyRecords.CountAsync());
+        Assert.Equal(
+            paymentStatusBefore,
+            await assertContext.Payments
+                .Where(payment => payment.Id == paymentId)
+                .Select(payment => payment.Status)
+                .SingleAsync());
+    }
+
+    private static async Task AssertCardSettlementRollbackAfterAccountingAsync(
+        IServiceProvider services,
+        string connectionString,
+        string accessToken,
+        Guid paymentId,
+        decimal amount)
+    {
+        int settlementsBefore;
+        int entriesBefore;
+        int auditsBefore;
+        int idempotencyBefore;
+        using (var beforeScope = services.CreateScope())
+        {
+            var context = beforeScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            settlementsBefore = await context.CardSettlements.CountAsync();
+            entriesBefore = await context.AccountingEntries.CountAsync();
+            auditsBefore = await context.AuditLogs.CountAsync();
+            idempotencyBefore = await context.IdempotencyRecords.CountAsync();
+        }
+
+        await using var factory = FailureFactory(
+            connectionString,
+            ApplicationFailureCheckpoints.CardSettlementAfterAccounting);
+        using var client = factory.CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
+        using var request = CardSettlementRequest(
+            accessToken,
+            Guid.NewGuid().ToString("D"),
+            $"LOTE-FALLA-{Guid.NewGuid():N}",
+            amount,
+            114m,
+            3m,
+            2m,
+            paymentId);
+        using var response = await client.SendAsync(request);
+        await AssertSafeProblemDetailsAsync(response, HttpStatusCode.InternalServerError);
+
+        using var assertScope = services.CreateScope();
+        var assertContext = assertScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        Assert.Equal(settlementsBefore, await assertContext.CardSettlements.CountAsync());
+        Assert.Equal(entriesBefore, await assertContext.AccountingEntries.CountAsync());
+        Assert.Equal(auditsBefore, await assertContext.AuditLogs.CountAsync());
+        Assert.Equal(idempotencyBefore, await assertContext.IdempotencyRecords.CountAsync());
+        Assert.Empty(await assertContext.CardSettlementApplications
+            .Where(application => application.PaymentId == paymentId)
+            .ToListAsync());
+    }
+
+    private static HotelErpWebApplicationFactory FailureFactory(
+        string connectionString,
+        string checkpoint)
+        => new(
+            connectionString,
+            services =>
+            {
+                services.RemoveAll<IApplicationFailureInjector>();
+                services.AddSingleton<IApplicationFailureInjector>(new ThrowingFailureInjector(checkpoint));
+            });
+
     private static async Task AssertPaymentLifecycleAsync(
         HttpClient client,
         IServiceProvider services,
         string accessToken,
-        Guid caiId)
+        Guid caiId,
+        string connectionString)
     {
         using var invoiceRequest = InvoiceRequest(
             accessToken,
@@ -1625,6 +1802,13 @@ public class AuthenticationFlowTests
             cashReceived: 200m);
         using var missingKeyResponse = await client.SendAsync(missingKeyRequest);
         Assert.Equal(HttpStatusCode.BadRequest, missingKeyResponse.StatusCode);
+
+        await AssertPaymentRollbackAfterAccountingAsync(
+            services,
+            connectionString,
+            accessToken,
+            invoice.Id,
+            register.Id);
 
         var cashKey = Guid.NewGuid().ToString("D");
         using var cashPaymentRequest = PaymentRequest(
@@ -1768,7 +1952,8 @@ public class AuthenticationFlowTests
         IServiceProvider services,
         string accessToken,
         Guid caiId,
-        Guid creditAuthorizationId)
+        Guid creditAuthorizationId,
+        string connectionString)
     {
         using var invoiceRequest = InvoiceRequest(
             accessToken,
@@ -1848,6 +2033,14 @@ public class AuthenticationFlowTests
             "   ");
         using var emptyReasonResponse = await client.SendAsync(emptyReasonRequest);
         Assert.Equal(HttpStatusCode.BadRequest, emptyReasonResponse.StatusCode);
+
+        await AssertRefundRollbackAfterAccountingAsync(
+            services,
+            connectionString,
+            accessToken,
+            payment.Id,
+            creditNote.Id,
+            register.Id);
 
         var refundKeys = new[] { Guid.NewGuid().ToString("D"), Guid.NewGuid().ToString("D") };
         var concurrentRequests = refundKeys
@@ -2051,7 +2244,8 @@ public class AuthenticationFlowTests
         IServiceProvider services,
         string accessToken,
         Guid caiId,
-        Guid creditAuthorizationId)
+        Guid creditAuthorizationId,
+        string connectionString)
     {
         using var invoiceRequest = InvoiceRequest(
             accessToken,
@@ -2102,6 +2296,13 @@ public class AuthenticationFlowTests
             payment.Id);
         using var invalidComponentsResponse = await client.SendAsync(invalidComponentsRequest);
         Assert.Equal(HttpStatusCode.BadRequest, invalidComponentsResponse.StatusCode);
+
+        await AssertCardSettlementRollbackAfterAccountingAsync(
+            services,
+            connectionString,
+            accessToken,
+            payment.Id,
+            invoice.TotalAmount);
 
         var keys = new[] { Guid.NewGuid().ToString("D"), Guid.NewGuid().ToString("D") };
         var references = new[] { "LOTE-ADQUIRENTE-A", "LOTE-ADQUIRENTE-B" };

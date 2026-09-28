@@ -124,4 +124,16 @@ La quinta entrega cierra P02-01. La compra y su asiento contable comparten trans
 | [p02e-qa-resumen.json](p02e-qa-resumen.json) | Resumen estructurado y hashes SHA-256 de código, pruebas y evidencia. |
 | [p02e-qa.log](p02e-qa.log) | Build sin advertencias, 93 unitarias, 4 integraciones PostgreSQL, 5 pruebas N01–N06, auditoría npm, lint y frontend aprobados. |
 
-P02 continúa abierta. P02-F cubrirá 56 guardados implícitos en 11 archivos de repositorio y los fallos inyectados pendientes de pagos, reembolsos y liquidaciones.
+Al cierre de P02-E, P02-F debía cubrir 56 guardados implícitos en 11 archivos de repositorio y los fallos inyectados pendientes de pagos, reembolsos y liquidaciones.
+
+### P02-F1 — rollback financiero
+
+La sexta entrega añade fallos controlados después del asiento de pago, reembolso y liquidación de tarjeta. PostgreSQL revierte en conjunto el documento financiero, sus aplicaciones, caja, estados relacionados, asiento, auditoría e idempotencia. Las pruebas normales, concurrentes y de reintento continúan dentro de la misma integración.
+
+| Archivo | Resultado |
+|---|---|
+| [p02f-modelo-ef.log](p02f-modelo-ef.log) | EF Core confirma que la instrumentación no requiere migración. |
+| [p02f-qa-resumen.json](p02f-qa-resumen.json) | Resumen estructurado y hashes SHA-256 de código, pruebas y evidencia. |
+| [p02f-qa.log](p02f-qa.log) | Build sin advertencias, 93 unitarias, 4 integraciones PostgreSQL con tres rollbacks financieros nuevos, 5 pruebas N01–N06, auditoría npm, lint y frontend aprobados. |
+
+P02-F2 queda pendiente para retirar 56 guardados implícitos en 11 archivos de repositorio.

@@ -2,7 +2,7 @@
 
 **Inicio:** 27 de septiembre de 2026
 
-**Estado:** en ejecución; entregas P02-A a P02-E aprobadas por pruebas automáticas
+**Estado:** en ejecución; entregas P02-A a P02-F1 aprobadas por pruebas automáticas
 
 Este registro divide P02 en entregas comprobables. No se declara G2 mientras queden controladores con lógica de negocio, repositorios que confirman cambios por su cuenta o contratos sin prueba.
 
@@ -29,7 +29,7 @@ La versión anterior calculaba el hash con ticks de 100 ns antes de guardar un `
 | Tarea | Estado verificable | Trabajo restante |
 |---|---|---|
 | P02-01 | Completada | Finanzas, factura/notas, reservas, check-in/out, folios, caja, compras, inventario y respaldo delegan sus mutaciones a servicios. |
-| P02-02 | Parcial | Los flujos fiscales, operativos, compra e inventario tienen transacción exterior y pruebas de rollback; faltan fallos P02-B y retirar 56 confirmaciones implícitas en 11 archivos de repositorio. |
+| P02-02 | Parcial | Los flujos fiscales, operativos, compras, inventario y finanzas tienen transacción exterior y rollback probado; falta retirar 56 confirmaciones implícitas en 11 archivos de repositorio. |
 | P02-03 | Parcial | Reloj y ejecución de respaldo tienen contrato inyectable; faltan interfaces para cálculo, correlativo e impresión. |
 | P02-04 | Parcial | `ProblemDetails`, código y `traceId` completados; faltan paginación general, convenciones de fechas/enums y descripción OpenAPI por respuesta. |
 | P02-05 | Pendiente | Generar o validar tipos TypeScript desde OpenAPI en QA. |
@@ -65,8 +65,12 @@ La integración conserva las pruebas de concurrencia para reserva, check-in y ca
 
 `IDatabaseBackupService` e `IPostgresDumpExecutor` separan la orquestación y el proceso externo. El ejecutor usa `ArgumentList`, conserva la contraseña fuera de los argumentos, registra el intento antes de ejecutar, elimina archivos parciales y devuelve un respaldo cuyo tamaño y SHA-256 se verifican contra una descarga real.
 
+## Entrega P02-F1 — rollback financiero
+
+Pagos, reembolsos y liquidaciones incorporan un punto de fallo inmediatamente después de generar el asiento. La integración ejecuta cada operación válida contra PostgreSQL, provoca la excepción y comprueba que la transacción no conserva pagos, aplicaciones, reembolsos, liquidaciones, movimientos de caja, cambios de estado, asientos, auditorías ni claves idempotentes. Los mismos flujos normales y concurrentes se ejecutan después para demostrar que la instrumentación no alteró el comportamiento.
+
 ## Criterio para la siguiente entrega
 
-P02-F retirará las confirmaciones implícitas de los repositorios que todavía las conservan y añadirá pruebas de rollback a pagos, reembolsos y liquidaciones. Después continuará con contratos de cálculo, correlativo e impresión, OpenAPI y tipos frontend.
+P02-F2 retirará las 56 confirmaciones implícitas de los 11 archivos de repositorio y migrará sus consumidores a una unidad de trabajo explícita. Después continuará con contratos de cálculo, correlativo e impresión, OpenAPI y tipos frontend.
 
 La evidencia de QA y compatibilidad se conserva en el [expediente general](../evidencia/README.md#p02--base-técnica-primera-entrega).
