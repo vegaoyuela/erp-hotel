@@ -100,4 +100,16 @@ La tercera entrega traslada actualización de borradores, emisión, liquidación
 | [p02c-qa-resumen.json](p02c-qa-resumen.json) | Resumen estructurado y hashes SHA-256 de código, pruebas y evidencia. |
 | [p02c-qa.log](p02c-qa.log) | Build sin advertencias, 87 unitarias, 4 integraciones PostgreSQL con tres escenarios de rollback fiscal, 5 pruebas N01–N06, auditoría npm, lint y frontend aprobados. |
 
-P02 continúa abierta. El siguiente bloque cubre reservas, check-in/out, cargos de folio y apertura/cierre de caja.
+P02 continúa abierta. El siguiente bloque cubre compras, inventario, respaldos, persistencia implícita de repositorios y fallos inyectados de P02-B.
+
+### P02-D — operación hotelera y caja
+
+La cuarta entrega traslada reservas, check-in/out, cargos de folio y ciclo de caja a servicios de aplicación. Las pruebas conservan los escenarios de concurrencia e idempotencia existentes e incorporan fallos intencionales después de persistir check-in, cargo de folio, apertura y cierre de caja. PostgreSQL revierte los estados, folios, cargos, movimientos, auditorías e idempotencia de cada intento fallido.
+
+| Archivo | Resultado |
+|---|---|
+| [p02d-modelo-ef.log](p02d-modelo-ef.log) | EF Core confirma que la extracción no requiere migración. |
+| [p02d-qa-resumen.json](p02d-qa-resumen.json) | Resumen estructurado y hashes SHA-256 de código, pruebas y evidencia. |
+| [p02d-qa.log](p02d-qa.log) | Build sin advertencias, 90 unitarias, 4 integraciones PostgreSQL con cuatro rollbacks operativos nuevos, 5 pruebas N01–N06, auditoría npm, lint y frontend aprobados. |
+
+P02-01 y P02-02 siguen parciales por compras, inventario, respaldos, repositorios con `SaveChanges` propio y fallos pendientes de P02-B.

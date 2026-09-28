@@ -2,7 +2,7 @@
 
 **Inicio:** 27 de septiembre de 2026
 
-**Estado:** en ejecución; entregas P02-A, P02-B y P02-C aprobadas por pruebas automáticas
+**Estado:** en ejecución; entregas P02-A a P02-D aprobadas por pruebas automáticas
 
 Este registro divide P02 en entregas comprobables. No se declara G2 mientras queden controladores con lógica de negocio, repositorios que confirman cambios por su cuenta o contratos sin prueba.
 
@@ -28,8 +28,8 @@ La versión anterior calculaba el hash con ticks de 100 ns antes de guardar un `
 
 | Tarea | Estado verificable | Trabajo restante |
 |---|---|---|
-| P02-01 | Parcial | Pagos, reembolsos, liquidaciones, factura y notas fiscales ya están en servicios de aplicación; faltan reservas, check-in/out, folios, caja, compras, inventario y respaldos. |
-| P02-02 | Parcial | Los servicios financieros y fiscales extraídos son dueños de su transacción exterior; factura y notas tienen pruebas de rollback. Faltan los demás casos y retirar confirmaciones implícitas de repositorios. |
+| P02-01 | Parcial | Finanzas, factura/notas, reservas, check-in/out, folios y caja ya están en servicios de aplicación; faltan compras, inventario y respaldos. |
+| P02-02 | Parcial | Los casos extraídos son dueños de su transacción exterior y los flujos fiscales/operativos tienen pruebas de rollback; faltan los demás casos, las pruebas de fallo P02-B y retirar confirmaciones implícitas de repositorios. |
 | P02-03 | Parcial | Reloj completado; faltan interfaces para cálculo, correlativo, impresión y respaldo, y mover su orquestación a servicios de aplicación. |
 | P02-04 | Parcial | `ProblemDetails`, código y `traceId` completados; faltan paginación general, convenciones de fechas/enums y descripción OpenAPI por respuesta. |
 | P02-05 | Pendiente | Generar o validar tipos TypeScript desde OpenAPI en QA. |
@@ -51,8 +51,14 @@ La prueba de arquitectura impide que estos tres controladores vuelvan a depender
 
 Los tres flujos fiscales incorporan puntos de fallo de prueba después de persistencia, contabilidad, auditoría e idempotencia. La integración provoca un fallo después del asiento en factura, nota de crédito y nota de débito, y comprueba que PostgreSQL revierte documento, asiento, cuentas creadas, bitácora, idempotencia, estado de la factura original y avance del correlativo. Los flujos normales, reintentos y conflictos siguen cubiertos por la misma suite.
 
+## Entrega P02-D — operación hotelera y caja
+
+`ReservationApplicationService`, `FolioApplicationService` y `CashRegisterApplicationService` concentran creación, actualización, confirmación y cancelación de reservas, check-in/out, cargos de folio y creación/apertura/cierre de caja. Los controladores mantienen las consultas y la traducción HTTP. Locks, control de versión, superposición de fechas, estado físico de habitación, cálculo de estancia, idempotencia y auditoría permanecen dentro de la transacción exterior de cada caso.
+
+La integración conserva las pruebas de concurrencia para reserva, check-in y caja. Además inyecta fallos después de persistir check-in, cargo de folio, apertura y cierre de caja, y confirma que no sobreviven folios, cargos, movimientos, cambios de habitación/reserva, auditorías ni registros idempotentes.
+
 ## Criterio para la siguiente entrega
 
-P02-D aplicará el patrón a reservas, check-in/out, cargos de folio y apertura/cierre de caja. Después continuará con compras, inventario y respaldos, y retirará las confirmaciones implícitas de los repositorios que todavía las conservan.
+P02-E extraerá compras, movimientos de inventario y ejecución de respaldos. Después retirará las confirmaciones implícitas de los repositorios que todavía las conservan y añadirá pruebas de rollback a pagos, reembolsos y liquidaciones.
 
 La evidencia de QA y compatibilidad se conserva en el [expediente general](../evidencia/README.md#p02--base-técnica-primera-entrega).

@@ -1,0 +1,124 @@
+{
+  "generated_at": "2026-09-28T03:13:15.400014+00:00",
+  "status": "passed",
+  "contains_secret_values": false,
+  "scope": "P02-D hotel operations and cash application services",
+  "implementation": {
+    "reservation_controller_delegates_mutations": true,
+    "folio_controller_delegates_mutations": true,
+    "cash_register_controller_delegates_mutations": true,
+    "outer_transactions_owned_by_application_services": true,
+    "reservation_and_room_concurrency_retained": true,
+    "cash_idempotency_retained": true,
+    "failure_checkpoints_after_persistence": true,
+    "architecture_boundary_test": true
+  },
+  "rollback_proof": {
+    "check_in_failure_after_persistence": true,
+    "folio_charge_failure_after_persistence": true,
+    "cash_open_failure_after_persistence": true,
+    "cash_close_failure_after_persistence": true,
+    "asserted_no_residual_reservation_or_room_state": true,
+    "asserted_no_residual_folio_or_item": true,
+    "asserted_no_residual_cash_movement": true,
+    "asserted_no_residual_audit_or_idempotency": true
+  },
+  "qa": {
+    "backend_build": {
+      "warnings": 0,
+      "errors": 0
+    },
+    "unit_tests": {
+      "passed": 90,
+      "skipped": 0,
+      "total": 90
+    },
+    "postgresql_integration_tests": {
+      "passed": 4,
+      "skipped": 0,
+      "total": 4
+    },
+    "operational_rollback_scenarios": {
+      "passed": 4,
+      "total": 4
+    },
+    "dossier_validator_tests": {
+      "passed": 5,
+      "total": 5
+    },
+    "frontend": {
+      "npm_audit_vulnerabilities": 0,
+      "lint": "passed",
+      "production_build": "passed"
+    },
+    "ef_pending_model_changes": false
+  },
+  "qa_database": {
+    "table_count": 42,
+    "total_rows": 345,
+    "migration_count": 11,
+    "temporary_databases_remaining": 0,
+    "unchanged_from_p00": true
+  },
+  "remaining": {
+    "p02_01": [
+      "purchases",
+      "inventory",
+      "backups"
+    ],
+    "p02_02": [
+      "remove repository-owned persistence",
+      "rollback injection tests for P02-B financial movements"
+    ]
+  },
+  "evidence": {
+    "qa": {
+      "path": "docs/plan de implementación/2026-09-27/evidencia/p02d-qa.log",
+      "sha256": "1263254514ece366190acb3c1589de965d5bd7c8820fda50f13a7bd10dfe020d"
+    },
+    "ef_model": {
+      "path": "docs/plan de implementación/2026-09-27/evidencia/p02d-modelo-ef.log",
+      "sha256": "815c5cd494b61a9d8737ba7653cd05fb05926e7b40a924683fa4eef4ca87566c"
+    },
+    "mutation_result": {
+      "path": "backend/src/hotel-erp.Api/Services/ApplicationMutationResult.cs",
+      "sha256": "6816f3b3e63045be4f128e1e9a19f4a1a4e9ce8f6df0612eb428b1570b9fb884"
+    },
+    "failure_injection": {
+      "path": "backend/src/hotel-erp.Api/Services/ApplicationFailureInjection.cs",
+      "sha256": "a839f20525ac537c123eda30a6bdb314408fc19ed19dd88e6744ef0aabc365ae"
+    },
+    "reservation_service": {
+      "path": "backend/src/hotel-erp.Api/Services/ReservationApplicationService.cs",
+      "sha256": "76c3ec8a2b9e3df3d59170af7bcc9736fc97192168b4bca5a4f570c65c414ded"
+    },
+    "folio_service": {
+      "path": "backend/src/hotel-erp.Api/Services/FolioApplicationService.cs",
+      "sha256": "215e4811829ab2f8822aacd5a168228f556837b5f73513032fa66f20cf7a9724"
+    },
+    "cash_register_service": {
+      "path": "backend/src/hotel-erp.Api/Services/CashRegisterApplicationService.cs",
+      "sha256": "163935baafada215a091e2794dea295366ae42a8a9c6e8d655c7c6669b9b58ae"
+    },
+    "reservation_controller": {
+      "path": "backend/src/hotel-erp.Api/Controllers/ReservationsController.cs",
+      "sha256": "1143f51c20e9641901b294863bd6900f9c19c8cd7a1a5f8e1d7dca2f3d03ca48"
+    },
+    "folio_controller": {
+      "path": "backend/src/hotel-erp.Api/Controllers/FoliosController.cs",
+      "sha256": "b800f08b8b433eabb3f6125d4ee91eccd3bd76e65ba245ce4885918364af306d"
+    },
+    "cash_register_controller": {
+      "path": "backend/src/hotel-erp.Api/Controllers/CashRegistersController.cs",
+      "sha256": "5eb05d77609228197f49187e06cb72390663f4fbbc92c79e2968e3c6c03c59cf"
+    },
+    "architecture_test": {
+      "path": "backend/tests/hotel-erp.UnitTests/ApplicationServiceArchitectureTests.cs",
+      "sha256": "e6a0824830aa71dfa7a021962893ee60ba6bf01f5c019576a21321af192570d2"
+    },
+    "integration_test": {
+      "path": "backend/tests/hotel-erp.IntegrationTests/AuthenticationFlowTests.cs",
+      "sha256": "df94cceedc146486e95a8097ef5c4e5e9a7f04b8a166bb68acd3aeb0065b57ff"
+    }
+  }
+}

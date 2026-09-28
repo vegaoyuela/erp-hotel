@@ -511,7 +511,8 @@ public class AuthenticationFlowTests
         await AssertCashRegisterLifecycleAsync(
             client,
             factory.Services,
-            currentSession.AccessToken!);
+            currentSession.AccessToken!,
+            database.ConnectionString);
 
         await AssertPaymentLifecycleAsync(
             client,
@@ -537,7 +538,8 @@ public class AuthenticationFlowTests
             client,
             factory.Services,
             currentSession.AccessToken!,
-            caiId);
+            caiId,
+            database.ConnectionString);
 
         using var retirementRequest = Authorized(HttpMethod.Post, "/api/settings/business/retire", currentSession.AccessToken!);
         retirementRequest.Content = JsonContent.Create(new
@@ -1047,7 +1049,8 @@ public class AuthenticationFlowTests
     private static async Task AssertCashRegisterLifecycleAsync(
         HttpClient client,
         IServiceProvider services,
-        string accessToken)
+        string accessToken,
+        string connectionString)
     {
         using var createRequest = Authorized(HttpMethod.Post, "/api/cash-registers", accessToken);
         createRequest.Content = JsonContent.Create(new
@@ -1060,6 +1063,15 @@ public class AuthenticationFlowTests
         var cashRegister = (await createResponse.Content.ReadFromJsonAsync<CashRegisterDto>())!;
         Assert.False(cashRegister.IsOpen);
         Assert.Equal(0m, cashRegister.CurrentBalance);
+
+        await AssertCashOperationRollbackAsync(
+            services,
+            connectionString,
+            accessToken,
+            cashRegister.Id,
+            "open",
+            ApplicationFailureCheckpoints.CashRegisterOpenAfterPersistence,
+            new { initialAmount = 1000m });
 
         using var missingKeyRequest = Authorized(
             HttpMethod.Post,
@@ -1101,6 +1113,15 @@ public class AuthenticationFlowTests
             new { initialAmount = 1001m });
         using var conflictingOpenResponse = await client.SendAsync(conflictingOpenRequest);
         Assert.Equal(HttpStatusCode.Conflict, conflictingOpenResponse.StatusCode);
+
+        await AssertCashOperationRollbackAsync(
+            services,
+            connectionString,
+            accessToken,
+            cashRegister.Id,
+            "close",
+            ApplicationFailureCheckpoints.CashRegisterCloseAfterPersistence,
+            new { countedAmount = 1000m, notes = (string?)null });
 
         var firstCloseKey = Guid.NewGuid().ToString("D");
         using var unexplainedCloseRequest = CashOperationRequest(
@@ -1207,6 +1228,56 @@ public class AuthenticationFlowTests
             request.Dispose();
         foreach (var response in concurrentOpenResponses.Concat(concurrentCloseResponses))
             response.Dispose();
+    }
+
+    private static async Task AssertCashOperationRollbackAsync(
+        IServiceProvider services,
+        string connectionString,
+        string accessToken,
+        Guid cashRegisterId,
+        string operation,
+        string checkpoint,
+        object body)
+    {
+        int movementsBefore;
+        int auditsBefore;
+        int idempotencyBefore;
+        using (var beforeScope = services.CreateScope())
+        {
+            var context = beforeScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            movementsBefore = await context.CashMovements.CountAsync(
+                movement => movement.CashRegisterId == cashRegisterId);
+            auditsBefore = await context.AuditLogs.CountAsync();
+            idempotencyBefore = await context.IdempotencyRecords.CountAsync();
+        }
+
+        await using var failingFactory = new HotelErpWebApplicationFactory(
+            connectionString,
+            collection =>
+            {
+                collection.RemoveAll<IApplicationFailureInjector>();
+                collection.AddSingleton<IApplicationFailureInjector>(new ThrowingFailureInjector(checkpoint));
+            });
+        using var failingClient = failingFactory.CreateClient(new WebApplicationFactoryClientOptions
+        {
+            AllowAutoRedirect = false
+        });
+        using var request = CashOperationRequest(
+            accessToken,
+            cashRegisterId,
+            operation,
+            Guid.NewGuid().ToString("D"),
+            body);
+        using var response = await failingClient.SendAsync(request);
+        await AssertSafeProblemDetailsAsync(response, HttpStatusCode.InternalServerError);
+
+        using var assertScope = services.CreateScope();
+        var assertContext = assertScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        Assert.Equal(
+            movementsBefore,
+            await assertContext.CashMovements.CountAsync(movement => movement.CashRegisterId == cashRegisterId));
+        Assert.Equal(auditsBefore, await assertContext.AuditLogs.CountAsync());
+        Assert.Equal(idempotencyBefore, await assertContext.IdempotencyRecords.CountAsync());
     }
 
     private static async Task AssertPaymentLifecycleAsync(
@@ -2081,7 +2152,8 @@ public class AuthenticationFlowTests
         HttpClient client,
         IServiceProvider services,
         string accessToken,
-        Guid caiId)
+        Guid caiId,
+        string connectionString)
     {
         var reservationId = Guid.NewGuid();
         var roomId = Guid.NewGuid();
@@ -2128,6 +2200,44 @@ public class AuthenticationFlowTests
                 Status = ReservationStatus.Confirmada
             });
             await context.SaveChangesAsync();
+        }
+
+        await using (var failingCheckInFactory = new HotelErpWebApplicationFactory(
+            connectionString,
+            collection =>
+            {
+                collection.RemoveAll<IApplicationFailureInjector>();
+                collection.AddSingleton<IApplicationFailureInjector>(new ThrowingFailureInjector(
+                    ApplicationFailureCheckpoints.ReservationCheckInAfterPersistence));
+            }))
+        using (var failingCheckInClient = failingCheckInFactory.CreateClient(new WebApplicationFactoryClientOptions
+        {
+            AllowAutoRedirect = false
+        }))
+        using (var failingCheckInRequest = Authorized(HttpMethod.Post, "/api/reservations/checkin", accessToken))
+        {
+            failingCheckInRequest.Content = JsonContent.Create(new
+            {
+                reservationId,
+                roomId,
+                expectedVersion = 1,
+                discountIds = Array.Empty<Guid>()
+            });
+            using var failingCheckInResponse = await failingCheckInClient.SendAsync(failingCheckInRequest);
+            await AssertSafeProblemDetailsAsync(failingCheckInResponse, HttpStatusCode.InternalServerError);
+        }
+
+        using (var rollbackScope = services.CreateScope())
+        {
+            var context = rollbackScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            var rolledBackReservation = await context.Reservations.SingleAsync(candidate => candidate.Id == reservationId);
+            var rolledBackRoom = await context.Rooms.SingleAsync(candidate => candidate.Id == roomId);
+            Assert.Equal(ReservationStatus.Confirmada, rolledBackReservation.Status);
+            Assert.Equal(1, rolledBackReservation.Version);
+            Assert.Equal(RoomStatus.Libre, rolledBackRoom.Status);
+            Assert.False(await context.Folios.AnyAsync(folio => folio.ReservationId == reservationId));
+            Assert.False(await context.AuditLogs.AnyAsync(
+                log => log.Action == "CheckIn" && log.EntityId == reservationId));
         }
 
         using var firstRequest = Authorized(HttpMethod.Post, "/api/reservations/checkin", accessToken);
@@ -2207,6 +2317,48 @@ public class AuthenticationFlowTests
             Description = "Apertura sintética"
         });
         await assertContext.SaveChangesAsync();
+
+        var folioItemCountBeforeFailure = persistedFolio.FolioItems.Count;
+        var folioTotalBeforeFailure = persistedFolio.TotalAmount;
+        await using (var failingFolioFactory = new HotelErpWebApplicationFactory(
+            connectionString,
+            collection =>
+            {
+                collection.RemoveAll<IApplicationFailureInjector>();
+                collection.AddSingleton<IApplicationFailureInjector>(new ThrowingFailureInjector(
+                    ApplicationFailureCheckpoints.FolioChargeAfterPersistence));
+            }))
+        using (var failingFolioClient = failingFolioFactory.CreateClient(new WebApplicationFactoryClientOptions
+        {
+            AllowAutoRedirect = false
+        }))
+        using (var failingChargeRequest = Authorized(
+            HttpMethod.Post,
+            $"/api/folios/{persistedFolio.Id}/items",
+            accessToken))
+        {
+            failingChargeRequest.Content = JsonContent.Create(new
+            {
+                description = "Cargo que debe revertirse",
+                quantity = 1,
+                unitPrice = 7m,
+                isExempt = false,
+                isvRate = 0.15m,
+                isTouristTaxable = false,
+                discountPercentage = 0m
+            });
+            using var failingChargeResponse = await failingFolioClient.SendAsync(failingChargeRequest);
+            await AssertSafeProblemDetailsAsync(failingChargeResponse, HttpStatusCode.InternalServerError);
+        }
+
+        assertContext.ChangeTracker.Clear();
+        var folioAfterFailure = await assertContext.Folios
+            .Include(folio => folio.FolioItems)
+            .SingleAsync(folio => folio.Id == persistedFolio.Id);
+        Assert.Equal(folioItemCountBeforeFailure, folioAfterFailure.FolioItems.Count);
+        Assert.Equal(folioTotalBeforeFailure, folioAfterFailure.TotalAmount);
+        Assert.False(await assertContext.AuditLogs.AnyAsync(
+            log => log.Action == "AddFolioCharge" && log.EntityId == persistedFolio.Id));
 
         using var addChargeRequest = Authorized(
             HttpMethod.Post,
