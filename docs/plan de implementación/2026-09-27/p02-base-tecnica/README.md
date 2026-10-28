@@ -2,7 +2,7 @@
 
 **Inicio:** 27 de septiembre de 2026
 
-**Estado:** en ejecución; entregas P02-A a P02-F2 aprobadas por pruebas automáticas. Última ejecución: 28 de octubre de 2026.
+**Estado:** en ejecución; entregas P02-A a P02-G aprobadas por pruebas automáticas. Última ejecución: 28 de octubre de 2026.
 
 Este registro divide P02 en entregas comprobables. No se declara G2 mientras queden controladores con lógica de negocio, repositorios que confirman cambios por su cuenta o contratos sin prueba.
 
@@ -30,7 +30,7 @@ La versión anterior calculaba el hash con ticks de 100 ns antes de guardar un `
 |---|---|---|
 | P02-01 | Completada | Finanzas, factura/notas, reservas, check-in/out, folios, caja, compras, inventario y respaldo delegan sus mutaciones a servicios. |
 | P02-02 | Completada | Persistencia explícita con `IUnitOfWork`, cero guardados/transacciones en repositorios y pruebas de aislamiento, rollback y regresión HTTP. |
-| P02-03 | Parcial | Reloj, correlativos y ejecución de respaldo tienen contrato inyectable; faltan interfaces para cálculo, auditoría e impresión. |
+| P02-03 | Completada en código | Contratos inyectables de reloj, cálculo, correlativo, auditoría, impresión y respaldo; sustitución/rollback y transporte simulado probados. Prueba física pendiente en Windows. |
 | P02-04 | Parcial | `ProblemDetails`, código y `traceId` completados; faltan paginación general, convenciones de fechas/enums y descripción OpenAPI por respuesta. |
 | P02-05 | Pendiente | Generar o validar tipos TypeScript desde OpenAPI en QA. |
 | P02-06 | Parcial previo | Existe matriz de permisos y prueba reflectiva; faltan motivos/aprobaciones por monto y revalidar todas las lecturas sensibles. |
@@ -75,8 +75,14 @@ El 28 de octubre se retiraron los 56 guardados internos de los repositorios. `IU
 
 La nueva integración prueba visibilidad antes/después del guardado, rollback exterior y reversión del lote ante fallo de unicidad. La matriz HTTP vuelve a probar altas, ediciones y bajas de catálogos, roles/permisos y usuarios; verifica que los intentos de acceso fallidos se guardan. El comprobador de límites de repositorio queda incorporado a QA. La auditoría npm de esta fecha detectó cinco alertas altas; se actualizaron dependencias dentro de los rangos existentes, incluidas Vite y Zod. El [detalle de la entrega](p02-f2-unidad-de-trabajo.md) contiene consumidores, pruebas y evidencia.
 
+## Entrega P02-G — contratos de cálculo, auditoría e impresión
+
+`IInvoiceCalculator`, `ITaxCalculator`, `IAuditService`, `IInvoicePrintRenderer` e `IPrinterTransport` completan las dependencias pendientes. Los consumidores reciben interfaces; `WindowsPrinterTransport` concentra el acceso al componente nativo. Se retiró la consulta síncrona al construir el calculador de impuestos y la muestra de impresión usa el cálculo compartido para conservar líneas y totales congruentes.
+
+La integración prueba que sustituir el calculador o la auditoría por una implementación que falla revierte la factura y el correlativo. La impresión captura los bytes del generador real con un transporte simulado y recorre vista previa, original/copia, regla, fallos y plataforma no disponible. El [detalle de P02-G](p02-g-contratos.md) conserva el alcance y la prueba física pendiente de Windows.
+
 ## Criterio para la siguiente entrega
 
-P02-G completará los contratos inyectables de cálculo, auditoría e impresión. Luego continuará con convenciones y descripción OpenAPI, paginación y tipos frontend. G2 sigue abierta hasta cubrir los pendientes de la tabla y obtener la revisión independiente.
+P02-H continuará con convenciones y descripción OpenAPI, paginación y tipos frontend. G2 sigue abierta hasta cubrir los pendientes de la tabla y obtener la revisión independiente.
 
 La evidencia de QA y compatibilidad se conserva en el [expediente general](../evidencia/README.md#p02--base-técnica-primera-entrega).

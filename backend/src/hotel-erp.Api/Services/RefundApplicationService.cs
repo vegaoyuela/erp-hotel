@@ -19,7 +19,7 @@ public sealed record RefundCreationResult(Refund? Refund, int? FailureStatus, st
 public sealed class RefundApplicationService(
     ApplicationDbContext context,
     IAccountingService accountingService,
-    AuditService auditService,
+    IAuditService auditService,
     IdempotencyService idempotencyService,
     IHotelClock clock,
     IApplicationFailureInjector failureInjector)

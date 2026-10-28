@@ -11,7 +11,7 @@ public sealed record PurchaseOperationResult(Guid Id);
 public sealed class PurchaseInvoiceApplicationService(
     ApplicationDbContext context,
     IAccountingService accountingService,
-    AuditService auditService,
+    IAuditService auditService,
     IApplicationFailureInjector failureInjector)
 {
     public async Task<ApplicationMutationResult<PurchaseInvoice>> CreateAsync(

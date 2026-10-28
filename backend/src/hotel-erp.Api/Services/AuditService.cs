@@ -6,7 +6,7 @@ using hotel_erp.Api.Database;
 
 namespace hotel_erp.Api.Services
 {
-    public class AuditService
+    public class AuditService : IAuditService
     {
         private readonly IAuditLogRepository _auditLogRepository;
         private readonly ApplicationDbContext _context;

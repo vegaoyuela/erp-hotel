@@ -1,3 +1,4 @@
+using hotel_erp.Api.Services.Interfaces;
 using hotel_erp.Api.Database;
 using hotel_erp.Api.Database.Entities;
 using hotel_erp.Api.Dtos.Cash;
@@ -7,7 +8,7 @@ namespace hotel_erp.Api.Services;
 
 public sealed class CashRegisterApplicationService(
     ApplicationDbContext context,
-    AuditService auditService,
+    IAuditService auditService,
     IdempotencyService idempotencyService,
     IHotelClock clock,
     IApplicationFailureInjector failureInjector)

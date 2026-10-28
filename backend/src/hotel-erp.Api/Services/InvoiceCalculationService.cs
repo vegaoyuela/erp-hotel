@@ -1,3 +1,4 @@
+using hotel_erp.Api.Services.Interfaces;
 using hotel_erp.Api.Database.Entities;
 
 namespace hotel_erp.Api.Services;
@@ -25,11 +26,11 @@ public sealed record InvoiceCalculation(
     decimal ExemptAmount,
     decimal ExoneratedAmount);
 
-public static class InvoiceCalculationService
+public sealed class InvoiceCalculationService : IInvoiceCalculator
 {
     private static readonly decimal[] SupportedIsvRates = [0m, 0.15m, 0.18m];
 
-    public static InvoiceCalculation Calculate(
+    public InvoiceCalculation Calculate(
         IEnumerable<InvoiceLineInput> source,
         bool isIsvExempt = false,
         bool isTouristTaxExempt = false)

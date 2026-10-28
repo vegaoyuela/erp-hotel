@@ -29,8 +29,8 @@ public sealed class ReservationApplicationService(
     IReservationRepository repository,
     IBusinessSettingsRepository settingsRepository,
     IDiscountRepository discountRepository,
-    TaxService taxService,
-    AuditService auditService,
+    ITaxCalculator taxService,
+    IAuditService auditService,
     IHotelClock clock,
     IApplicationFailureInjector failureInjector)
 {

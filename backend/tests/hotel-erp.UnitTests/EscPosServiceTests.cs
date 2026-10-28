@@ -1,3 +1,4 @@
+using hotel_erp.Api.Services.Interfaces;
 using hotel_erp.Api.Database.Entities;
 using hotel_erp.Api.Services;
 
@@ -5,6 +6,8 @@ namespace hotel_erp.UnitTests;
 
 public class EscPosServiceTests
 {
+    private readonly IInvoicePrintRenderer _renderer = new EscPosService();
+
     [Fact]
     public void BuildLines_DoesNotInventCashPaymentForPendingInvoice()
     {
@@ -27,7 +30,7 @@ public class EscPosServiceTests
             PaymentMethod = null
         };
 
-        var lines = new EscPosService().BuildLines(
+        var lines = _renderer.BuildLines(
             invoice,
             new BusinessSettings { PrintWidth = 46, ShowPayment = true },
             null,
@@ -68,7 +71,7 @@ public class EscPosServiceTests
             TotalAmount = 133m
         };
 
-        var lines = new EscPosService().BuildLines(
+        var lines = _renderer.BuildLines(
             invoice,
             new BusinessSettings { PrintWidth = 46, ShowFiscal = true, ShowTotals = true },
             null,

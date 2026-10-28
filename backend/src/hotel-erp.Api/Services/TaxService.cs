@@ -1,40 +1,12 @@
-using hotel_erp.Api.Database;
-using Microsoft.EntityFrameworkCore;
+using hotel_erp.Api.Services.Interfaces;
 
 namespace hotel_erp.Api.Services
 {
-    public class TaxService
+    public class TaxService : ITaxCalculator
     {
-        private readonly ApplicationDbContext? _context;
-        private bool _loaded;
-
         public decimal IsvRate { get; set; } = 0.15m;
         public decimal TouristTaxRate { get; set; } = 0.04m;
         public decimal TaxFactor => 1m + IsvRate + TouristTaxRate;
-
-        public TaxService() { }
-
-        public TaxService(ApplicationDbContext context)
-        {
-            _context = context;
-            LoadRates();
-        }
-
-        private void LoadRates()
-        {
-            if (_loaded || _context == null) return;
-            var settings = _context.BusinessSettings
-                .AsNoTracking()
-                .OrderBy(setting => setting.CreatedAt)
-                .ThenBy(setting => setting.Id)
-                .FirstOrDefault();
-            if (settings != null)
-            {
-                IsvRate = settings.IsvRate;
-                TouristTaxRate = settings.TouristTaxRate;
-            }
-            _loaded = true;
-        }
 
         public static decimal RoundCurrency(decimal amount) => Math.Round(amount, 2, MidpointRounding.AwayFromZero);
 

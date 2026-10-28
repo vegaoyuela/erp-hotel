@@ -21,6 +21,7 @@ public class ApplicationServiceArchitectureTests
         Assert.Contains(applicationServiceType, dependencies);
         Assert.DoesNotContain(typeof(IAccountingService), dependencies);
         Assert.DoesNotContain(typeof(AuditService), dependencies);
+        Assert.DoesNotContain(typeof(IAuditService), dependencies);
         Assert.DoesNotContain(typeof(IdempotencyService), dependencies);
         Assert.DoesNotContain(typeof(IHotelClock), dependencies);
     }
@@ -38,6 +39,7 @@ public class ApplicationServiceArchitectureTests
 
         Assert.Contains(applicationServiceType, dependencies);
         Assert.DoesNotContain(typeof(AuditService), dependencies);
+        Assert.DoesNotContain(typeof(IAuditService), dependencies);
         Assert.DoesNotContain(typeof(IdempotencyService), dependencies);
     }
 
@@ -54,6 +56,7 @@ public class ApplicationServiceArchitectureTests
         Assert.Contains(applicationServiceType, dependencies);
         Assert.DoesNotContain(typeof(IAccountingService), dependencies);
         Assert.DoesNotContain(typeof(AuditService), dependencies);
+        Assert.DoesNotContain(typeof(IAuditService), dependencies);
         Assert.DoesNotContain(typeof(IHotelClock), dependencies);
     }
 
@@ -65,5 +68,33 @@ public class ApplicationServiceArchitectureTests
 
         Assert.Contains(typeof(IDatabaseBackupService), dependencies);
         Assert.DoesNotContain(typeof(DatabaseBackupService), dependencies);
+    }
+
+    [Theory]
+    [InlineData(typeof(InvoiceApplicationService), typeof(IInvoiceCalculator))]
+    [InlineData(typeof(FolioApplicationService), typeof(IInvoiceCalculator))]
+    [InlineData(typeof(ReservationApplicationService), typeof(ITaxCalculator))]
+    [InlineData(typeof(InvoiceApplicationService), typeof(IAuditService))]
+    [InlineData(typeof(FolioApplicationService), typeof(IAuditService))]
+    [InlineData(typeof(ReservationApplicationService), typeof(IAuditService))]
+    [InlineData(typeof(PaymentApplicationService), typeof(IAuditService))]
+    [InlineData(typeof(RefundApplicationService), typeof(IAuditService))]
+    [InlineData(typeof(CardSettlementApplicationService), typeof(IAuditService))]
+    [InlineData(typeof(CashRegisterApplicationService), typeof(IAuditService))]
+    [InlineData(typeof(PurchaseInvoiceApplicationService), typeof(IAuditService))]
+    [InlineData(typeof(InventoryApplicationService), typeof(IAuditService))]
+    [InlineData(typeof(AuthController), typeof(IAuditService))]
+    [InlineData(typeof(SettingsController), typeof(IAuditService))]
+    [InlineData(typeof(PrintController), typeof(IInvoicePrintRenderer))]
+    [InlineData(typeof(PrintController), typeof(IPrinterTransport))]
+    public void Consumer_RequiresReplaceableContract(Type consumer, Type contract)
+    {
+        var dependencies = Assert.Single(consumer.GetConstructors())
+            .GetParameters().Select(parameter => parameter.ParameterType).ToHashSet();
+        Assert.Contains(contract, dependencies);
+        Assert.DoesNotContain(typeof(AuditService), dependencies);
+        Assert.DoesNotContain(typeof(TaxService), dependencies);
+        Assert.DoesNotContain(typeof(InvoiceCalculationService), dependencies);
+        Assert.DoesNotContain(typeof(EscPosService), dependencies);
     }
 }

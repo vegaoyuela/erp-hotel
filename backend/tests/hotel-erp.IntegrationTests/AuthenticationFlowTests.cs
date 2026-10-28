@@ -379,6 +379,11 @@ public partial class AuthenticationFlowTests
         Assert.Equal(64, approvedRevision.SnapshotSha256.Length);
 
         var caiId = await CreateActiveCaiAsync(factory.Services);
+        await AssertReplaceableInvoiceContractsAsync(
+            database.ConnectionString,
+            factory.Services,
+            currentSession.AccessToken!,
+            caiId);
         await AssertInvoiceRollbackAfterAccountingFailureAsync(
             database.ConnectionString,
             currentSession.AccessToken!,
@@ -392,6 +397,12 @@ public partial class AuthenticationFlowTests
         Assert.Equal("001-001-01-00000001", issuedInvoice.CorrelativeNumber);
         Assert.Single(issuedInvoice.Items);
         await AssertInvoiceAccountingAndAuditAsync(factory.Services, issuedInvoice.Id);
+
+        await AssertPrinterContractsAsync(
+            database.ConnectionString,
+            factory.Services,
+            currentSession.AccessToken!,
+            issuedInvoice.Id);
 
         using var repeatedInvoiceRequest = InvoiceRequest(currentSession.AccessToken!, caiId, invoiceIdempotencyKey);
         var repeatedInvoiceResponse = await client.SendAsync(repeatedInvoiceRequest);

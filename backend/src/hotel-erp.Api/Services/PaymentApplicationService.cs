@@ -18,7 +18,7 @@ public sealed record PaymentCreationResult(Payment? Payment, int? FailureStatus,
 public sealed class PaymentApplicationService(
     ApplicationDbContext context,
     IAccountingService accountingService,
-    AuditService auditService,
+    IAuditService auditService,
     IdempotencyService idempotencyService,
     IHotelClock clock,
     IApplicationFailureInjector failureInjector)

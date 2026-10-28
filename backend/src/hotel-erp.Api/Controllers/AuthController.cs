@@ -15,12 +15,12 @@ namespace hotel_erp.Api.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
-        private readonly AuditService _auditService;
+        private readonly IAuditService _auditService;
         private readonly AuthenticationSessionCookies _sessionCookies;
 
         public AuthController(
             IAuthService authService,
-            AuditService auditService,
+            IAuditService auditService,
             AuthenticationSessionCookies sessionCookies)
         {
             _authService = authService;

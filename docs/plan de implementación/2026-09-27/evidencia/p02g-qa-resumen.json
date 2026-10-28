@@ -1,0 +1,273 @@
+{
+  "generated_at": "2026-10-28T19:51:53.476470+00:00",
+  "implementation_date_honduras": "2026-10-28",
+  "baseline_revision": "9ff2b2a189e720ce83127bd48a523d8a2fe71925",
+  "status": "passed",
+  "contains_secret_values": false,
+  "scope": "P02-G injectable calculation, audit and printing contracts",
+  "p02_03_complete_in_code": true,
+  "contracts": {
+    "IInvoiceCalculator": {
+      "implementation": "InvoiceCalculationService",
+      "lifetime": "Scoped",
+      "consumers": [
+        "InvoiceApplicationService",
+        "FolioApplicationService",
+        "PrintController"
+      ]
+    },
+    "ITaxCalculator": {
+      "implementation": "TaxService",
+      "lifetime": "Scoped",
+      "consumers": [
+        "ReservationApplicationService"
+      ]
+    },
+    "IAuditService": {
+      "implementation": "AuditService",
+      "lifetime": "Scoped",
+      "consumers": [
+        "InvoiceApplicationService",
+        "FolioApplicationService",
+        "ReservationApplicationService",
+        "PaymentApplicationService",
+        "RefundApplicationService",
+        "CardSettlementApplicationService",
+        "CashRegisterApplicationService",
+        "PurchaseInvoiceApplicationService",
+        "InventoryApplicationService",
+        "AuthController",
+        "SettingsController"
+      ]
+    },
+    "IInvoicePrintRenderer": {
+      "implementation": "EscPosService",
+      "lifetime": "Scoped",
+      "consumers": [
+        "PrintController"
+      ]
+    },
+    "IPrinterTransport": {
+      "implementation": "WindowsPrinterTransport",
+      "lifetime": "Singleton",
+      "consumers": [
+        "PrintController"
+      ]
+    }
+  },
+  "implementation": {
+    "invoice_calculation_static_dependency_removed": true,
+    "financial_and_operational_audit_consumers_use_interface": true,
+    "tax_constructor_database_query_removed": true,
+    "check_in_explicit_async_settings_load_retained": true,
+    "calibration_invoice_uses_shared_calculator": true,
+    "native_printer_calls_isolated_in_transport": true
+  },
+  "proof": {
+    "calculator_replacement_failure_rolls_back_invoice_and_correlative": true,
+    "audit_replacement_failure_rolls_back_document_accounting_and_correlative": true,
+    "no_residual_payments_cash_audit_or_idempotency": true,
+    "tax_rates_isolated_between_scopes": true,
+    "printing_renderer_replaced_and_exercised": true,
+    "real_escpos_bytes_captured_by_simulated_transport": true,
+    "preview_does_not_send_print_jobs": true,
+    "original_and_copy_present_in_payload": true,
+    "calibration_ruler_routed_through_contracts": true,
+    "renderer_and_transport_failures_report_error": true,
+    "unsupported_transport_returns_501_without_sending": true
+  },
+  "qa": {
+    "backend_build": {
+      "warnings": 0,
+      "errors": 0
+    },
+    "unit_tests": {
+      "passed": 109,
+      "skipped": 0,
+      "total": 109
+    },
+    "postgresql_integration_tests": {
+      "passed": 5,
+      "skipped": 0,
+      "total": 5
+    },
+    "contract_rollback_scenarios": {
+      "passed": 2,
+      "total": 2
+    },
+    "dossier_validator_tests": {
+      "passed": 5,
+      "total": 5
+    },
+    "frontend": {
+      "npm_audit_vulnerabilities": 0,
+      "lint": "passed",
+      "production_build": "passed"
+    },
+    "ef_pending_model_changes": false,
+    "dotnet_format": "passed"
+  },
+  "printing_acceptance": {
+    "native_windows_spooler_exercised": false,
+    "physical_paper_and_invoice_acceptance": "pending_windows_hotel_validation"
+  },
+  "qa_database": {
+    "database": "hotel_erp_qa",
+    "table_count": 42,
+    "total_rows": 345,
+    "migration_count": 11,
+    "temporary_databases_remaining": 0,
+    "unchanged_from_p00": true
+  },
+  "remaining": {
+    "p02_h": [
+      "OpenAPI response descriptions and conventions",
+      "pagination",
+      "frontend types"
+    ],
+    "other_p02": [
+      "security tasks",
+      "formal test matrix",
+      "independent technical review"
+    ],
+    "external": [
+      "official hotel inputs for G0 and G1",
+      "Windows 11 setup",
+      "physical invoice acceptance"
+    ]
+  },
+  "evidence": {
+    "file_01": {
+      "path": "backend/src/hotel-erp.Api/Controllers/AuthController.cs",
+      "sha256": "e9fe971f249c54445aaca8fe457d0c1d9a5a3b58bee245cf08b32f7e13ea12b8"
+    },
+    "file_02": {
+      "path": "backend/src/hotel-erp.Api/Controllers/PrintController.cs",
+      "sha256": "fa9babd110796af870c421bed6de35a46f16735a2ad339279d86e16f8db20fc7"
+    },
+    "file_03": {
+      "path": "backend/src/hotel-erp.Api/Controllers/SettingsController.cs",
+      "sha256": "f0434d068837982b78b55f81a8503821b8547b9e7a00490c5adc14297668c2ac"
+    },
+    "file_04": {
+      "path": "backend/src/hotel-erp.Api/Program.cs",
+      "sha256": "2790f0173d173923975951cf9f9c9a633eb9c75d74e23a13878de787972a6d09"
+    },
+    "file_05": {
+      "path": "backend/src/hotel-erp.Api/Services/AuditService.cs",
+      "sha256": "53c27305fa91a5d15c01fa40d30fa6f6e6f28d2eb1581fb5cb538b930cc49c10"
+    },
+    "file_06": {
+      "path": "backend/src/hotel-erp.Api/Services/CardSettlementApplicationService.cs",
+      "sha256": "3e79b1bd04b4a14018a23308cc032a2ca6da2196804e52f3dcb3ac72e50aa383"
+    },
+    "file_07": {
+      "path": "backend/src/hotel-erp.Api/Services/CashRegisterApplicationService.cs",
+      "sha256": "d9cda32807245a82aa7f2e39ed62bb198302100f0429ae4d869170ffa3ff1af1"
+    },
+    "file_08": {
+      "path": "backend/src/hotel-erp.Api/Services/EscPosService.cs",
+      "sha256": "735df6bd3c64553f2b35418aa671be6757e6002363d4e3a3464f929328e21e6c"
+    },
+    "file_09": {
+      "path": "backend/src/hotel-erp.Api/Services/FolioApplicationService.cs",
+      "sha256": "822981810dfb28485c44c9bc4ff8fd6dcf1fe303042bca9723ab91f9a916dccd"
+    },
+    "file_10": {
+      "path": "backend/src/hotel-erp.Api/Services/Interfaces/IAuditService.cs",
+      "sha256": "c10d8bdeeed1ea05ca134834cb5fb7ebee5a2ee45853e3a014847e67bc476780"
+    },
+    "file_11": {
+      "path": "backend/src/hotel-erp.Api/Services/Interfaces/IInvoiceCalculator.cs",
+      "sha256": "4f89a0b58c1cc71ce85975728672b34cb4aa2b428501209b3caf531455f54605"
+    },
+    "file_12": {
+      "path": "backend/src/hotel-erp.Api/Services/Interfaces/IInvoicePrintRenderer.cs",
+      "sha256": "795b3dce1c081018d3836730e9290eacc88c7c9bbe7bc487eae37c9d1e8946d0"
+    },
+    "file_13": {
+      "path": "backend/src/hotel-erp.Api/Services/Interfaces/IPrinterTransport.cs",
+      "sha256": "1f0b7e5125b3852497a5aa7ef7fa762f2389d469829946d0571aeecbb58ecd9e"
+    },
+    "file_14": {
+      "path": "backend/src/hotel-erp.Api/Services/Interfaces/ITaxCalculator.cs",
+      "sha256": "f02077804e0a74fa78a88c1ec882d02717f43825836d17abc55434fdbc1a1cf5"
+    },
+    "file_15": {
+      "path": "backend/src/hotel-erp.Api/Services/InventoryApplicationService.cs",
+      "sha256": "0ad720b7088b7595a267511f01d610f81961a4b3e1d0e57561d700519e692e08"
+    },
+    "file_16": {
+      "path": "backend/src/hotel-erp.Api/Services/InvoiceApplicationService.cs",
+      "sha256": "ab926baa6b3860cd8a38def80b6affd34910b921685593124c41b5086745f27f"
+    },
+    "file_17": {
+      "path": "backend/src/hotel-erp.Api/Services/InvoiceCalculationService.cs",
+      "sha256": "7966c277374a414877d4c83e97dcee7f089ec259c3319208425ffce376184651"
+    },
+    "file_18": {
+      "path": "backend/src/hotel-erp.Api/Services/PaymentApplicationService.cs",
+      "sha256": "ca819ba357a2b291dca8824527af1fcd7f0b84045b259bc5bf20f56a06a3d0d4"
+    },
+    "file_19": {
+      "path": "backend/src/hotel-erp.Api/Services/PurchaseInvoiceApplicationService.cs",
+      "sha256": "10a10c968a0ee0a85886f8e44ac01f91af53a5041371a16c9968cd7b12140712"
+    },
+    "file_20": {
+      "path": "backend/src/hotel-erp.Api/Services/RefundApplicationService.cs",
+      "sha256": "b0075be7c4af991048c009f8bf4ad04e06708203d65ddd8b4ea6d7fc48b6db0d"
+    },
+    "file_21": {
+      "path": "backend/src/hotel-erp.Api/Services/ReservationApplicationService.cs",
+      "sha256": "59106ac111da753ff3d5439e1c60fb89f9fb0d93103d3b9f6e611724cdc5e5a2"
+    },
+    "file_22": {
+      "path": "backend/src/hotel-erp.Api/Services/TaxService.cs",
+      "sha256": "7aee6b8c3811696c5de0e9257e60ae2c7b380972d2f99f6e12ee484bdf7ed55e"
+    },
+    "file_23": {
+      "path": "backend/src/hotel-erp.Api/Services/WindowsPrinterTransport.cs",
+      "sha256": "23e69884e9caa0b37390f11d8577d910dcc0ceeffa2804a4eb179dd6bad9b273"
+    },
+    "file_24": {
+      "path": "backend/tests/hotel-erp.IntegrationTests/AuthenticationFlowTests.Contracts.cs",
+      "sha256": "5c47a3153d703ab9f0cb2c5daaaf1af3fec732dbc7de7460fce452385c64e3ef"
+    },
+    "file_25": {
+      "path": "backend/tests/hotel-erp.IntegrationTests/AuthenticationFlowTests.cs",
+      "sha256": "48397b8a7ccc0337442c97799c83e6fadfb5c1d2cb54b1a668e4ee71aa221b6b"
+    },
+    "file_26": {
+      "path": "backend/tests/hotel-erp.UnitTests/ApplicationServiceArchitectureTests.cs",
+      "sha256": "2b95b264ff1aadd20ba4ad373aad1eaf300a63d99b3a50c29bb6c7fa7b3df96f"
+    },
+    "file_27": {
+      "path": "backend/tests/hotel-erp.UnitTests/EscPosServiceTests.cs",
+      "sha256": "0b4985fee343625d8e1aa864779f761961b072b6ae945f84334f3819145d93d0"
+    },
+    "file_28": {
+      "path": "backend/tests/hotel-erp.UnitTests/InvoiceCalculationServiceTests.cs",
+      "sha256": "dd2cc40b76c2835e3aa3b9f42558c68f0c58e3cf4414b67aae145d8bed83e98c"
+    },
+    "file_29": {
+      "path": "backend/tests/hotel-erp.UnitTests/TaxServiceTests.cs",
+      "sha256": "1e898794ea9219f21a139141de4f0850e83259db55accb5ec85475084c1b86fe"
+    },
+    "file_30": {
+      "path": "docs/plan de implementación/2026-09-27/evidencia/p02g-base-qa.json",
+      "sha256": "a410ee8a81c297bff43cca77564f281a175d931c8fb625863de409bcc86ca2e7"
+    },
+    "file_31": {
+      "path": "docs/plan de implementación/2026-09-27/evidencia/p02g-modelo-ef.log",
+      "sha256": "815c5cd494b61a9d8737ba7653cd05fb05926e7b40a924683fa4eef4ca87566c"
+    },
+    "file_32": {
+      "path": "docs/plan de implementación/2026-09-27/evidencia/p02g-qa.log",
+      "sha256": "c5bce4b8621e4b72c6f25391ba2d14d2fe786561c39a3b95fc2d555f74404c90"
+    },
+    "file_33": {
+      "path": "docs/plan de implementación/2026-09-27/p02-base-tecnica/p02-g-contratos.md",
+      "sha256": "af99104ba4ffb74a23508d35498a39e392ac4dc40729e6fac16879e17521bc72"
+    }
+  }
+}

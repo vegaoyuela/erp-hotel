@@ -1,3 +1,4 @@
+using hotel_erp.Api.Services.Interfaces;
 using hotel_erp.Api.Database;
 using hotel_erp.Api.Database.Entities;
 using hotel_erp.Api.Dtos.Common;
@@ -9,7 +10,8 @@ public sealed record FolioChargeResult(string Message, Guid ItemId, decimal Tota
 
 public sealed class FolioApplicationService(
     ApplicationDbContext context,
-    AuditService auditService,
+    IAuditService auditService,
+    IInvoiceCalculator invoiceCalculator,
     IApplicationFailureInjector failureInjector)
 {
     public async Task<ApplicationMutationResult<FolioChargeResult>> AddItemAsync(
@@ -35,7 +37,7 @@ public sealed class FolioApplicationService(
         InvoiceCalculation calculation;
         try
         {
-            calculation = InvoiceCalculationService.Calculate(
+            calculation = invoiceCalculator.Calculate(
                 folio.FolioItems.Select(item => new InvoiceLineInput(
                         item.Description,
                         item.Quantity,

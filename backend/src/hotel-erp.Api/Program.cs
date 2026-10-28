@@ -94,8 +94,9 @@ builder.Services.AddScoped<IUnitOfWork, EfUnitOfWork>();
 // Application services
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
-builder.Services.AddScoped<TaxService>();
-builder.Services.AddScoped<AuditService>();
+builder.Services.AddScoped<ITaxCalculator, TaxService>();
+builder.Services.AddScoped<IInvoiceCalculator, InvoiceCalculationService>();
+builder.Services.AddScoped<IAuditService, AuditService>();
 builder.Services.AddScoped<AuditChainService>();
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddSingleton<IHotelClock, HotelClock>();
@@ -103,7 +104,8 @@ builder.Services.AddScoped<IBusinessSettingsRepository, BusinessSettingsReposito
 builder.Services.AddScoped<IDiscountRepository, DiscountRepository>();
 builder.Services.AddScoped<ISupplierRepository, SupplierRepository>();
 builder.Services.AddScoped<IPurchaseInvoiceRepository, PurchaseInvoiceRepository>();
-builder.Services.AddScoped<EscPosService>();
+builder.Services.AddScoped<IInvoicePrintRenderer, EscPosService>();
+builder.Services.AddSingleton<IPrinterTransport, WindowsPrinterTransport>();
 builder.Services.AddScoped<IAccountingService, AccountingService>();
 builder.Services.AddScoped<IFiscalAuthorizationService, FiscalAuthorizationService>();
 builder.Services.AddScoped<FiscalProfileService>();

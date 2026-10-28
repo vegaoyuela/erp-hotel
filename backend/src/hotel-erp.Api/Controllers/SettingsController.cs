@@ -19,13 +19,13 @@ namespace hotel_erp.Api.Controllers
     {
         private readonly IBusinessSettingsRepository _repo;
         private readonly IMapper _mapper;
-        private readonly AuditService _auditService;
+        private readonly IAuditService _auditService;
         private readonly ApplicationDbContext _context;
         private readonly IHotelClock _clock;
 
         private readonly IUnitOfWork _unitOfWork;
 
-        public SettingsController(IBusinessSettingsRepository repo, IMapper mapper, AuditService auditService, ApplicationDbContext context, IHotelClock clock, IUnitOfWork unitOfWork)
+        public SettingsController(IBusinessSettingsRepository repo, IMapper mapper, IAuditService auditService, ApplicationDbContext context, IHotelClock clock, IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
             _repo = repo;

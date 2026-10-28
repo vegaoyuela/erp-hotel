@@ -1,3 +1,4 @@
+using hotel_erp.Api.Services.Interfaces;
 using hotel_erp.Api.Database;
 using hotel_erp.Api.Database.Entities;
 using hotel_erp.Api.Dtos.Inventory;
@@ -9,7 +10,7 @@ public sealed record InventoryMutationResult(Guid Id);
 
 public sealed class InventoryApplicationService(
     ApplicationDbContext context,
-    AuditService auditService,
+    IAuditService auditService,
     IHotelClock clock,
     IApplicationFailureInjector failureInjector)
 {

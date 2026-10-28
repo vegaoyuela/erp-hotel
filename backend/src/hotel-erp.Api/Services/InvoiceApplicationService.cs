@@ -40,7 +40,8 @@ public sealed class InvoiceApplicationService(
     IFiscalAuthorizationService fiscalAuthorizationService,
     FiscalProfileService fiscalProfileService,
     IdempotencyService idempotencyService,
-    AuditService auditService,
+    IAuditService auditService,
+    IInvoiceCalculator invoiceCalculator,
     IHotelClock clock,
     IApplicationFailureInjector failureInjector)
 {
@@ -272,7 +273,7 @@ public sealed class InvoiceApplicationService(
                     item.ISVRate,
                     item.IsTouristTaxable,
                     CombineDiscountPercent(item.DiscountPercentage, appliedDiscount?.Value ?? 0m)));
-            calculation = InvoiceCalculationService.Calculate(
+            calculation = invoiceCalculator.Calculate(
                 calculationLines,
                 isIsvExempt,
                 isTouristTaxExempt);
@@ -596,7 +597,7 @@ public sealed class InvoiceApplicationService(
         InvoiceCalculation calculation;
         try
         {
-            calculation = InvoiceCalculationService.Calculate(
+            calculation = invoiceCalculator.Calculate(
                 request.Items.Select(requested =>
                 {
                     var source = originalLines[requested.OriginalInvoiceItemId];
@@ -747,7 +748,7 @@ public sealed class InvoiceApplicationService(
         InvoiceCalculation calculation;
         try
         {
-            calculation = InvoiceCalculationService.Calculate(
+            calculation = invoiceCalculator.Calculate(
                 request.Items.Select(ToCalculationLine),
                 original.IsIsvExempt,
                 original.IsTouristTaxExempt);

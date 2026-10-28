@@ -1,13 +1,16 @@
+using hotel_erp.Api.Services.Interfaces;
 using hotel_erp.Api.Services;
 
 namespace hotel_erp.UnitTests;
 
 public class InvoiceCalculationServiceTests
 {
+    private readonly IInvoiceCalculator _calculator = new InvoiceCalculationService();
+
     [Fact]
     public void Calculate_SeparatesTaxBasesAndRoundsEachLine()
     {
-        var result = InvoiceCalculationService.Calculate(
+        var result = _calculator.Calculate(
         [
             new("Hospedaje", 2, 100m, false, 0.15m, true, 10m),
             new("Bebida alcohólica", 1, 100m, false, 0.18m, false, 0m),
@@ -29,7 +32,7 @@ public class InvoiceCalculationServiceTests
     [Fact]
     public void Calculate_TracksExoneratedBaseWithoutCreatingIsv()
     {
-        var result = InvoiceCalculationService.Calculate(
+        var result = _calculator.Calculate(
             [new("Hospedaje exonerado", 1, 100m, false, 0.15m, true, 0m)],
             isIsvExempt: true,
             isTouristTaxExempt: true);
@@ -49,7 +52,7 @@ public class InvoiceCalculationServiceTests
     public void Calculate_RejectsInvalidFiscalLines(int quantity, int unitPrice, double rate, int discount)
     {
         Assert.Throws<InvoiceCalculationException>(() =>
-            InvoiceCalculationService.Calculate(
+            _calculator.Calculate(
                 [new("Línea inválida", quantity, unitPrice, false, (decimal)rate, false, discount)]));
     }
 }

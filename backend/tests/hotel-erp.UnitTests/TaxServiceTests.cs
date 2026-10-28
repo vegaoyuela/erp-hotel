@@ -1,10 +1,11 @@
+using hotel_erp.Api.Services.Interfaces;
 using hotel_erp.Api.Services;
 
 namespace hotel_erp.UnitTests;
 
 public class TaxServiceTests
 {
-    private readonly TaxService _service = new()
+    private readonly ITaxCalculator _service = new TaxService()
     {
         IsvRate = 0.15m,
         TouristTaxRate = 0.04m

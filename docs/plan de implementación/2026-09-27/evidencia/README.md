@@ -151,4 +151,17 @@ Se retiraron los 56 guardados implícitos de los repositorios. Los consumidores 
 | [p02f2-qa.log](p02f2-qa.log) | Ejecución final: 93 unitarias, 5 integraciones PostgreSQL, 5 validaciones fiscales, auditoría npm, lint y build. |
 | [p02f2-qa-resumen.json](p02f2-qa-resumen.json) | Resumen verificable con hashes, versiones corregidas y alcance de las pruebas. |
 
-P02-02 queda completada. Los pendientes de P02-G, contratos API, seguridad, matriz formal y revisión independiente permanecen en la [lista maestra](../06-lista-maestra.md).
+P02-02 queda completada. Al cierre de P02-F2, los pendientes de P02-G, contratos API, seguridad, matriz formal y revisión independiente permanecían en la [lista maestra](../06-lista-maestra.md).
+
+### P02-G — contratos de cálculo, auditoría e impresión (28 de octubre de 2026)
+
+Se incorporaron cinco contratos para los consumidores de cálculo, auditoría, generación ESC/POS y transporte de impresión. La muestra de impresión utiliza el cálculo compartido y check-in carga sus tasas sin una consulta síncrona al construir el servicio.
+
+| Archivo | Resultado |
+|---|---|
+| [p02g-modelo-ef.log](p02g-modelo-ef.log) | EF confirma que no hace falta una migración. |
+| [p02g-base-qa.json](p02g-base-qa.json) | Conteos reales de tablas, filas, migraciones y bases temporales. |
+| [p02g-qa.log](p02g-qa.log) | Build, 109 unitarias, 5 integraciones PostgreSQL, 5 validaciones fiscales, npm audit, lint y frontend. |
+| [p02g-qa-resumen.json](p02g-qa-resumen.json) | Hashes y resultado estructurado; diferencia pruebas de transporte simulado y validación física pendiente. |
+
+P02-03 queda completada en código. Los pendientes de contratos API, seguridad, matriz formal, revisión independiente y Windows permanecen en la [lista maestra](../06-lista-maestra.md).

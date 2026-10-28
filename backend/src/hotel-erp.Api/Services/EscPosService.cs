@@ -1,10 +1,11 @@
+using hotel_erp.Api.Services.Interfaces;
 using System.Text;
 using System.Runtime.Versioning;
 using hotel_erp.Api.Database.Entities;
 
 namespace hotel_erp.Api.Services
 {
-    public class EscPosService
+    public class EscPosService : IInvoicePrintRenderer
     {
         private static readonly Encoding Enc = GetEncoder();
         private static Encoding GetEncoder()
@@ -423,21 +424,49 @@ namespace hotel_erp.Api.Services
 
         private static string EnLetras(long n) => n switch
         {
-            0 => "CERO", 100 => "CIEN", < 100 => Decenas(n), < 1000 => Centenas(n), < 1000000 => Miles(n), _ => Millones(n)
+            0 => "CERO",
+            100 => "CIEN",
+            < 100 => Decenas(n),
+            < 1000 => Centenas(n),
+            < 1000000 => Miles(n),
+            _ => Millones(n)
         };
         private static string Unidades(long n) => n switch
         {
-            1 => "UNO", 2 => "DOS", 3 => "TRES", 4 => "CUATRO", 5 => "CINCO",
-            6 => "SEIS", 7 => "SIETE", 8 => "OCHO", 9 => "NUEVE", _ => ""
+            1 => "UNO",
+            2 => "DOS",
+            3 => "TRES",
+            4 => "CUATRO",
+            5 => "CINCO",
+            6 => "SEIS",
+            7 => "SIETE",
+            8 => "OCHO",
+            9 => "NUEVE",
+            _ => ""
         };
         private static string Decenas(long n) => n switch
         {
-            10 => "DIEZ", 11 => "ONCE", 12 => "DOCE", 13 => "TRECE", 14 => "CATORCE",
-            15 => "QUINCE", 16 => "DIECISEIS", 17 => "DIECISIETE", 18 => "DIECIOCHO", 19 => "DIECINUEVE",
-            20 => "VEINTE", >= 21 and < 30 => $"VEINTI{Unidades(n - 20)}",
-            30 => "TREINTA", 40 => "CUARENTA", 50 => "CINCUENTA",
-            60 => "SESENTA", 70 => "SETENTA", 80 => "OCHENTA", 90 => "NOVENTA",
-            _ when n > 30 => $"{Decenas((n / 10) * 10)} Y {Unidades(n % 10)}", _ => Unidades(n)
+            10 => "DIEZ",
+            11 => "ONCE",
+            12 => "DOCE",
+            13 => "TRECE",
+            14 => "CATORCE",
+            15 => "QUINCE",
+            16 => "DIECISEIS",
+            17 => "DIECISIETE",
+            18 => "DIECIOCHO",
+            19 => "DIECINUEVE",
+            20 => "VEINTE",
+            >= 21 and < 30 => $"VEINTI{Unidades(n - 20)}",
+            30 => "TREINTA",
+            40 => "CUARENTA",
+            50 => "CINCUENTA",
+            60 => "SESENTA",
+            70 => "SETENTA",
+            80 => "OCHENTA",
+            90 => "NOVENTA",
+            _ when n > 30 => $"{Decenas((n / 10) * 10)} Y {Unidades(n % 10)}",
+            _ => Unidades(n)
         };
         private static string Centenas(long n)
         {

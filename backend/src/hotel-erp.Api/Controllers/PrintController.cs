@@ -15,27 +15,33 @@ namespace hotel_erp.Api.Controllers
     {
         private readonly IInvoiceRepository _invoiceRepo;
         private readonly IBusinessSettingsRepository _settingsRepo;
-        private readonly EscPosService _escPosService;
+        private readonly IInvoicePrintRenderer _escPosService;
         private readonly IHotelClock _clock;
+        private readonly IPrinterTransport _printerTransport;
+        private readonly IInvoiceCalculator _invoiceCalculator;
 
         public PrintController(
             IInvoiceRepository invoiceRepo,
             IBusinessSettingsRepository settingsRepo,
-            EscPosService escPosService,
+            IInvoicePrintRenderer escPosService,
+            IPrinterTransport printerTransport,
+            IInvoiceCalculator invoiceCalculator,
             IHotelClock clock)
         {
             _invoiceRepo = invoiceRepo;
             _settingsRepo = settingsRepo;
             _escPosService = escPosService;
             _clock = clock;
+            _printerTransport = printerTransport;
+            _invoiceCalculator = invoiceCalculator;
         }
 
         [HttpGet("printers")]
         [Authorize(Policy = PermissionNames.ManageSettings)]
         public ActionResult GetPrinters()
         {
-            if (!OperatingSystem.IsWindows()) return PrinterPlatformUnavailable();
-            var printers = RawPrinterHelper.GetInstalledPrinters();
+            if (!_printerTransport.IsSupported) return PrinterPlatformUnavailable();
+            var printers = _printerTransport.GetInstalledPrinters();
             return Ok(printers);
         }
 
@@ -43,11 +49,11 @@ namespace hotel_erp.Api.Controllers
         [Authorize(Policy = PermissionNames.ManageSettings)]
         public ActionResult TestPrinter([FromQuery] string name)
         {
-            if (!OperatingSystem.IsWindows()) return PrinterPlatformUnavailable();
+            if (!_printerTransport.IsSupported) return PrinterPlatformUnavailable();
             if (string.IsNullOrWhiteSpace(name))
                 return BadRequest(new { message = "Especifique el nombre de la impresora" });
 
-            var (success, message) = RawPrinterHelper.TestPrinterConnection(name);
+            var (success, message) = _printerTransport.TestPrinterConnection(name);
             return Ok(new { success, message });
         }
 
@@ -57,7 +63,7 @@ namespace hotel_erp.Api.Controllers
         {
             var settings = await _settingsRepo.GetAsync() ?? new BusinessSettings();
             if (width.HasValue) settings.PrintWidth = width.Value;
-            var fake = BuildFakeInvoice(settings);
+            var fake = BuildFakeInvoice();
             var text = _escPosService.GeneratePreviewText(fake, settings, "Juan Perez", "15/05/2026", "18/05/2026");
             var logo = settings.ShowLogo ? settings.LogoBase64 ?? "" : "";
             return Ok(new { text, logoBase64 = logo, printLogoHeight = settings.PrintLogoHeight, printWidth = settings.PrintWidth });
@@ -67,7 +73,7 @@ namespace hotel_erp.Api.Controllers
         [Authorize(Policy = PermissionNames.ManageSettings)]
         public async Task<ActionResult> PrintTest([FromQuery] int? width)
         {
-            if (!OperatingSystem.IsWindows()) return PrinterPlatformUnavailable();
+            if (!_printerTransport.IsSupported) return PrinterPlatformUnavailable();
             var settings = await _settingsRepo.GetAsync();
             if (settings == null)
                 return BadRequest(new { message = "Configure los datos del negocio" });
@@ -77,9 +83,9 @@ namespace hotel_erp.Api.Controllers
 
             try
             {
-                var fake = BuildFakeInvoice(settings);
+                var fake = BuildFakeInvoice();
                 var data = _escPosService.GenerateTwoCopyInvoice(fake, settings, "Juan Perez", "15/05/2026", "18/05/2026");
-                RawPrinterHelper.SendBytesToPrinter(settings.PrintPrinterName, data);
+                _printerTransport.Send(settings.PrintPrinterName, data);
                 return Ok(new { message = "Factura de prueba enviada a imprimir" });
             }
             catch (Exception ex)
@@ -92,21 +98,24 @@ namespace hotel_erp.Api.Controllers
         [Authorize(Policy = PermissionNames.ManageSettings)]
         public async Task<ActionResult> GetTestRuler()
         {
-            if (!OperatingSystem.IsWindows()) return PrinterPlatformUnavailable();
+            if (!_printerTransport.IsSupported) return PrinterPlatformUnavailable();
             var settings = await _settingsRepo.GetAsync();
             if (settings == null || string.IsNullOrWhiteSpace(settings.PrintPrinterName))
                 return BadRequest(new { message = "Configure la impresora primero" });
             try
             {
                 var data = _escPosService.BuildRulerData(settings, 100);
-                RawPrinterHelper.SendBytesToPrinter(settings.PrintPrinterName, data);
+                _printerTransport.Send(settings.PrintPrinterName, data);
                 return Ok(new { message = "Regla de calibracion impresa. Observe hasta que numero llega el papel sin cortarse y anote ese valor en 'Ancho observado' en la pantalla de configuracion." });
             }
             catch (Exception ex) { return BadRequest(new { message = ex.Message }); }
         }
 
-        private Invoice BuildFakeInvoice(BusinessSettings settings)
+        private Invoice BuildFakeInvoice()
         {
+            var calculation = _invoiceCalculator.Calculate(
+                [new InvoiceLineInput("Habitación Sencilla|Hospedaje x3 noche(s)", 3, 100m, false, 0.15m, true, 0m)]);
+            const decimal cashReceived = 500m;
             return new Invoice
             {
                 CAI = new CAI
@@ -121,29 +130,19 @@ namespace hotel_erp.Api.Controllers
                 InvoiceDate = _clock.HondurasNow,
                 CustomerName = "Juan Perez - Factura de Prueba",
                 RTNCliente = "08019012345678",
-                SubTotal = 840.34m,
-                ISVAmount = 126.05m,
-                TouristTaxAmount = 33.61m,
-                DiscountsAmount = 0,
-                TotalAmount = 1000.00m,
+                SubTotal = calculation.SubTotal,
+                ISVAmount = calculation.ISVAmount,
+                ISV15Amount = calculation.ISV15Amount,
+                ISV18Amount = calculation.ISV18Amount,
+                TouristTaxAmount = calculation.TouristTaxAmount,
+                DiscountsAmount = calculation.DiscountsAmount,
+                TotalAmount = calculation.TotalAmount,
                 PaymentMethod = "Efectivo",
-                CashReceived = 1500,
-                CashChange = 500,
+                CashReceived = cashReceived,
+                CashChange = cashReceived - calculation.TotalAmount,
                 DocumentType = InvoiceDocumentType.Factura,
                 Status = InvoiceStatus.Pagada,
-                InvoiceItems = new List<InvoiceItem>
-                {
-                    new()
-                    {
-                        Description = "Habitación Sencilla|Hospedaje x3 noche(s)",
-                        Quantity = 3,
-                        UnitPrice = 333.33m,
-                        LineTotal = 1000m,
-                        ISVRate = 0.15m,
-                        IsTouristTaxable = true,
-                        IsExempt = false
-                    }
-                }
+                InvoiceItems = calculation.Items.ToList()
             };
         }
 
@@ -171,7 +170,7 @@ namespace hotel_erp.Api.Controllers
         [HttpPost("invoice/{id}")]
         public async Task<ActionResult> PrintInvoice(Guid id)
         {
-            if (!OperatingSystem.IsWindows()) return PrinterPlatformUnavailable();
+            if (!_printerTransport.IsSupported) return PrinterPlatformUnavailable();
             var invoice = await _invoiceRepo.GetByIdAsync(id);
             if (invoice == null) return NotFound(new { message = "Factura no encontrada" });
 
@@ -199,7 +198,7 @@ namespace hotel_erp.Api.Controllers
             try
             {
                 var data = _escPosService.GenerateTwoCopyInvoice(invoice, settings, guestName, checkIn, checkOut);
-                RawPrinterHelper.SendBytesToPrinter(printerName, data);
+                _printerTransport.Send(printerName, data);
                 return Ok(new { message = "Factura enviada a imprimir", printer = printerName });
             }
             catch (Exception ex)
