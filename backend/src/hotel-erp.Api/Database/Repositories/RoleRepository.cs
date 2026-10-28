@@ -25,14 +25,24 @@ namespace hotel_erp.Api.Database.Repositories
         public async Task<IEnumerable<Role>> GetAllAsync()
             => await _context.Roles.Where(r => !r.IsDeleted).Include(r => r.RolePermissions).ThenInclude(rp => rp.Permission).ToListAsync();
 
-        public async Task AddAsync(Role role) { await _context.Roles.AddAsync(role); await _context.SaveChangesAsync(); }
+        public async Task AddAsync(Role role)
+        {
+            await _context.Roles.AddAsync(role);
+        }
 
-        public async Task UpdateAsync(Role role) { _context.Roles.Update(role); await _context.SaveChangesAsync(); }
+        public Task UpdateAsync(Role role)
+        {
+            _context.Roles.Update(role);
+            return Task.CompletedTask;
+        }
 
         public async Task DeleteAsync(Guid id)
         {
             var role = await _context.Roles.FindAsync(id);
-            if (role != null) { role.IsDeleted = true; await _context.SaveChangesAsync(); }
+            if (role != null)
+            {
+                role.IsDeleted = true;
+            }
         }
 
         public async Task<IEnumerable<Permission>> GetRolePermissionsAsync(Guid roleId)
@@ -47,7 +57,6 @@ namespace hotel_erp.Api.Database.Repositories
             {
                 await _context.RolePermissions.AddAsync(new RolePermission { RoleId = roleId, PermissionId = permId });
             }
-            await _context.SaveChangesAsync();
         }
     }
 
@@ -60,7 +69,17 @@ namespace hotel_erp.Api.Database.Repositories
         public async Task<Permission?> GetByIdAsync(Guid id) => await _context.Permissions.FindAsync(id);
         public async Task<Permission?> GetByNameAsync(string name) => await _context.Permissions.FirstOrDefaultAsync(p => p.Name == name);
         public async Task<IEnumerable<Permission>> GetAllAsync() => await _context.Permissions.ToListAsync();
-        public async Task AddAsync(Permission permission) { await _context.Permissions.AddAsync(permission); await _context.SaveChangesAsync(); }
-        public async Task DeleteAsync(Guid id) { var p = await _context.Permissions.FindAsync(id); if (p != null) { p.IsDeleted = true; await _context.SaveChangesAsync(); } }
+        public async Task AddAsync(Permission permission)
+        {
+            await _context.Permissions.AddAsync(permission);
+        }
+        public async Task DeleteAsync(Guid id)
+        {
+            var p = await _context.Permissions.FindAsync(id);
+            if (p != null)
+            {
+                p.IsDeleted = true;
+            }
+        }
     }
 }

@@ -23,13 +23,16 @@ namespace hotel_erp.Api.Controllers
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
 
+        private readonly IUnitOfWork _unitOfWork;
+
         public UsersController(
             IUserRepository userRepository,
             IRoleRepository roleRepository,
             IJwtService jwtService,
             ApplicationDbContext context,
-            IMapper mapper)
+            IMapper mapper, IUnitOfWork unitOfWork)
         {
+            _unitOfWork = unitOfWork;
             _userRepository = userRepository;
             _roleRepository = roleRepository;
             _jwtService = jwtService;
@@ -178,6 +181,8 @@ namespace hotel_erp.Api.Controllers
             user.LockoutEnd = null;
 
             await _userRepository.UpdateAsync(user);
+
+            await _unitOfWork.SaveChangesAsync(HttpContext.RequestAborted);
             await _jwtService.RevokeAllRefreshTokensAsync(id);
 
             return Ok(new { message = "Contraseña restablecida exitosamente" });
@@ -210,6 +215,7 @@ namespace hotel_erp.Api.Controllers
             user.IsActive = false;
             user.SecurityVersion++;
             await _userRepository.UpdateAsync(user);
+            await _unitOfWork.SaveChangesAsync(HttpContext.RequestAborted);
             await _jwtService.RevokeAllRefreshTokensAsync(id);
 
             return Ok(new { message = "Usuario desactivado exitosamente" });

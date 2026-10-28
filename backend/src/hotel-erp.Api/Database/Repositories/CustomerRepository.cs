@@ -13,9 +13,23 @@ namespace hotel_erp.Api.Database.Repositories
         public async Task<Customer?> GetByRTNAsync(string rtn) => await _context.Customers.FirstOrDefaultAsync(c => c.RTN == rtn);
         public async Task<IEnumerable<Customer>> GetAllAsync() => await _context.Customers.ToListAsync();
         public async Task<IEnumerable<Customer>> SearchAsync(string term) => await _context.Customers.Where(c => c.Name.Contains(term) || (c.RTN != null && c.RTN.Contains(term)) || (c.Email != null && c.Email.Contains(term)) || (c.Address != null && c.Address.Contains(term))).ToListAsync();
-        public async Task AddAsync(Customer c) { await _context.Customers.AddAsync(c); await _context.SaveChangesAsync(); }
-        public async Task UpdateAsync(Customer c) { _context.Customers.Update(c); await _context.SaveChangesAsync(); }
-        public async Task DeleteAsync(Guid id) { var c = await _context.Customers.FindAsync(id); if (c != null) { c.IsDeleted = true; await _context.SaveChangesAsync(); } }
+        public async Task AddAsync(Customer c)
+        {
+            await _context.Customers.AddAsync(c);
+        }
+        public Task UpdateAsync(Customer c)
+        {
+            _context.Customers.Update(c);
+            return Task.CompletedTask;
+        }
+        public async Task DeleteAsync(Guid id)
+        {
+            var c = await _context.Customers.FindAsync(id);
+            if (c != null)
+            {
+                c.IsDeleted = true;
+            }
+        }
     }
 
     public class GuestRepository : IGuestRepository
@@ -27,9 +41,23 @@ namespace hotel_erp.Api.Database.Repositories
         public async Task<Guest?> GetByDocumentNumberAsync(string doc) => await _context.Guests.FirstOrDefaultAsync(g => g.DocumentNumber == doc);
         public async Task<IEnumerable<Guest>> GetAllAsync() => await _context.Guests.ToListAsync();
         public async Task<IEnumerable<Guest>> SearchAsync(string term) => await _context.Guests.Where(g => (g.FirstName + " " + g.LastName).Contains(term) || (g.DocumentNumber != null && g.DocumentNumber.Contains(term))).ToListAsync();
-        public async Task AddAsync(Guest g) { await _context.Guests.AddAsync(g); await _context.SaveChangesAsync(); }
-        public async Task UpdateAsync(Guest g) { _context.Guests.Update(g); await _context.SaveChangesAsync(); }
-        public async Task DeleteAsync(Guid id) { var g = await _context.Guests.FindAsync(id); if (g != null) { g.IsDeleted = true; await _context.SaveChangesAsync(); } }
+        public async Task AddAsync(Guest g)
+        {
+            await _context.Guests.AddAsync(g);
+        }
+        public Task UpdateAsync(Guest g)
+        {
+            _context.Guests.Update(g);
+            return Task.CompletedTask;
+        }
+        public async Task DeleteAsync(Guid id)
+        {
+            var g = await _context.Guests.FindAsync(id);
+            if (g != null)
+            {
+                g.IsDeleted = true;
+            }
+        }
     }
 }
 

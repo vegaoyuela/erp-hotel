@@ -16,8 +16,11 @@ namespace hotel_erp.Api.Controllers
         private readonly ICAIRepository _repo;
         private readonly IMapper _mapper;
 
-        public CAIController(ICAIRepository repo, IMapper mapper)
+        private readonly IUnitOfWork _unitOfWork;
+
+        public CAIController(ICAIRepository repo, IMapper mapper, IUnitOfWork unitOfWork)
         {
+            _unitOfWork = unitOfWork;
             _repo = repo;
             _mapper = mapper;
         }
@@ -64,6 +67,7 @@ namespace hotel_erp.Api.Controllers
             };
 
             await _repo.AddAsync(cai);
+            await _unitOfWork.SaveChangesAsync(HttpContext.RequestAborted);
             return CreatedAtAction(nameof(GetById), new { id = cai.Id }, _mapper.Map<CAIDto>(cai));
         }
 
@@ -72,6 +76,7 @@ namespace hotel_erp.Api.Controllers
         public async Task<ActionResult> Delete(Guid id)
         {
             await _repo.DeleteAsync(id);
+            await _unitOfWork.SaveChangesAsync(HttpContext.RequestAborted);
             return NoContent();
         }
     }

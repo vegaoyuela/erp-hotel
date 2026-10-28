@@ -16,8 +16,11 @@ namespace hotel_erp.Api.Controllers
         private readonly IAccountingRepository _repo;
         private readonly IMapper _mapper;
 
-        public AccountsController(IAccountingRepository repo, IMapper mapper)
+        private readonly IUnitOfWork _unitOfWork;
+
+        public AccountsController(IAccountingRepository repo, IMapper mapper, IUnitOfWork unitOfWork)
         {
+            _unitOfWork = unitOfWork;
             _repo = repo;
             _mapper = mapper;
         }
@@ -74,6 +77,7 @@ namespace hotel_erp.Api.Controllers
             };
 
             await _repo.AddAccountAsync(account);
+            await _unitOfWork.SaveChangesAsync(HttpContext.RequestAborted);
             var dto = _mapper.Map<AccountingAccountDto>(account);
             return CreatedAtAction(nameof(GetById), new { id = account.Id }, dto);
         }
@@ -98,6 +102,7 @@ namespace hotel_erp.Api.Controllers
                 account.IsActive = request.IsActive.Value;
 
             await _repo.UpdateAccountAsync(account);
+            await _unitOfWork.SaveChangesAsync(HttpContext.RequestAborted);
             return NoContent();
         }
 
@@ -112,10 +117,12 @@ namespace hotel_erp.Api.Controllers
             {
                 account.IsActive = false;
                 await _repo.UpdateAccountAsync(account);
+                await _unitOfWork.SaveChangesAsync(HttpContext.RequestAborted);
                 return Ok(new { message = "Cuenta desactivada (tiene movimientos)" });
             }
 
             await _repo.DeleteAccountAsync(account);
+            await _unitOfWork.SaveChangesAsync(HttpContext.RequestAborted);
             return Ok(new { message = "Cuenta eliminada" });
         }
 
@@ -182,6 +189,7 @@ namespace hotel_erp.Api.Controllers
             }
 
             await _repo.AddEntryAsync(entry);
+            await _unitOfWork.SaveChangesAsync(HttpContext.RequestAborted);
 
             var createdEntry = await _repo.GetEntryByIdAsync(entry.Id);
             return CreatedAtAction(nameof(GetJournalEntry), new { id = entry.Id }, _mapper.Map<AccountingEntryDto>(createdEntry ?? entry));

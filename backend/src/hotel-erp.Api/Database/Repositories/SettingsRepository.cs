@@ -65,7 +65,6 @@ namespace hotel_erp.Api.Database.Repositories
             {
                 await _context.BusinessSettings.AddAsync(settings);
             }
-            await _context.SaveChangesAsync();
         }
     }
 }

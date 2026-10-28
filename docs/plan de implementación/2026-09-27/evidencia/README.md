@@ -136,4 +136,19 @@ La sexta entrega añade fallos controlados después del asiento de pago, reembol
 | [p02f-qa-resumen.json](p02f-qa-resumen.json) | Resumen estructurado y hashes SHA-256 de código, pruebas y evidencia. |
 | [p02f-qa.log](p02f-qa.log) | Build sin advertencias, 93 unitarias, 4 integraciones PostgreSQL con tres rollbacks financieros nuevos, 5 pruebas N01–N06, auditoría npm, lint y frontend aprobados. |
 
-P02-F2 queda pendiente para retirar 56 guardados implícitos en 11 archivos de repositorio.
+Al cierre de P02-F1, P02-F2 quedaba pendiente para retirar 56 guardados implícitos en 11 archivos de repositorio.
+
+### P02-F2 — persistencia explícita (28 de octubre de 2026)
+
+Se retiraron los 56 guardados implícitos de los repositorios. Los consumidores confirman mediante `IUnitOfWork`; el correlativo fue trasladado a un servicio que conserva el lock y la transacción exterior. QA incorpora una comprobación que rechaza persistencia y transacciones dentro de los repositorios.
+
+| Archivo | Resultado |
+|---|---|
+| [p02f2-repositorios.json](p02f2-repositorios.json) | Inventario de 11 archivos: 56 guardados anteriores, 0 actuales; referencia base y hashes. |
+| [p02f2-base-qa.json](p02f2-base-qa.json) | Conteos reales: 42 tablas, 345 filas, 11 migraciones y 0 bases temporales residuales. |
+| [p02f2-modelo-ef.log](p02f2-modelo-ef.log) | EF Core confirma que no hace falta una migración. |
+| [p02f2-qa-inicial.log](p02f2-qa-inicial.log) | Primera ejecución: backend aprobado; npm detectó cinco alertas altas, corregidas antes del cierre. |
+| [p02f2-qa.log](p02f2-qa.log) | Ejecución final: 93 unitarias, 5 integraciones PostgreSQL, 5 validaciones fiscales, auditoría npm, lint y build. |
+| [p02f2-qa-resumen.json](p02f2-qa-resumen.json) | Resumen verificable con hashes, versiones corregidas y alcance de las pruebas. |
+
+P02-02 queda completada. Los pendientes de P02-G, contratos API, seguridad, matriz formal y revisión independiente permanecen en la [lista maestra](../06-lista-maestra.md).

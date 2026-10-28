@@ -35,6 +35,7 @@ public sealed class InvoiceApplicationService(
     ApplicationDbContext context,
     IInvoiceRepository repository,
     ICAIRepository caiRepository,
+    ICaiCorrelativeService caiCorrelativeService,
     IAccountingService accountingService,
     IFiscalAuthorizationService fiscalAuthorizationService,
     FiscalProfileService fiscalProfileService,
@@ -238,7 +239,7 @@ public sealed class InvoiceApplicationService(
             }
             else
             {
-                correlative = await repository.GetNextCorrelativeAsync(request.CAIId);
+                correlative = await caiCorrelativeService.GetNextAsync(request.CAIId);
             }
         }
         catch (InvalidOperationException exception)

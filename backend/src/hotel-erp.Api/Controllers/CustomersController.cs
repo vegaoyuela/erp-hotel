@@ -18,8 +18,11 @@ namespace hotel_erp.Api.Controllers
         private readonly IInvoiceRepository _invoiceRepo;
         private readonly IMapper _mapper;
 
-        public CustomersController(ICustomerRepository repo, IInvoiceRepository invoiceRepo, IMapper mapper)
+        private readonly IUnitOfWork _unitOfWork;
+
+        public CustomersController(ICustomerRepository repo, IInvoiceRepository invoiceRepo, IMapper mapper, IUnitOfWork unitOfWork)
         {
+            _unitOfWork = unitOfWork;
             _repo = repo;
             _invoiceRepo = invoiceRepo;
             _mapper = mapper;
@@ -72,6 +75,7 @@ namespace hotel_erp.Api.Controllers
                 ExonerationValidTo = request.ExonerationValidTo
             };
             await _repo.AddAsync(entity);
+            await _unitOfWork.SaveChangesAsync(HttpContext.RequestAborted);
             return CreatedAtAction(nameof(GetById), new { id = entity.Id }, _mapper.Map<CustomerDto>(entity));
         }
 
@@ -98,6 +102,7 @@ namespace hotel_erp.Api.Controllers
             if (entity.TaxpayerType == TaxpayerType.Exonerado && (string.IsNullOrWhiteSpace(entity.ExonerationOrderNumber) || string.IsNullOrWhiteSpace(entity.SefinExonerationCertificateNumber)))
                 return BadRequest("Cliente exonerado requiere O.C. Exenta y Constancia SEFIN");
             await _repo.UpdateAsync(entity);
+            await _unitOfWork.SaveChangesAsync(HttpContext.RequestAborted);
             return NoContent();
         }
 
@@ -110,6 +115,7 @@ namespace hotel_erp.Api.Controllers
                 return BadRequest("No se puede eliminar el cliente porque tiene facturas emitidas (trazabilidad fiscal).");
 
             await _repo.DeleteAsync(id);
+            await _unitOfWork.SaveChangesAsync(HttpContext.RequestAborted);
             return NoContent();
         }
     }

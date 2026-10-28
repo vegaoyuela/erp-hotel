@@ -15,8 +15,11 @@ namespace hotel_erp.Api.Controllers
         private readonly IRoomRepository _repo;
         private readonly IMapper _mapper;
 
-        public RoomsController(IRoomRepository repo, IMapper mapper)
+        private readonly IUnitOfWork _unitOfWork;
+
+        public RoomsController(IRoomRepository repo, IMapper mapper, IUnitOfWork unitOfWork)
         {
+            _unitOfWork = unitOfWork;
             _repo = repo;
             _mapper = mapper;
         }
@@ -56,6 +59,7 @@ namespace hotel_erp.Api.Controllers
                 Observations = request.Observations
             };
             await _repo.AddAsync(room);
+            await _unitOfWork.SaveChangesAsync(HttpContext.RequestAborted);
             return CreatedAtAction(nameof(GetById), new { id = room.Id }, _mapper.Map<RoomDto>(room));
         }
 
@@ -73,6 +77,7 @@ namespace hotel_erp.Api.Controllers
                 room.Status = parsedStatus;
             if (request.Observations != null) room.Observations = request.Observations;
             await _repo.UpdateAsync(room);
+            await _unitOfWork.SaveChangesAsync(HttpContext.RequestAborted);
             return NoContent();
         }
 
@@ -81,6 +86,7 @@ namespace hotel_erp.Api.Controllers
         public async Task<ActionResult> Delete(Guid id)
         {
             await _repo.DeleteAsync(id);
+            await _unitOfWork.SaveChangesAsync(HttpContext.RequestAborted);
             return NoContent();
         }
     }

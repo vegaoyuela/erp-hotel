@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using hotel_erp.Api.Services.Interfaces;
 using hotel_erp.Api.Database.Entities;
-using hotel_erp.Api.Services;
 
 namespace hotel_erp.Api.Database.Repositories
 {
@@ -14,19 +13,32 @@ namespace hotel_erp.Api.Database.Repositories
         public async Task<CAI?> GetByCAINumberAsync(string number) => await _context.CAIs.FirstOrDefaultAsync(c => c.CAINumber == number);
         public async Task<IEnumerable<CAI>> GetAllAsync() => await _context.CAIs.ToListAsync();
         public async Task<CAI?> GetActiveCAIAsync() => await _context.CAIs.Where(c => c.Status == hotel_erp.Api.Database.Entities.CAIStatus.Activo).FirstOrDefaultAsync();
-        public async Task AddAsync(CAI c) { await _context.CAIs.AddAsync(c); await _context.SaveChangesAsync(); }
-        public async Task UpdateAsync(CAI c) { _context.CAIs.Update(c); await _context.SaveChangesAsync(); }
-        public async Task DeleteAsync(Guid id) { var c = await _context.CAIs.FindAsync(id); if (c != null) { c.Status = CAIStatus.Desactivado; _context.CAIs.Update(c); await _context.SaveChangesAsync(); } }
+        public async Task AddAsync(CAI c)
+        {
+            await _context.CAIs.AddAsync(c);
+        }
+        public Task UpdateAsync(CAI c)
+        {
+            _context.CAIs.Update(c);
+            return Task.CompletedTask;
+        }
+        public async Task DeleteAsync(Guid id)
+        {
+            var c = await _context.CAIs.FindAsync(id);
+            if (c != null)
+            {
+                c.Status = CAIStatus.Desactivado;
+                _context.CAIs.Update(c);
+            }
+        }
     }
 
     public class InvoiceRepository : IInvoiceRepository
     {
         private readonly ApplicationDbContext _context;
-        private readonly IHotelClock _clock;
-        public InvoiceRepository(ApplicationDbContext context, IHotelClock clock)
+        public InvoiceRepository(ApplicationDbContext context)
         {
             _context = context;
-            _clock = clock;
         }
 
         public async Task<Invoice?> GetByIdAsync(Guid id) => await _context.Invoices
@@ -67,50 +79,22 @@ namespace hotel_erp.Api.Database.Repositories
             .Include(invoice => invoice.PaymentApplications)
             .ThenInclude(application => application.Payment)
             .Include(invoice => invoice.CreditNotes);
-        public async Task AddAsync(Invoice i) { await _context.Invoices.AddAsync(i); await _context.SaveChangesAsync(); }
-        public async Task UpdateAsync(Invoice i) { _context.Invoices.Update(i); await _context.SaveChangesAsync(); }
+        public async Task AddAsync(Invoice i)
+        {
+            await _context.Invoices.AddAsync(i);
+        }
+        public Task UpdateAsync(Invoice i)
+        {
+            _context.Invoices.Update(i);
+            return Task.CompletedTask;
+        }
         public async Task DeleteInvoiceItemsAsync(Guid invoiceId)
         {
-            var items = _context.InvoiceItems.Where(ii => ii.InvoiceId == invoiceId).ToList();
+            var items = await _context.InvoiceItems.Where(ii => ii.InvoiceId == invoiceId).ToListAsync();
             foreach (var item in items)
             {
                 item.IsDeleted = true;
             }
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task<string> GetNextCorrelativeAsync(Guid caiId)
-        {
-            return await PostgresCorrelativeLock.ExecuteAsync(_context, _clock, $"cai:{caiId}", async () =>
-            {
-                var cai = await _context.CAIs.FirstOrDefaultAsync(c => c.Id == caiId) ?? throw new InvalidOperationException("CAI no encontrado");
-                if (cai.Status != CAIStatus.Activo) throw new InvalidOperationException("El CAI no está activo");
-                if (cai.DueDate < _clock.Today) throw new InvalidOperationException("El CAI está vencido");
-
-                var parts = cai.CurrentCorrelative.Split('-');
-                if (parts.Length != 4) throw new InvalidOperationException("Formato de correlativo inválido");
-
-                var hasIssuedDocuments = await _context.Invoices
-                    .IgnoreQueryFilters()
-                    .AnyAsync(invoice => invoice.CAIId == caiId);
-                var sequential = !hasIssuedDocuments && cai.CurrentCorrelative == cai.InitialRange
-                    ? int.Parse(parts[3])
-                    : int.Parse(parts[3]) + 1;
-                var finalSeq = int.Parse(cai.FinalRange.Split('-').Last());
-                if (sequential > finalSeq)
-                {
-                    cai.Status = CAIStatus.Agotado;
-                    await _context.SaveChangesAsync();
-                    throw new CorrelativeStateException("El CAI ha agotado su rango de correlativos");
-                }
-
-                var newCorrelative = $"{parts[0]}-{parts[1]}-{parts[2]}-{sequential:D8}";
-
-                cai.CurrentCorrelative = newCorrelative;
-                _context.CAIs.Update(cai);
-                await _context.SaveChangesAsync();
-                return newCorrelative;
-            });
         }
     }
 
@@ -137,13 +121,12 @@ namespace hotel_erp.Api.Database.Repositories
         public async Task AddAsync(DocumentAuthorization authorization)
         {
             await _context.DocumentAuthorizations.AddAsync(authorization);
-            await _context.SaveChangesAsync();
         }
 
-        public async Task UpdateAsync(DocumentAuthorization authorization)
+        public Task UpdateAsync(DocumentAuthorization authorization)
         {
             _context.DocumentAuthorizations.Update(authorization);
-            await _context.SaveChangesAsync();
+            return Task.CompletedTask;
         }
 
         public async Task DeleteAsync(Guid id)
@@ -151,7 +134,6 @@ namespace hotel_erp.Api.Database.Repositories
             var authorization = await _context.DocumentAuthorizations.FindAsync(id);
             if (authorization == null) return;
             authorization.IsDeleted = true;
-            await _context.SaveChangesAsync();
         }
     }
 }

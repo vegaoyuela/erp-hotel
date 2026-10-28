@@ -18,11 +18,14 @@ namespace hotel_erp.Api.Controllers
         private readonly IMapper _mapper;
         private readonly AuthorizationAttachmentStore _attachmentStore;
 
+        private readonly IUnitOfWork _unitOfWork;
+
         public DocumentAuthorizationsController(
             IDocumentAuthorizationRepository repo,
             IMapper mapper,
-            AuthorizationAttachmentStore attachmentStore)
+            AuthorizationAttachmentStore attachmentStore, IUnitOfWork unitOfWork)
         {
+            _unitOfWork = unitOfWork;
             _repo = repo;
             _mapper = mapper;
             _attachmentStore = attachmentStore;
@@ -75,6 +78,7 @@ namespace hotel_erp.Api.Controllers
             };
 
             await _repo.AddAsync(authorization);
+            await _unitOfWork.SaveChangesAsync(HttpContext.RequestAborted);
             return CreatedAtAction(nameof(GetById), new { id = authorization.Id }, _mapper.Map<DocumentAuthorizationDto>(authorization));
         }
 
@@ -83,6 +87,7 @@ namespace hotel_erp.Api.Controllers
         public async Task<ActionResult> Delete(Guid id)
         {
             await _repo.DeleteAsync(id);
+            await _unitOfWork.SaveChangesAsync(HttpContext.RequestAborted);
             return NoContent();
         }
 
@@ -136,6 +141,7 @@ namespace hotel_erp.Api.Controllers
             try
             {
                 await _repo.AddAsync(authorization);
+                await _unitOfWork.SaveChangesAsync(HttpContext.RequestAborted);
             }
             catch
             {

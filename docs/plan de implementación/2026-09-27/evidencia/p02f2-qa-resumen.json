@@ -1,0 +1,295 @@
+{
+  "generated_at": "2026-10-28T19:37:35.650101+00:00",
+  "implementation_date_honduras": "2026-10-28",
+  "status": "passed",
+  "contains_secret_values": false,
+  "scope": "P02-F2 explicit unit of work and repository persistence boundaries",
+  "baseline_revision": "6af1b36340bb29607804df726638c35e9409dd24",
+  "implementation": {
+    "p02_02_complete": true,
+    "repository_files": 11,
+    "before_implicit_saves": 56,
+    "after_implicit_saves": 0,
+    "scoped_unit_of_work_uses_shared_context": true,
+    "caller_owned_outer_transaction_preserved": true,
+    "cai_correlative_moved_to_locked_application_service": true,
+    "audit_chain_flushed_while_locked": true,
+    "fiscal_attachment_cleanup_preserved": true,
+    "role_permissions_saved_together": true,
+    "role_session_invalidation_transactional": true,
+    "login_failure_counters_saved_explicitly": true,
+    "repository_boundary_check_in_qa": true
+  },
+  "proof": {
+    "staged_entities_invisible_before_save": true,
+    "entities_visible_after_explicit_save": true,
+    "flush_does_not_commit_outer_transaction": true,
+    "outer_rollback_restores_update_and_soft_delete": true,
+    "failed_unique_constraint_rolls_back_entire_flush": true,
+    "http_catalog_crud_regressions_passed": true,
+    "http_role_permission_replacement_passed": true,
+    "http_login_counter_and_password_reset_passed": true,
+    "existing_financial_fiscal_concurrency_and_backup_suite_passed": true
+  },
+  "qa": {
+    "backend_build": {
+      "warnings": 0,
+      "errors": 0
+    },
+    "unit_tests": {
+      "passed": 93,
+      "skipped": 0,
+      "total": 93
+    },
+    "postgresql_integration_tests": {
+      "passed": 5,
+      "skipped": 0,
+      "total": 5
+    },
+    "dossier_validator_tests": {
+      "passed": 5,
+      "total": 5
+    },
+    "frontend": {
+      "npm_audit_vulnerabilities": 0,
+      "lint": "passed",
+      "production_build": "passed"
+    },
+    "ef_pending_model_changes": false,
+    "dotnet_format": "passed"
+  },
+  "dependency_remediation": {
+    "initial_high_severity_packages": 5,
+    "final_vulnerabilities": 0,
+    "forced_major_updates": false,
+    "package_json_ranges_changed": false,
+    "versions": {
+      "brace-expansion": {
+        "before": "5.0.9",
+        "after": "5.0.12"
+      },
+      "follow-redirects": {
+        "before": "1.16.0",
+        "after": "1.16.2"
+      },
+      "source-map-js": {
+        "before": "1.2.1",
+        "after": "1.2.2"
+      },
+      "vite": {
+        "before": "8.2.2",
+        "after": "8.3.5"
+      },
+      "zod": {
+        "before": "4.5.4",
+        "after": "4.6.7"
+      },
+      "rolldown": {
+        "before": "1.2.7",
+        "after": "1.2.15"
+      }
+    }
+  },
+  "qa_database": {
+    "database": "hotel_erp_qa",
+    "table_count": 42,
+    "total_rows": 345,
+    "migration_count": 11,
+    "temporary_databases_remaining": 0,
+    "unchanged_from_p00": true
+  },
+  "remaining": {
+    "p02_03": [
+      "calculation contract",
+      "audit contract",
+      "printing contract"
+    ],
+    "later_p02": [
+      "OpenAPI descriptions and conventions",
+      "pagination",
+      "frontend types",
+      "security tasks",
+      "formal test matrix",
+      "independent review"
+    ],
+    "external_gates": [
+      "official hotel database and files for G0",
+      "approved hotel fiscal decisions for G1",
+      "Windows 11 validation and fiscal invoice acceptance"
+    ]
+  },
+  "evidence": {
+    "file_01": {
+      "path": "backend/src/hotel-erp.Api/Controllers/AccountingController.cs",
+      "sha256": "ca0fb592742f8e599485c735f87390becc46b1d0406ada2535e3d5fc56e3241d"
+    },
+    "file_02": {
+      "path": "backend/src/hotel-erp.Api/Controllers/CAIController.cs",
+      "sha256": "69f059c87e635d67a90f70fe96c1e2d0abb905780e9e7e4f57192a2a27adf317"
+    },
+    "file_03": {
+      "path": "backend/src/hotel-erp.Api/Controllers/CustomersController.cs",
+      "sha256": "2dd30fde80bd93dbaeacc004225a968987dd41c49628255959493ce8ca66f2c3"
+    },
+    "file_04": {
+      "path": "backend/src/hotel-erp.Api/Controllers/DiscountsController.cs",
+      "sha256": "c626e2526b8794153cb7c6d32f568c6f756dbee09c4eca1cad0ce78744b1932a"
+    },
+    "file_05": {
+      "path": "backend/src/hotel-erp.Api/Controllers/DocumentAuthorizationsController.cs",
+      "sha256": "88199c22a1f308b774f2e3add30547e7d0426fc74da8b4770c1e2e9bb3f5f8e3"
+    },
+    "file_06": {
+      "path": "backend/src/hotel-erp.Api/Controllers/GuestsController.cs",
+      "sha256": "70a2cd398d06d171dfd2f3fe1b692c8d8f5bea33778ed5099028ae964bd5fa05"
+    },
+    "file_07": {
+      "path": "backend/src/hotel-erp.Api/Controllers/RolesController.cs",
+      "sha256": "5a2430c192c3ff7057ef5c1f111386701b125c82e695ad6b029738de8f3c81b5"
+    },
+    "file_08": {
+      "path": "backend/src/hotel-erp.Api/Controllers/RoomTypesController.cs",
+      "sha256": "dd5d1c87aef19a64dede732bb45e523494ac8544e7ea647769a9bea6bfad45c7"
+    },
+    "file_09": {
+      "path": "backend/src/hotel-erp.Api/Controllers/RoomsController.cs",
+      "sha256": "53e1db1e19dc1a40653918a460a9794bf5eef0aa325960da858b0d6909ed7dad"
+    },
+    "file_10": {
+      "path": "backend/src/hotel-erp.Api/Controllers/SettingsController.cs",
+      "sha256": "b2d8141240f19c067ba0527f32d302dbd2b836b165c4078bc89dbbb8d30cf485"
+    },
+    "file_11": {
+      "path": "backend/src/hotel-erp.Api/Controllers/SuppliersController.cs",
+      "sha256": "3998682731228843aec0e6c0f8dc337d9f2000ea2ee76ef261c8dbbed7275a73"
+    },
+    "file_12": {
+      "path": "backend/src/hotel-erp.Api/Controllers/UsersController.cs",
+      "sha256": "1baf172ce5f52b69a8b7fd9930f42cee7c11b108cdd2e76f0a0be12f7160c014"
+    },
+    "file_13": {
+      "path": "backend/src/hotel-erp.Api/Database/EfUnitOfWork.cs",
+      "sha256": "24cb515cc374ec8a79bb25e664490953a3b58266f3540de21cf5f1a997a04714"
+    },
+    "file_14": {
+      "path": "backend/src/hotel-erp.Api/Database/Repositories/AccountingRepository.cs",
+      "sha256": "f42d8a99672ae84ed8d973ce8c834336ffd86f2f3abf72b0ab9369c12950b6f7"
+    },
+    "file_15": {
+      "path": "backend/src/hotel-erp.Api/Database/Repositories/CashRepository.cs",
+      "sha256": "06de7f28b3f591cdbddd2696a06ea5d8dc487947f01837dbf74a0b13b30c6533"
+    },
+    "file_16": {
+      "path": "backend/src/hotel-erp.Api/Database/Repositories/CustomerRepository.cs",
+      "sha256": "05764ab31b680ee68f4efd99c0eeddba06f27e063d598f50e483af0a1c5a9082"
+    },
+    "file_17": {
+      "path": "backend/src/hotel-erp.Api/Database/Repositories/DiscountRepository.cs",
+      "sha256": "325cdc92f853a1316e29caedb100c2e407efdca7d421fc3037ea125084546502"
+    },
+    "file_18": {
+      "path": "backend/src/hotel-erp.Api/Database/Repositories/InvoiceRepository.cs",
+      "sha256": "73207c28840c3548065241aed28c447daf7619be135fb7c74802d74ba44b1abd"
+    },
+    "file_19": {
+      "path": "backend/src/hotel-erp.Api/Database/Repositories/PurchaseRepository.cs",
+      "sha256": "fddd93997201e627eeaecb03dd2454fb76a063da0d5ddf6130863b2622e575d9"
+    },
+    "file_20": {
+      "path": "backend/src/hotel-erp.Api/Database/Repositories/ReservationRepository.cs",
+      "sha256": "6116484b64c9bc98e4d6bfc2ab3049ac1b0d2a5c2c218f64e029872a52c4b4eb"
+    },
+    "file_21": {
+      "path": "backend/src/hotel-erp.Api/Database/Repositories/RoleRepository.cs",
+      "sha256": "2e8bbda79586a8d2d798f887deb47b30313cc0545063d62d914543e6b1fd9074"
+    },
+    "file_22": {
+      "path": "backend/src/hotel-erp.Api/Database/Repositories/RoomRepository.cs",
+      "sha256": "1439cd9be592d7fe490ac6cc184872d09db3c4e182bbb92a33b7dbc47b33bc3e"
+    },
+    "file_23": {
+      "path": "backend/src/hotel-erp.Api/Database/Repositories/SettingsRepository.cs",
+      "sha256": "060cdfe4eb6ae717b6b05dd6130dfc5c18c765a78c79e88f12dca476abeca156"
+    },
+    "file_24": {
+      "path": "backend/src/hotel-erp.Api/Database/Repositories/UserRepository.cs",
+      "sha256": "e084419e05ccd17a9c50591714553d681c42f139837669e59f3530af36a656fd"
+    },
+    "file_25": {
+      "path": "backend/src/hotel-erp.Api/Program.cs",
+      "sha256": "17e245e54edf25d021bf92169f45f6314b8427c6865bd62827451050e11f00ae"
+    },
+    "file_26": {
+      "path": "backend/src/hotel-erp.Api/Services/AuditService.cs",
+      "sha256": "20501119bc563fe2ca85f668be52164ab61423b849c26d77955e80584ad1f6e5"
+    },
+    "file_27": {
+      "path": "backend/src/hotel-erp.Api/Services/AuthService.cs",
+      "sha256": "87c92782f624a5fcb198ce82a85e92a72f43e9f0c048ed5a937112118c1e792f"
+    },
+    "file_28": {
+      "path": "backend/src/hotel-erp.Api/Services/CaiCorrelativeService.cs",
+      "sha256": "17adf80ccf66caf8d2211cbba0c9addb5e8646296a0b85d2b17315777f9faf3a"
+    },
+    "file_29": {
+      "path": "backend/src/hotel-erp.Api/Services/Interfaces/IRepositories.cs",
+      "sha256": "e59016f3e77f1327c908b2752a0609387d607849cea8b152cc39b22a5bdf010f"
+    },
+    "file_30": {
+      "path": "backend/src/hotel-erp.Api/Services/Interfaces/IUnitOfWork.cs",
+      "sha256": "8520199748a7d31b9a30d0765b8014b5cf7a653c0ff2adb24baa7b07ecdcedc5"
+    },
+    "file_31": {
+      "path": "backend/src/hotel-erp.Api/Services/InvoiceApplicationService.cs",
+      "sha256": "f834bbc4db477b647ad9178dd4e4946ae3f89a6998a204514437e786f65ac4d3"
+    },
+    "file_32": {
+      "path": "backend/tests/hotel-erp.IntegrationTests/AuthenticationFlowTests.Persistence.cs",
+      "sha256": "2c529a7c59f155c3792d7c91e02483b30483a9631f8d49c6d0ee13a83327ae1e"
+    },
+    "file_33": {
+      "path": "backend/tests/hotel-erp.IntegrationTests/AuthenticationFlowTests.cs",
+      "sha256": "91900775d2608127a551a6c5d7c2a0d69e366a2e2d17f26c791cd561161419d3"
+    },
+    "file_34": {
+      "path": "backend/tests/hotel-erp.IntegrationTests/RepositoryUnitOfWorkTests.cs",
+      "sha256": "0be7ca06c29d48e8c4f3420a263d2e3178757fd9797e90ae85d93d44e4367ecc"
+    },
+    "file_35": {
+      "path": "frontend/package-lock.json",
+      "sha256": "7ecf1c03b2fbef69967c4a9de6c765697f892831384ed3603c56ff80299d952c"
+    },
+    "file_36": {
+      "path": "scripts/check-repository-boundaries.mjs",
+      "sha256": "bbd8c0509550a045bee90c050860d29f63b831a73bd1f1f59d30694e30fcfc06"
+    },
+    "file_37": {
+      "path": "scripts/qa.sh",
+      "sha256": "945f45f5ea231cf0796e2a7931af1259b54c82464db203b3fa185700cbab57c1"
+    },
+    "file_38": {
+      "path": "docs/plan de implementación/2026-09-27/evidencia/p02f2-base-qa.json",
+      "sha256": "a410ee8a81c297bff43cca77564f281a175d931c8fb625863de409bcc86ca2e7"
+    },
+    "file_39": {
+      "path": "docs/plan de implementación/2026-09-27/evidencia/p02f2-modelo-ef.log",
+      "sha256": "815c5cd494b61a9d8737ba7653cd05fb05926e7b40a924683fa4eef4ca87566c"
+    },
+    "file_40": {
+      "path": "docs/plan de implementación/2026-09-27/evidencia/p02f2-qa-inicial.log",
+      "sha256": "0c096427790fe0c1282fe6c6bfc3e313a60231d95ce87a0baed8ef6aa8e383f9"
+    },
+    "file_41": {
+      "path": "docs/plan de implementación/2026-09-27/evidencia/p02f2-qa.log",
+      "sha256": "a51965e03e142b256e8043b2c66c7e12ceddd093f97836122170a661899cab7d"
+    },
+    "file_42": {
+      "path": "docs/plan de implementación/2026-09-27/evidencia/p02f2-repositorios.json",
+      "sha256": "a6d12bb1dd939705143b3faf4b7a1ceacd1810cd1b7678fa38eed5068571308e"
+    },
+    "file_43": {
+      "path": "docs/plan de implementación/2026-09-27/p02-base-tecnica/p02-f2-unidad-de-trabajo.md",
+      "sha256": "fe2d7ca485120d93a39cff2909e02169d1693104c03f1c994db9ac9f3a81e2b1"
+    }
+  }
+}

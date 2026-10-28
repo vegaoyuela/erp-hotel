@@ -20,6 +20,7 @@ namespace hotel_erp.Api.Services
     {
         private readonly IUserRepository _userRepository;
         private readonly IJwtService _jwtService;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IConfiguration _configuration;
         private readonly ApplicationDbContext _context;
@@ -31,8 +32,9 @@ namespace hotel_erp.Api.Services
             IMapper mapper,
             IConfiguration configuration,
             ApplicationDbContext context,
-            IHotelClock clock)
+            IHotelClock clock, IUnitOfWork unitOfWork)
         {
+            _unitOfWork = unitOfWork;
             _userRepository = userRepository;
             _jwtService = jwtService;
             _mapper = mapper;
@@ -59,6 +61,7 @@ namespace hotel_erp.Api.Services
                 if (user.FailedLoginAttempts >= 5)
                     user.LockoutEnd = _clock.UtcNow.AddMinutes(15);
                 await _userRepository.UpdateAsync(user);
+                await _unitOfWork.SaveChangesAsync();
                 return new AuthResponse { Success = false, Message = "Credenciales inválidas" };
             }
 
@@ -66,6 +69,7 @@ namespace hotel_erp.Api.Services
             user.LockoutEnd = null;
             user.LastLogin = _clock.UtcNow;
             await _userRepository.UpdateAsync(user);
+            await _unitOfWork.SaveChangesAsync();
 
             return await _jwtService.GenerateTokensAsync(user.Id);
         }
@@ -113,8 +117,8 @@ namespace hotel_erp.Api.Services
             if (defaultRole != null)
             {
                 await _context.UserRoles.AddAsync(new UserRole { UserId = user.Id, RoleId = defaultRole.Id });
-                await _context.SaveChangesAsync();
             }
+            await _unitOfWork.SaveChangesAsync();
 
             var roles = await _userRepository.GetUserRolesAsync(user.Id);
             var permissions = await _userRepository.GetUserPermissionsAsync(user.Id);
@@ -168,6 +172,7 @@ namespace hotel_erp.Api.Services
             user.MustChangePassword = false;
             user.SecurityVersion++;
             await _userRepository.UpdateAsync(user);
+            await _unitOfWork.SaveChangesAsync();
             await _jwtService.RevokeAllRefreshTokensAsync(userId);
         }
 

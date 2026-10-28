@@ -1,0 +1,77 @@
+{
+  "generated_at": "2026-10-28T19:33:24.837520+00:00",
+  "implementation_date_honduras": "2026-10-28",
+  "baseline_revision": "6af1b36340bb29607804df726638c35e9409dd24",
+  "contains_secret_values": false,
+  "repository_files": 11,
+  "before_implicit_saves": 56,
+  "after_implicit_saves": 0,
+  "files": [
+    {
+      "path": "backend/src/hotel-erp.Api/Database/Repositories/AccountingRepository.cs",
+      "before_implicit_saves": 5,
+      "after_implicit_saves": 0,
+      "sha256": "f42d8a99672ae84ed8d973ce8c834336ffd86f2f3abf72b0ab9369c12950b6f7"
+    },
+    {
+      "path": "backend/src/hotel-erp.Api/Database/Repositories/CashRepository.cs",
+      "before_implicit_saves": 4,
+      "after_implicit_saves": 0,
+      "sha256": "06de7f28b3f591cdbddd2696a06ea5d8dc487947f01837dbf74a0b13b30c6533"
+    },
+    {
+      "path": "backend/src/hotel-erp.Api/Database/Repositories/CustomerRepository.cs",
+      "before_implicit_saves": 6,
+      "after_implicit_saves": 0,
+      "sha256": "05764ab31b680ee68f4efd99c0eeddba06f27e063d598f50e483af0a1c5a9082"
+    },
+    {
+      "path": "backend/src/hotel-erp.Api/Database/Repositories/DiscountRepository.cs",
+      "before_implicit_saves": 3,
+      "after_implicit_saves": 0,
+      "sha256": "325cdc92f853a1316e29caedb100c2e407efdca7d421fc3037ea125084546502"
+    },
+    {
+      "path": "backend/src/hotel-erp.Api/Database/Repositories/InvoiceRepository.cs",
+      "before_implicit_saves": 11,
+      "after_implicit_saves": 0,
+      "sha256": "73207c28840c3548065241aed28c447daf7619be135fb7c74802d74ba44b1abd"
+    },
+    {
+      "path": "backend/src/hotel-erp.Api/Database/Repositories/PurchaseRepository.cs",
+      "before_implicit_saves": 6,
+      "after_implicit_saves": 0,
+      "sha256": "fddd93997201e627eeaecb03dd2454fb76a063da0d5ddf6130863b2622e575d9"
+    },
+    {
+      "path": "backend/src/hotel-erp.Api/Database/Repositories/ReservationRepository.cs",
+      "before_implicit_saves": 5,
+      "after_implicit_saves": 0,
+      "sha256": "6116484b64c9bc98e4d6bfc2ab3049ac1b0d2a5c2c218f64e029872a52c4b4eb"
+    },
+    {
+      "path": "backend/src/hotel-erp.Api/Database/Repositories/RoleRepository.cs",
+      "before_implicit_saves": 6,
+      "after_implicit_saves": 0,
+      "sha256": "2e8bbda79586a8d2d798f887deb47b30313cc0545063d62d914543e6b1fd9074"
+    },
+    {
+      "path": "backend/src/hotel-erp.Api/Database/Repositories/RoomRepository.cs",
+      "before_implicit_saves": 6,
+      "after_implicit_saves": 0,
+      "sha256": "1439cd9be592d7fe490ac6cc184872d09db3c4e182bbb92a33b7dbc47b33bc3e"
+    },
+    {
+      "path": "backend/src/hotel-erp.Api/Database/Repositories/SettingsRepository.cs",
+      "before_implicit_saves": 1,
+      "after_implicit_saves": 0,
+      "sha256": "060cdfe4eb6ae717b6b05dd6130dfc5c18c765a78c79e88f12dca476abeca156"
+    },
+    {
+      "path": "backend/src/hotel-erp.Api/Database/Repositories/UserRepository.cs",
+      "before_implicit_saves": 3,
+      "after_implicit_saves": 0,
+      "sha256": "e084419e05ccd17a9c50591714553d681c42f139837669e59f3530af36a656fd"
+    }
+  ]
+}

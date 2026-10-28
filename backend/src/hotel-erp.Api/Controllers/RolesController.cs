@@ -22,19 +22,22 @@ namespace hotel_erp.Api.Controllers
         private readonly ApplicationDbContext _context;
         private readonly IJwtService _jwtService;
         private readonly IMapper _mapper;
+        private readonly IUnitOfWork _unitOfWork;
 
         public RolesController(
             IRoleRepository roleRepository,
             IPermissionRepository permissionRepository,
             ApplicationDbContext context,
             IJwtService jwtService,
-            IMapper mapper)
+            IMapper mapper,
+            IUnitOfWork unitOfWork)
         {
             _roleRepository = roleRepository;
             _permissionRepository = permissionRepository;
             _context = context;
             _jwtService = jwtService;
             _mapper = mapper;
+            _unitOfWork = unitOfWork;
         }
 
         [HttpGet]
@@ -75,12 +78,14 @@ namespace hotel_erp.Api.Controllers
                 await _roleRepository.AssignPermissionsAsync(role.Id, selectedPermissions.Select(permission => permission.Id));
             }
 
+            await _unitOfWork.SaveChangesAsync(HttpContext.RequestAborted);
             return CreatedAtAction(nameof(GetById), new { id = role.Id }, _mapper.Map<RoleDto>(role));
         }
 
         [HttpPut("{id}")]
         public async Task<ActionResult> Update(Guid id, [FromBody] UpdateRoleRequest request)
         {
+            await using var transaction = await _context.Database.BeginTransactionAsync(HttpContext.RequestAborted);
             var role = await _roleRepository.GetByIdAsync(id);
             if (role == null) return NotFound();
 
@@ -114,6 +119,7 @@ namespace hotel_erp.Api.Controllers
                 await _roleRepository.AssignPermissionsAsync(role.Id, selectedPermissions.Select(permission => permission.Id));
 
             await InvalidateRoleSessionsAsync(role.Id);
+            await transaction.CommitAsync(HttpContext.RequestAborted);
 
             return NoContent();
         }
@@ -121,6 +127,7 @@ namespace hotel_erp.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(Guid id)
         {
+            await using var transaction = await _context.Database.BeginTransactionAsync(HttpContext.RequestAborted);
             var role = await _roleRepository.GetByIdAsync(id);
             if (role == null) return NotFound();
             if (role.SystemKey is not null)
@@ -128,6 +135,7 @@ namespace hotel_erp.Api.Controllers
 
             await _roleRepository.DeleteAsync(id);
             await InvalidateRoleSessionsAsync(id);
+            await transaction.CommitAsync(HttpContext.RequestAborted);
             return NoContent();
         }
 
@@ -171,7 +179,7 @@ namespace hotel_erp.Api.Controllers
             foreach (var user in users)
                 user.SecurityVersion++;
 
-            await _context.SaveChangesAsync();
+            await _unitOfWork.SaveChangesAsync(HttpContext.RequestAborted);
             foreach (var user in users)
                 await _jwtService.RevokeAllRefreshTokensAsync(user.Id);
         }

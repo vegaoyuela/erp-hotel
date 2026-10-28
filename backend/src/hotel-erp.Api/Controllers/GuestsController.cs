@@ -19,8 +19,11 @@ namespace hotel_erp.Api.Controllers
         private readonly IInvoiceRepository _invoiceRepo;
         private readonly IMapper _mapper;
 
-        public GuestsController(IGuestRepository repo, IReservationRepository reservationRepo, IInvoiceRepository invoiceRepo, IMapper mapper)
+        private readonly IUnitOfWork _unitOfWork;
+
+        public GuestsController(IGuestRepository repo, IReservationRepository reservationRepo, IInvoiceRepository invoiceRepo, IMapper mapper, IUnitOfWork unitOfWork)
         {
+            _unitOfWork = unitOfWork;
             _repo = repo;
             _reservationRepo = reservationRepo;
             _invoiceRepo = invoiceRepo;
@@ -84,6 +87,7 @@ namespace hotel_erp.Api.Controllers
                 ExonerationValidTo = request.ExonerationValidTo
             };
             await _repo.AddAsync(entity);
+            await _unitOfWork.SaveChangesAsync(HttpContext.RequestAborted);
             return CreatedAtAction(nameof(GetById), new { id = entity.Id }, _mapper.Map<GuestDto>(entity));
         }
 
@@ -120,6 +124,7 @@ namespace hotel_erp.Api.Controllers
             if (entity.TaxpayerType == TaxpayerType.Exonerado && (string.IsNullOrWhiteSpace(entity.ExonerationOrderNumber) || string.IsNullOrWhiteSpace(entity.SefinExonerationCertificateNumber)))
                 return BadRequest("Huésped exonerado requiere O.C. Exenta y Constancia SEFIN");
             await _repo.UpdateAsync(entity);
+            await _unitOfWork.SaveChangesAsync(HttpContext.RequestAborted);
             return NoContent();
         }
 
@@ -152,6 +157,7 @@ namespace hotel_erp.Api.Controllers
             if (guest == null) return NotFound();
             guest.Classification = request.Classification;
             await _repo.UpdateAsync(guest);
+            await _unitOfWork.SaveChangesAsync(HttpContext.RequestAborted);
             return Ok(new { classification = guest.Classification });
         }
 
@@ -168,6 +174,7 @@ namespace hotel_erp.Api.Controllers
                 return BadRequest("No se puede eliminar el huésped porque tiene facturas emitidas (trazabilidad fiscal).");
 
             await _repo.DeleteAsync(id);
+            await _unitOfWork.SaveChangesAsync(HttpContext.RequestAborted);
             return NoContent();
         }
     }

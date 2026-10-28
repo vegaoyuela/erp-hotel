@@ -11,12 +11,14 @@ namespace hotel_erp.Api.Services
         private readonly IAuditLogRepository _auditLogRepository;
         private readonly ApplicationDbContext _context;
         private readonly IHotelClock _clock;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public AuditService(IAuditLogRepository auditLogRepository, ApplicationDbContext context, IHotelClock clock)
+        public AuditService(IAuditLogRepository auditLogRepository, ApplicationDbContext context, IHotelClock clock, IUnitOfWork unitOfWork)
         {
             _auditLogRepository = auditLogRepository;
             _context = context;
             _clock = clock;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task LogAsync(Guid? userId, string action, string? entityName, Guid? entityId, object? changes = null, string? correlativeNumber = null, string? paymentMethod = null)
@@ -46,6 +48,7 @@ namespace hotel_erp.Api.Services
                 auditLog.Hash = AuditChainService.ComputeHash(auditLog);
 
                 await _auditLogRepository.AddAsync(auditLog);
+                await _unitOfWork.SaveChangesAsync();
                 return true;
             });
         }

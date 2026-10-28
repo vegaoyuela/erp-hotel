@@ -89,6 +89,8 @@ builder.Services.AddScoped<ICashMovementRepository, CashMovementRepository>();
 builder.Services.AddScoped<IAuditLogRepository, AuditLogRepository>();
 builder.Services.AddScoped<IAccountingRepository, AccountingRepository>();
 
+builder.Services.AddScoped<IUnitOfWork, EfUnitOfWork>();
+
 // Application services
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
@@ -110,6 +112,7 @@ builder.Services.AddScoped<PaymentApplicationService>();
 builder.Services.AddScoped<RefundApplicationService>();
 builder.Services.AddScoped<CardSettlementApplicationService>();
 builder.Services.AddScoped<InvoiceApplicationService>();
+builder.Services.AddScoped<ICaiCorrelativeService, CaiCorrelativeService>();
 builder.Services.AddScoped<ReservationApplicationService>();
 builder.Services.AddScoped<FolioApplicationService>();
 builder.Services.AddScoped<CashRegisterApplicationService>();

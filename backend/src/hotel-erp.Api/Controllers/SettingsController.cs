@@ -23,8 +23,11 @@ namespace hotel_erp.Api.Controllers
         private readonly ApplicationDbContext _context;
         private readonly IHotelClock _clock;
 
-        public SettingsController(IBusinessSettingsRepository repo, IMapper mapper, AuditService auditService, ApplicationDbContext context, IHotelClock clock)
+        private readonly IUnitOfWork _unitOfWork;
+
+        public SettingsController(IBusinessSettingsRepository repo, IMapper mapper, AuditService auditService, ApplicationDbContext context, IHotelClock clock, IUnitOfWork unitOfWork)
         {
+            _unitOfWork = unitOfWork;
             _repo = repo;
             _mapper = mapper;
             _auditService = auditService;
@@ -126,6 +129,7 @@ namespace hotel_erp.Api.Controllers
             }
 
             await _repo.UpdateAsync(existing);
+            await _unitOfWork.SaveChangesAsync(HttpContext.RequestAborted);
             var actorId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             await _auditService.LogAsync(actorId, "UpdateBusinessSettings", nameof(BusinessSettings), existing.Id, new
             {
@@ -182,6 +186,7 @@ namespace hotel_erp.Api.Controllers
             try
             {
                 await _repo.UpdateAsync(settings);
+                await _unitOfWork.SaveChangesAsync(HttpContext.RequestAborted);
             }
             catch (DbUpdateException)
             {
@@ -248,6 +253,7 @@ namespace hotel_erp.Api.Controllers
             revision.RetiredByUserId = actorId;
             revision.RetirementReason = settings.FiscalRetirementReason;
             await _repo.UpdateAsync(settings);
+            await _unitOfWork.SaveChangesAsync(HttpContext.RequestAborted);
             await _auditService.LogAsync(actorId, "RetireFiscalProfile", nameof(BusinessSettings), settings.Id, new
             {
                 settings.FiscalProfileVersion,

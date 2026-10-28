@@ -2,7 +2,7 @@
 
 **Inicio:** 27 de septiembre de 2026
 
-**Estado:** en ejecución; entregas P02-A a P02-F1 aprobadas por pruebas automáticas
+**Estado:** en ejecución; entregas P02-A a P02-F2 aprobadas por pruebas automáticas. Última ejecución: 28 de octubre de 2026.
 
 Este registro divide P02 en entregas comprobables. No se declara G2 mientras queden controladores con lógica de negocio, repositorios que confirman cambios por su cuenta o contratos sin prueba.
 
@@ -29,8 +29,8 @@ La versión anterior calculaba el hash con ticks de 100 ns antes de guardar un `
 | Tarea | Estado verificable | Trabajo restante |
 |---|---|---|
 | P02-01 | Completada | Finanzas, factura/notas, reservas, check-in/out, folios, caja, compras, inventario y respaldo delegan sus mutaciones a servicios. |
-| P02-02 | Parcial | Los flujos fiscales, operativos, compras, inventario y finanzas tienen transacción exterior y rollback probado; falta retirar 56 confirmaciones implícitas en 11 archivos de repositorio. |
-| P02-03 | Parcial | Reloj y ejecución de respaldo tienen contrato inyectable; faltan interfaces para cálculo, correlativo e impresión. |
+| P02-02 | Completada | Persistencia explícita con `IUnitOfWork`, cero guardados/transacciones en repositorios y pruebas de aislamiento, rollback y regresión HTTP. |
+| P02-03 | Parcial | Reloj, correlativos y ejecución de respaldo tienen contrato inyectable; faltan interfaces para cálculo, auditoría e impresión. |
 | P02-04 | Parcial | `ProblemDetails`, código y `traceId` completados; faltan paginación general, convenciones de fechas/enums y descripción OpenAPI por respuesta. |
 | P02-05 | Pendiente | Generar o validar tipos TypeScript desde OpenAPI en QA. |
 | P02-06 | Parcial previo | Existe matriz de permisos y prueba reflectiva; faltan motivos/aprobaciones por monto y revalidar todas las lecturas sensibles. |
@@ -69,8 +69,14 @@ La integración conserva las pruebas de concurrencia para reserva, check-in y ca
 
 Pagos, reembolsos y liquidaciones incorporan un punto de fallo inmediatamente después de generar el asiento. La integración ejecuta cada operación válida contra PostgreSQL, provoca la excepción y comprueba que la transacción no conserva pagos, aplicaciones, reembolsos, liquidaciones, movimientos de caja, cambios de estado, asientos, auditorías ni claves idempotentes. Los mismos flujos normales y concurrentes se ejecutan después para demostrar que la instrumentación no alteró el comportamiento.
 
+## Entrega P02-F2 — unidad de trabajo explícita
+
+El 28 de octubre se retiraron los 56 guardados internos de los repositorios. `IUnitOfWork` permite persistir los cambios preparados desde el consumidor, sin confirmar una transacción exterior. `CaiCorrelativeService` conserva la asignación del correlativo dentro del lock y `AuditService` guarda la bitácora dentro del lock de cadena.
+
+La nueva integración prueba visibilidad antes/después del guardado, rollback exterior y reversión del lote ante fallo de unicidad. La matriz HTTP vuelve a probar altas, ediciones y bajas de catálogos, roles/permisos y usuarios; verifica que los intentos de acceso fallidos se guardan. El comprobador de límites de repositorio queda incorporado a QA. La auditoría npm de esta fecha detectó cinco alertas altas; se actualizaron dependencias dentro de los rangos existentes, incluidas Vite y Zod. El [detalle de la entrega](p02-f2-unidad-de-trabajo.md) contiene consumidores, pruebas y evidencia.
+
 ## Criterio para la siguiente entrega
 
-P02-F2 retirará las 56 confirmaciones implícitas de los 11 archivos de repositorio y migrará sus consumidores a una unidad de trabajo explícita. Después continuará con contratos de cálculo, correlativo e impresión, OpenAPI y tipos frontend.
+P02-G completará los contratos inyectables de cálculo, auditoría e impresión. Luego continuará con convenciones y descripción OpenAPI, paginación y tipos frontend. G2 sigue abierta hasta cubrir los pendientes de la tabla y obtener la revisión independiente.
 
 La evidencia de QA y compatibilidad se conserva en el [expediente general](../evidencia/README.md#p02--base-técnica-primera-entrega).

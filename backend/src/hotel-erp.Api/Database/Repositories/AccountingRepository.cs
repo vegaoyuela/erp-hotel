@@ -48,13 +48,11 @@ namespace hotel_erp.Api.Database.Repositories
         public async Task AddAccountAsync(AccountingAccount account)
         {
             await _context.AccountingAccounts.AddAsync(account);
-            await _context.SaveChangesAsync();
         }
 
         public async Task AddEntryAsync(AccountingEntry entry)
         {
             await _context.AccountingEntries.AddAsync(entry);
-            await _context.SaveChangesAsync();
         }
 
         public async Task<decimal> GetAccountBalanceAsync(Guid accountId)
@@ -136,16 +134,16 @@ namespace hotel_erp.Api.Database.Repositories
             return allItems.ToDictionary(x => x.AccountId, x => (x.TotalDebit, x.TotalCredit));
         }
 
-        public async Task UpdateAccountAsync(AccountingAccount account)
+        public Task UpdateAccountAsync(AccountingAccount account)
         {
             _context.AccountingAccounts.Update(account);
-            await _context.SaveChangesAsync();
+            return Task.CompletedTask;
         }
 
-        public async Task DeleteAccountAsync(AccountingAccount account)
+        public Task DeleteAccountAsync(AccountingAccount account)
         {
             account.IsDeleted = true;
-            await _context.SaveChangesAsync();
+            return Task.CompletedTask;
         }
 
         public async Task<bool> AccountNumberExistsAsync(string number)
@@ -159,11 +157,10 @@ namespace hotel_erp.Api.Database.Repositories
             if (entry != null)
             {
                 entry.IsDeleted = true;
-                foreach(var item in entry.EntryItems)
+                foreach (var item in entry.EntryItems)
                 {
                     item.IsDeleted = true;
                 }
-                await _context.SaveChangesAsync();
             }
         }
     }

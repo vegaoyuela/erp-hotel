@@ -1,6 +1,6 @@
 # 08 — Registro de pendientes y bloqueos
 
-**Última actualización:** 27 de septiembre de 2026
+**Última actualización:** 28 de octubre de 2026
 
 Este registro separa lo que depende del código de aquello que requiere información o aprobación del hotel. Una tarea externa no se cierra con datos supuestos ni con el expediente sintético de QA.
 
@@ -51,4 +51,4 @@ La plantilla puede copiarse desde [expediente P01](p01-expediente/README.md), pe
 
 ## Pendientes técnicos abiertos de P02
 
-Las entregas P02-A a P02-F1 completaron la extracción de los casos críticos y el rollback inyectado de documentos fiscales, operación hotelera, caja, compras, inventario, pagos, reembolsos y liquidaciones. Compra y asiento comparten transacción; inventario serializa movimientos por producto y el respaldo usa un ejecutor inyectable con argumentos seguros. Permanecen abiertos 56 guardados implícitos en 11 archivos de repositorio; los contratos restantes de P02-03; P02-04 a P02-07; la matriz completa P02-09 y la revisión independiente P02-10. El detalle y el orden de la siguiente entrega están en [P02 — base técnica](p02-base-tecnica/README.md).
+Las entregas P02-A a P02-F2 completaron la extracción de los casos críticos, el rollback financiero/fiscal/operativo y la eliminación de los 56 guardados implícitos en los 11 archivos de repositorio. Los consumidores usan persistencia explícita; auditoría y correlativo conservan sus locks y participan en la transacción del caso. La actualización de dependencias también corrigió cinco alertas altas detectadas por npm el 28 de octubre. Permanecen abiertos los contratos de cálculo, auditoría e impresión de P02-03; P02-04 a P02-07; la matriz completa P02-09 y la revisión independiente P02-10. El detalle está en [P02 — base técnica](p02-base-tecnica/README.md) y en la [entrega P02-F2](p02-base-tecnica/p02-f2-unidad-de-trabajo.md).

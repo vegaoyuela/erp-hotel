@@ -1,0 +1,100 @@
+[QA] 11 archivos de repositorio: sin persistencia ni transacciones implícitas
+[QA] Restaurando backend
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+[QA] Compilando backend
+  hotel-erp.Api -> /home/vm/Projects/erp-hotel/backend/src/hotel-erp.Api/bin/Debug/net10.0/hotel-erp.Api.dll
+  hotel-erp.UnitTests -> /home/vm/Projects/erp-hotel/backend/tests/hotel-erp.UnitTests/bin/Debug/net10.0/hotel-erp.UnitTests.dll
+  hotel-erp.IntegrationTests -> /home/vm/Projects/erp-hotel/backend/tests/hotel-erp.IntegrationTests/bin/Debug/net10.0/hotel-erp.IntegrationTests.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:23.45
+[QA] Ejecutando pruebas unitarias
+  hotel-erp.Api -> /home/vm/Projects/erp-hotel/backend/src/hotel-erp.Api/bin/Debug/net10.0/hotel-erp.Api.dll
+  hotel-erp.UnitTests -> /home/vm/Projects/erp-hotel/backend/tests/hotel-erp.UnitTests/bin/Debug/net10.0/hotel-erp.UnitTests.dll
+Test run for /home/vm/Projects/erp-hotel/backend/tests/hotel-erp.UnitTests/bin/Debug/net10.0/hotel-erp.UnitTests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+
+Passed!  - Failed:     0, Passed:    93, Skipped:     0, Total:    93, Duration: 175 ms - hotel-erp.UnitTests.dll (net10.0)
+[QA] Ejecutando integración PostgreSQL
+  hotel-erp.Api -> /home/vm/Projects/erp-hotel/backend/src/hotel-erp.Api/bin/Debug/net10.0/hotel-erp.Api.dll
+  hotel-erp.IntegrationTests -> /home/vm/Projects/erp-hotel/backend/tests/hotel-erp.IntegrationTests/bin/Debug/net10.0/hotel-erp.IntegrationTests.dll
+Test run for /home/vm/Projects/erp-hotel/backend/tests/hotel-erp.IntegrationTests/bin/Debug/net10.0/hotel-erp.IntegrationTests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+
+Passed!  - Failed:     0, Passed:     5, Skipped:     0, Total:     5, Duration: 1 m 3 s - hotel-erp.IntegrationTests.dll (net10.0)
+[QA] Validando expediente fiscal N01-N06
+✔ acepta un expediente sintético completo para QA (35.240242ms)
+✔ rechaza el expediente sintético cuando se exige fuente oficial (0.684726ms)
+✔ rechaza decisiones ausentes o duplicadas (0.609365ms)
+✔ el resultado no copia valores del expediente (2.156862ms)
+✔ rechaza fechas de calendario inexistentes (0.624382ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 153.958666
+[QA] Instalando frontend desde package-lock.json
+
+added 211 packages, and audited 212 packages in 9s
+
+57 packages are looking for funding
+  run `npm fund` for details
+
+5 high severity vulnerabilities
+
+To address all issues, run:
+  npm audit fix
+
+Run `npm audit` for details.
+[QA] Auditando dependencias frontend
+# npm audit report
+
+brace-expansion  4.0.0 - 5.0.11
+Severity: high
+brace-expansion: Quadratic-time expansion of the `{a},b}` rewrite causes CPU denial of service - https://github.com/advisories/GHSA-q2hr-2g5m-vwhr
+brace-expansion: DoS via uncontrolled recursion on nested brace groups causing stack exhaustion - https://github.com/advisories/GHSA-qhr7-859c-m2p7
+brace-expansion: DoS via uncontrolled recursion in parseCommaParts causing stack exhaustion - https://github.com/advisories/GHSA-6j4f-fj2g-mc7p
+fix available via `npm audit fix`
+node_modules/brace-expansion
+
+follow-redirects  1.16.0
+Severity: high
+follow-redirects array-form headers bypass cross-origin credential stripping - https://github.com/advisories/GHSA-q3jh-wrc6-jgq8
+follow-redirects sensitiveHeaders regex escaping can expose credential headers - https://github.com/advisories/GHSA-8r9p-f939-6h3c
+fix available via `npm audit fix`
+node_modules/follow-redirects
+
+source-map-js  1.0.0 - 1.2.1
+Severity: high
+source-map-js allows event-loop denial of service through indexed source-map section offsets - https://github.com/advisories/GHSA-68fv-2mgg-jv7q
+fix available via `npm audit fix`
+node_modules/source-map-js
+
+vite  8.2.0 - 8.2.2
+Severity: high
+launch-editor: escapeCmdArgs() omits % escaping on Windows - https://github.com/advisories/GHSA-698v-4r3x-3vcv
+launch-editor: Editor CLI flag misinterpretation causing arbitrary command execution for some editors - https://github.com/advisories/GHSA-r825-w8mm-5pxw
+launch-editor: `fs.existsSync()` existence check can be bypassed on Windows - https://github.com/advisories/GHSA-587h-7wmj-h5pm
+Vite: Cross origin script execution through Vite custom middleware - https://github.com/advisories/GHSA-9jrq-w75r-8gcw
+Vite: Files outside `server.fs.allow` could be served when project paths match system paths on non-Windows machine - https://github.com/advisories/GHSA-rq7h-c2jc-7f22
+Vite: First 4 bytes of files outside of `server.fs` setting is exposed by `?vite-wasm-instance` - https://github.com/advisories/GHSA-vfpm-58rq-9qcg
+fix available via `npm audit fix`
+node_modules/vite
+
+zod  <4.6.6
+Severity: high
+Zod can exhaust memory while validating oversized constrained collections - https://github.com/advisories/GHSA-mrhx-c7xc-m3w5
+fix available via `npm audit fix`
+node_modules/zod
+
+5 high severity vulnerabilities
+
+To address all issues, run:
+  npm audit fix

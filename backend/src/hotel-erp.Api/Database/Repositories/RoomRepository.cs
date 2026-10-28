@@ -12,9 +12,23 @@ namespace hotel_erp.Api.Database.Repositories
         public async Task<RoomType?> GetByIdAsync(Guid id) => await _context.RoomTypes.FindAsync(id);
         public async Task<RoomType?> GetByNameAsync(string name) => await _context.RoomTypes.FirstOrDefaultAsync(rt => rt.Name == name);
         public async Task<IEnumerable<RoomType>> GetAllAsync() => await _context.RoomTypes.ToListAsync();
-        public async Task AddAsync(RoomType rt) { await _context.RoomTypes.AddAsync(rt); await _context.SaveChangesAsync(); }
-        public async Task UpdateAsync(RoomType rt) { _context.RoomTypes.Update(rt); await _context.SaveChangesAsync(); }
-        public async Task DeleteAsync(Guid id) { var rt = await _context.RoomTypes.FindAsync(id); if (rt != null) { rt.IsDeleted = true; await _context.SaveChangesAsync(); } }
+        public async Task AddAsync(RoomType rt)
+        {
+            await _context.RoomTypes.AddAsync(rt);
+        }
+        public Task UpdateAsync(RoomType rt)
+        {
+            _context.RoomTypes.Update(rt);
+            return Task.CompletedTask;
+        }
+        public async Task DeleteAsync(Guid id)
+        {
+            var rt = await _context.RoomTypes.FindAsync(id);
+            if (rt != null)
+            {
+                rt.IsDeleted = true;
+            }
+        }
     }
 
     public class RoomRepository : IRoomRepository
@@ -45,8 +59,22 @@ namespace hotel_erp.Api.Database.Repositories
                 .ToListAsync();
         }
 
-        public async Task AddAsync(Room room) { await _context.Rooms.AddAsync(room); await _context.SaveChangesAsync(); }
-        public async Task UpdateAsync(Room room) { _context.Rooms.Update(room); await _context.SaveChangesAsync(); }
-        public async Task DeleteAsync(Guid id) { var r = await _context.Rooms.FindAsync(id); if (r != null) { r.IsDeleted = true; await _context.SaveChangesAsync(); } }
+        public async Task AddAsync(Room room)
+        {
+            await _context.Rooms.AddAsync(room);
+        }
+        public Task UpdateAsync(Room room)
+        {
+            _context.Rooms.Update(room);
+            return Task.CompletedTask;
+        }
+        public async Task DeleteAsync(Guid id)
+        {
+            var r = await _context.Rooms.FindAsync(id);
+            if (r != null)
+            {
+                r.IsDeleted = true;
+            }
+        }
     }
 }

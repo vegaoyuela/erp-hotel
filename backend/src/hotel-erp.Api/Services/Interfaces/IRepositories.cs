@@ -152,7 +152,6 @@ namespace hotel_erp.Api.Services.Interfaces
         Task AddAsync(Invoice invoice);
         Task DeleteInvoiceItemsAsync(Guid invoiceId);
         Task UpdateAsync(Invoice invoice);
-        Task<string> GetNextCorrelativeAsync(Guid caiId);
     }
 
     public interface ICashRegisterRepository

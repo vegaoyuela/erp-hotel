@@ -21,7 +21,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace hotel_erp.IntegrationTests;
 
-public class AuthenticationFlowTests
+public partial class AuthenticationFlowTests
 {
     [PostgreSqlFact]
     public async Task AuthenticationAbuse_IsRateLimited_AndInternalErrorsAreSafe()
@@ -549,6 +549,8 @@ public class AuthenticationFlowTests
             factory.Services,
             currentSession.AccessToken!,
             database.ConnectionString);
+
+        await AssertExplicitPersistenceConsumersAsync(client, factory.Services, currentSession.AccessToken!);
 
         using var retirementRequest = Authorized(HttpMethod.Post, "/api/settings/business/retire", currentSession.AccessToken!);
         retirementRequest.Content = JsonContent.Create(new

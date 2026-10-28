@@ -3,6 +3,8 @@ set -euo pipefail
 
 root_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 
+node "$root_dir/scripts/check-repository-boundaries.mjs"
+
 echo "[QA] Restaurando backend"
 dotnet restore "$root_dir/backend/hotel-erp.slnx" --nologo
 

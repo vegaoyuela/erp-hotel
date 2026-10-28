@@ -17,8 +17,11 @@ namespace hotel_erp.Api.Controllers
         private readonly IDiscountRepository _repo;
         private readonly IMapper _mapper;
 
-        public DiscountsController(IDiscountRepository repo, IMapper mapper)
+        private readonly IUnitOfWork _unitOfWork;
+
+        public DiscountsController(IDiscountRepository repo, IMapper mapper, IUnitOfWork unitOfWork)
         {
+            _unitOfWork = unitOfWork;
             _repo = repo;
             _mapper = mapper;
         }
@@ -52,6 +55,7 @@ namespace hotel_erp.Api.Controllers
                 Priority = request.Priority
             };
             await _repo.AddAsync(entity);
+            await _unitOfWork.SaveChangesAsync(HttpContext.RequestAborted);
             return CreatedAtAction(nameof(GetById), new { id = entity.Id }, _mapper.Map<DiscountDto>(entity));
         }
 
@@ -73,6 +77,7 @@ namespace hotel_erp.Api.Controllers
             if (request.Priority.HasValue) entity.Priority = request.Priority.Value;
 
             await _repo.UpdateAsync(entity);
+            await _unitOfWork.SaveChangesAsync(HttpContext.RequestAborted);
             return NoContent();
         }
 
@@ -81,6 +86,7 @@ namespace hotel_erp.Api.Controllers
         public async Task<ActionResult> Delete(Guid id)
         {
             await _repo.DeleteAsync(id);
+            await _unitOfWork.SaveChangesAsync(HttpContext.RequestAborted);
             return NoContent();
         }
     }
