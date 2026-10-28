@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+import { usePagedList } from '@/hooks/usePagedList'
 import { useSearchParams } from 'react-router-dom'
 import axios from 'axios'
 import api from '@/lib/axios'
@@ -90,7 +91,6 @@ export default function InvoicesPage() {
   const canManageCash = useAuthStore((state) => state.hasPermission('manage_cash'))
   const canCreateInvoices = useAuthStore((state) => state.hasPermission('create_invoices'))
   const [searchParams] = useSearchParams()
-  const [invoices, setInvoices] = useState<Invoice[]>([])
   const [dni, setDni] = useState('')
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
@@ -100,7 +100,7 @@ export default function InvoicesPage() {
     documentType: 'Factura' | 'NotaCredito' | 'NotaDebito'
     label: string
   }[]>([])
-  const [selectedAuth, setSelectedAuth] = useState('')
+  const [selectedAuth] = useState(searchParams.get('filter') ?? '')
   const [docTypeFilter, setDocTypeFilter] = useState('Todos')
 
   const [invoicePreview, setInvoicePreview] = useState<string | null>(null)
@@ -108,7 +108,6 @@ export default function InvoicesPage() {
   const [previewLogoHeight, setPreviewLogoHeight] = useState(40)
   const [selectedInvoiceId, setSelectedInvoiceId] = useState<string | null>(null)
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null)
-  const [loading, setLoading] = useState(false)
   const [alertInfo, setAlertInfo] = useState<{ variant: 'error' | 'success' | 'info'; message: string } | null>(null)
 
   // Credit Note Modal State
@@ -155,7 +154,24 @@ export default function InvoicesPage() {
   // Pagination
   const [currentPage, setCurrentPage] = useState(1)
   const [pageSize, setPageSize] = useState(15)
-  const initialized = useRef(false)
+  const [appliedFilters, setAppliedFilters] = useState({ dni: '', start: '', end: '' })
+  const [source, authorizationId] = selectedAuth.split(':')
+  const { items: paginatedInvoices, loading, error: listError, load, totalItems, totalPages, page } = usePagedList<Invoice>(
+    '/invoices/paged', {
+      page: currentPage, pageSize,
+      dni: appliedFilters.dni || undefined,
+      start: appliedFilters.start || undefined,
+      end: appliedFilters.end || undefined,
+      caiId: source === 'cai' ? authorizationId : undefined,
+      documentAuthorizationId: source === 'docauth' ? authorizationId : undefined,
+      documentType: docTypeFilter === 'Todos' ? undefined : docTypeFilter,
+    })
+  const applyFilters = () => {
+    const unchanged = currentPage === 1 && appliedFilters.dni === dni && appliedFilters.start === startDate && appliedFilters.end === endDate
+    setAppliedFilters({ dni, start: startDate, end: endDate })
+    setCurrentPage(1)
+    if (unchanged) void load()
+  }
 
   const loadAuthList = useCallback(async () => {
     try {
@@ -191,33 +207,6 @@ export default function InvoicesPage() {
     }
   }, [])
 
-  const load = useCallback(
-    async (authFilter?: string) => {
-      setLoading(true)
-      try {
-        const params: Record<string, string> = {}
-        const filter = authFilter ?? selectedAuth
-        if (filter) {
-          const [source, id] = filter.split(':')
-          if (source === 'cai') params.caiId = id
-          else if (source === 'docauth') params.documentAuthorizationId = id
-        }
-        if (dni) params.dni = dni
-        if (startDate && endDate) {
-          params.start = startDate
-          params.end = endDate
-        }
-        const { data } = await api.get<Invoice[]>('/invoices/search', { params })
-        setInvoices(data)
-      } catch {
-        setAlertInfo({ variant: 'error', message: 'Error al consultar las facturas registradas.' })
-      } finally {
-        setLoading(false)
-      }
-    },
-    [selectedAuth, dni, startDate, endDate]
-  )
-
   const loadPayments = useCallback(async (invoiceId: string) => {
     if (!canManageCash) {
       setPayments([])
@@ -236,20 +225,9 @@ export default function InvoicesPage() {
   }, [canManageCash])
 
   useEffect(() => {
-    if (initialized.current) return
-    initialized.current = true
-    const init = async () => {
-      await loadAuthList()
-      const filter = searchParams.get('filter')
-      if (filter) {
-        setSelectedAuth(filter)
-        await load(filter)
-      } else {
-        await load()
-      }
-    }
-    void init()
-  }, [load, loadAuthList, searchParams])
+    const timer = window.setTimeout(() => void loadAuthList(), 0)
+    return () => window.clearTimeout(timer)
+  }, [loadAuthList])
 
   const viewPrint = async (inv: Invoice) => {
     setSelectedInvoiceId(inv.id)
@@ -328,7 +306,7 @@ export default function InvoicesPage() {
       clearPaymentIntent(selectedInvoice.id)
       const { data: updatedInvoice } = await api.get<Invoice>(`/invoices/${selectedInvoice.id}`)
       setSelectedInvoice(updatedInvoice)
-      setInvoices((current) => current.map((invoice) => invoice.id === updatedInvoice.id ? updatedInvoice : invoice))
+      void load()
       await loadPayments(selectedInvoice.id)
       setShowPaymentModal(false)
       setAlertInfo({
@@ -472,7 +450,7 @@ export default function InvoicesPage() {
       clearRefundIntent(refundPayment.id)
       const { data: updatedInvoice } = await api.get<Invoice>(`/invoices/${selectedInvoice.id}`)
       setSelectedInvoice(updatedInvoice)
-      setInvoices((current) => current.map((invoice) => invoice.id === updatedInvoice.id ? updatedInvoice : invoice))
+      void load()
       await loadPayments(selectedInvoice.id)
       setShowRefundModal(false)
       setAlertInfo({
@@ -603,21 +581,6 @@ export default function InvoicesPage() {
     }
   }
 
-  const filteredInvoices = useMemo(() => {
-    return invoices.filter((inv) => {
-      if (docTypeFilter === 'Factura') return inv.documentType === 'Factura' || !inv.documentType
-      if (docTypeFilter === 'NotaCredito') return inv.documentType === 'NotaCredito'
-      if (docTypeFilter === 'NotaDebito') return inv.documentType === 'NotaDebito'
-      return true
-    })
-  }, [invoices, docTypeFilter])
-
-  const totalPages = Math.ceil(filteredInvoices.length / pageSize) || 1
-  const paginatedInvoices = useMemo(() => {
-    const start = (currentPage - 1) * pageSize
-    return filteredInvoices.slice(start, start + pageSize)
-  }, [filteredInvoices, currentPage, pageSize])
-
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -636,6 +599,8 @@ export default function InvoicesPage() {
       {alertInfo && (
         <InlineAlert variant={alertInfo.variant} message={alertInfo.message} onClose={() => setAlertInfo(null)} />
       )}
+
+      {listError && <InlineAlert variant="error" message="No se pudo cargar la página de facturas. Usa Filtrar para reintentar." />}
 
       {/* Filter and Search Bar */}
       <div className="p-4 rounded-xl border border-border bg-card shadow-xs grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
@@ -687,7 +652,7 @@ export default function InvoicesPage() {
         </div>
 
         <div className="flex items-end gap-2">
-          <Button onClick={() => load()} disabled={loading} className="w-full text-xs gap-1.5 h-9">
+          <Button onClick={applyFilters} disabled={loading} className="w-full text-xs gap-1.5 h-9">
             {loading ? <Loader2 size={13} className="animate-spin" /> : <Search size={13} />}
             Filtrar
           </Button>
@@ -703,7 +668,7 @@ export default function InvoicesPage() {
               <h3 className="font-semibold text-xs text-foreground uppercase tracking-wider">
                 Comprobantes Fiscales
               </h3>
-              <span className="text-xs text-muted-foreground">{filteredInvoices.length} registrado(s)</span>
+              <span className="text-xs text-muted-foreground">{totalItems} registrado(s)</span>
             </div>
 
             {loading ? (
@@ -794,9 +759,10 @@ export default function InvoicesPage() {
             )}
 
             <Pagination
-              currentPage={currentPage}
+              currentPage={page}
+              disabled={loading}
               totalPages={totalPages}
-              totalItems={filteredInvoices.length}
+              totalItems={totalItems}
               pageSize={pageSize}
               onPageChange={setCurrentPage}
               onPageSizeChange={(size) => {

@@ -1,0 +1,6 @@
+{
+  "status": "passed",
+  "deliberate_contract_drift_rejected": true,
+  "exit_code": 1,
+  "repository_schema_modified": false
+}

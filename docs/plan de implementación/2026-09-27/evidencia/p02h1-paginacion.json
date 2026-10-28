@@ -1,0 +1,10 @@
+{
+  "containsSecretValues": false,
+  "guestMatchCount": 37,
+  "guestLegacyRows": 37,
+  "guestPageRows": 10,
+  "guestLegacyPayloadBytes": 22682,
+  "guestPagePayloadBytes": 6195,
+  "auditTotalItems": 255,
+  "auditPageRows": 1
+}

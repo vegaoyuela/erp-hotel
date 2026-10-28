@@ -1,3 +1,4 @@
+using hotel_erp.Api.Dtos.Common;
 using hotel_erp.Api.Database;
 using hotel_erp.Api.Authorization;
 using hotel_erp.Api.Database.Entities;
@@ -35,12 +36,14 @@ namespace hotel_erp.Api.Controllers
         private readonly ApplicationDbContext _context;
         private readonly AuditChainService _auditChain;
         private readonly IHotelClock _clock;
+        private readonly HotelListQueryService _lists;
 
-        public AuditLogsController(ApplicationDbContext context, AuditChainService auditChain, IHotelClock clock)
+        public AuditLogsController(ApplicationDbContext context, AuditChainService auditChain, IHotelClock clock, HotelListQueryService lists)
         {
             _context = context;
             _auditChain = auditChain;
             _clock = clock;
+            _lists = lists;
         }
 
         [HttpGet]
@@ -102,6 +105,15 @@ namespace hotel_erp.Api.Controllers
 
             return Ok(logs);
         }
+
+        [HttpGet("paged")]
+        public async Task<ActionResult<PagedResult<AuditLogDto>>> GetPage([FromQuery] AuditPageQuery query)
+            => Ok(await _lists.AuditAsync(query, HttpContext.RequestAborted));
+
+        [HttpGet("actions")]
+        public async Task<ActionResult<IEnumerable<string>>> GetActions()
+            => Ok(await _context.AuditLogs.AsNoTracking().Select(log => log.Action)
+                .Distinct().OrderBy(action => action).ToListAsync(HttpContext.RequestAborted));
 
         [HttpGet("verify-integrity")]
         public async Task<ActionResult<AuditIntegrityResult>> VerifyIntegrity(CancellationToken cancellationToken)

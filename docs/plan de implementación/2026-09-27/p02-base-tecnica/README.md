@@ -2,7 +2,7 @@
 
 **Inicio:** 27 de septiembre de 2026
 
-**Estado:** en ejecución; entregas P02-A a P02-G aprobadas por pruebas automáticas. Última ejecución: 28 de octubre de 2026.
+**Estado:** en ejecución; entregas P02-A a P02-H1 aprobadas por pruebas automáticas. Última ejecución: 28 de octubre de 2026.
 
 Este registro divide P02 en entregas comprobables. No se declara G2 mientras queden controladores con lógica de negocio, repositorios que confirman cambios por su cuenta o contratos sin prueba.
 
@@ -31,8 +31,8 @@ La versión anterior calculaba el hash con ticks de 100 ns antes de guardar un `
 | P02-01 | Completada | Finanzas, factura/notas, reservas, check-in/out, folios, caja, compras, inventario y respaldo delegan sus mutaciones a servicios. |
 | P02-02 | Completada | Persistencia explícita con `IUnitOfWork`, cero guardados/transacciones en repositorios y pruebas de aislamiento, rollback y regresión HTTP. |
 | P02-03 | Completada en código | Contratos inyectables de reloj, cálculo, correlativo, auditoría, impresión y respaldo; sustitución/rollback y transporte simulado probados. Prueba física pendiente en Windows. |
-| P02-04 | Parcial | `ProblemDetails`, código y `traceId` completados; faltan paginación general, convenciones de fechas/enums y descripción OpenAPI por respuesta. |
-| P02-05 | Pendiente | Generar o validar tipos TypeScript desde OpenAPI en QA. |
+| P02-04 | Parcial (P02-H1) | Seguridad/errores OpenAPI, convenciones y paginación SQL de huéspedes, facturas y auditoría probadas; faltan las demás colecciones y esquemas explícitos de respuestas de éxito. |
+| P02-05 | Parcial (P02-H1) | Tipos generados y comparación del contrato real en QA; huéspedes, facturas, líneas y bitácora migrados. Faltan los contratos manuales restantes. |
 | P02-06 | Parcial previo | Existe matriz de permisos y prueba reflectiva; faltan motivos/aprobaciones por monto y revalidar todas las lecturas sensibles. |
 | P02-07 | Parcial previo | Existen roles PostgreSQL y migración separada; la rotación de secretos se ejecutará durante instalación Windows. |
 | P02-08 | Completada | Verificador, exportador, UI, compatibilidad histórica y pruebas. |
@@ -81,8 +81,14 @@ La nueva integración prueba visibilidad antes/después del guardado, rollback e
 
 La integración prueba que sustituir el calculador o la auditoría por una implementación que falla revierte la factura y el correlativo. La impresión captura los bytes del generador real con un transporte simulado y recorre vista previa, original/copia, regla, fallos y plataforma no disponible. El [detalle de P02-G](p02-g-contratos.md) conserva el alcance y la prueba física pendiente de Windows.
 
+## Entrega P02-H1 — contrato API y tres listados paginados
+
+El contrato OpenAPI queda versionado y genera tipos TypeScript. QA compara el documento obtenido de una API real en una base sintética contra el snapshot y los tipos del repositorio. Los listados de huéspedes, facturas y auditoría filtran y paginan en PostgreSQL; las facturas combinan los filtros y contemplan el día final completo. La bitácora permite consultar más de 200 eventos.
+
+El [detalle de P02-H1](p02-h1-contrato-paginacion.md) contiene rutas, convenciones, comandos, capturas, límites y próximos pasos. Se aprobaron 109 unitarias, 5 integraciones PostgreSQL, 5 validaciones del expediente, compilación, lint y comparación del contrato; además se comprobó el rechazo de una divergencia deliberada y seis capturas en navegador.
+
 ## Criterio para la siguiente entrega
 
-P02-H continuará con convenciones y descripción OpenAPI, paginación y tipos frontend. G2 sigue abierta hasta cubrir los pendientes de la tabla y obtener la revisión independiente.
+P02-H2 continuará con la paginación de las colecciones restantes, respuestas de éxito explícitas y migración de los contratos manuales frontend. G2 sigue abierta hasta cubrir los pendientes de la tabla y obtener la revisión independiente.
 
 La evidencia de QA y compatibilidad se conserva en el [expediente general](../evidencia/README.md#p02--base-técnica-primera-entrega).

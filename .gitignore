@@ -12,3 +12,6 @@ frontend/dist/
 *.lscache
 .codex
 .agents
+
+# Isolated API contract generator dependencies
+scripts/api-contract/node_modules/

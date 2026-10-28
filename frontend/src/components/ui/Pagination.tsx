@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-r
 import { Button } from './button'
 
 interface PaginationProps {
+  disabled?: boolean
   currentPage: number
   totalPages: number
   totalItems: number
@@ -19,7 +20,8 @@ export function Pagination({
   pageSize,
   onPageChange,
   onPageSizeChange,
-  pageSizeOptions = [10, 25, 50, 100],
+  pageSizeOptions = [10, 15, 25, 50, 100],
+  disabled = false,
 }: PaginationProps) {
   if (totalItems === 0) return null
 
@@ -45,7 +47,7 @@ export function Pagination({
   return (
     <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-3.5 py-3 border-t border-border bg-card/60 text-xs text-muted-foreground select-none">
       <div className="flex items-center gap-2">
-        <span>
+        <span aria-live="polite">
           Mostrando <strong className="text-foreground font-semibold">{startItem}</strong> -{' '}
           <strong className="text-foreground font-semibold">{endItem}</strong> de{' '}
           <strong className="text-foreground font-semibold">{totalItems}</strong> registros
@@ -54,6 +56,8 @@ export function Pagination({
           <div className="flex items-center gap-1.5 ml-2 border-l border-border pl-3">
             <span>Por pág:</span>
             <select
+              aria-label="Registros por página"
+              disabled={disabled}
               value={pageSize}
               onChange={(e) => onPageSizeChange(Number(e.target.value))}
               className="border border-input rounded px-1.5 py-0.5 bg-background text-foreground text-xs"
@@ -73,7 +77,7 @@ export function Pagination({
           size="sm"
           variant="outline"
           onClick={() => onPageChange(1)}
-          disabled={currentPage === 1}
+          disabled={disabled || currentPage === 1}
           className="h-7 w-7 p-0"
           title="Primera página"
         >
@@ -83,7 +87,7 @@ export function Pagination({
           size="sm"
           variant="outline"
           onClick={() => onPageChange(currentPage - 1)}
-          disabled={currentPage === 1}
+          disabled={disabled || currentPage === 1}
           className="h-7 w-7 p-0"
           title="Página anterior"
         >
@@ -95,6 +99,8 @@ export function Pagination({
             typeof page === 'number' ? (
               <Button
                 key={idx}
+                disabled={disabled}
+                aria-current={currentPage === page ? 'page' : undefined}
                 size="sm"
                 variant={currentPage === page ? 'default' : 'outline'}
                 onClick={() => onPageChange(page)}
@@ -116,7 +122,7 @@ export function Pagination({
           size="sm"
           variant="outline"
           onClick={() => onPageChange(currentPage + 1)}
-          disabled={currentPage >= totalPages}
+          disabled={disabled || currentPage >= totalPages}
           className="h-7 w-7 p-0"
           title="Página siguiente"
         >
@@ -126,7 +132,7 @@ export function Pagination({
           size="sm"
           variant="outline"
           onClick={() => onPageChange(totalPages)}
-          disabled={currentPage >= totalPages}
+          disabled={disabled || currentPage >= totalPages}
           className="h-7 w-7 p-0"
           title="Última página"
         >

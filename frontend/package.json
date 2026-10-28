@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "api:generate": "node ../scripts/api-contract/generate.mjs",
+    "api:check": "node ../scripts/api-contract/generate.mjs --check"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

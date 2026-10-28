@@ -52,3 +52,10 @@ La plantilla puede copiarse desde [expediente P01](p01-expediente/README.md), pe
 ## Pendientes técnicos abiertos de P02
 
 Las entregas P02-A a P02-G completaron la extracción de casos críticos, el rollback financiero/fiscal/operativo, la eliminación de los 56 guardados implícitos y los contratos pendientes de cálculo, auditoría e impresión. Los consumidores usan interfaces y persistencia explícita; la auditoría y los correlativos conservan sus locks y transacciones. Las pruebas sustituyen cálculo/auditoría con fallos y recorren la impresión con un transporte simulado. Permanecen abiertos P02-04 a P02-07; la matriz completa P02-09; la revisión independiente P02-10; y las tareas de impresión física, instalación Windows y aceptación fiscal del hotel. El detalle está en [P02 — base técnica](p02-base-tecnica/README.md) y en la [entrega P02-G](p02-base-tecnica/p02-g-contratos.md).
+
+
+### Avance P02-H1 — contrato y paginación (28 de octubre de 2026)
+
+OpenAPI y tipos TypeScript están versionados y se validan contra el contrato de una API real en QA. Huéspedes, facturas y auditoría consumen paginación SQL; los filtros fiscales se combinan y la bitácora ya no queda limitada a los 200 primeros eventos. Se verificaron escritorio y móvil con datos sintéticos.
+
+P02-H2 debe completar las demás colecciones paginadas, declarar los esquemas de éxito de las acciones aún sin DTO explícito y sustituir los tipos frontend manuales restantes. P02-04 y P02-05 siguen parciales. No cambia el estado de G0/G1, P02-06/P02-07/P02-09/P02-10 ni la aceptación fiscal, impresión física y ejecución de QA PowerShell en Windows. Véase [entrega P02-H1](p02-base-tecnica/p02-h1-contrato-paginacion.md).

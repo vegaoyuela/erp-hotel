@@ -1,4 +1,7 @@
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { usePagedList, useDebouncedValue } from '@/hooks/usePagedList'
+import type { ApiAuditLog as AuditLog } from '@/types/api'
 import api from '@/lib/axios'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -18,23 +21,6 @@ import {
   Download,
 } from 'lucide-react'
 
-interface AuditLog {
-  id: string
-  userId: string | null
-  userName: string | null
-  userFullName: string
-  action: string
-  entityName: string | null
-  entityId: string | null
-  correlativeNumber: string | null
-  paymentMethod: string | null
-  previousHash: string | null
-  hash: string | null
-  changes: string | null
-  timestamp: string
-  hondurasTimestamp: string
-}
-
 interface IntegrityResult {
   isValid: boolean
   totalRecordsVerified: number
@@ -45,8 +31,6 @@ interface IntegrityResult {
 }
 
 export default function AuditLogsPage() {
-  const [logs, setLogs] = useState<AuditLog[]>([])
-  const [loading, setLoading] = useState(true)
   const [verifying, setVerifying] = useState(false)
   const [exporting, setExporting] = useState(false)
   const [integrityResult, setIntegrityResult] = useState<IntegrityResult | null>(null)
@@ -59,22 +43,12 @@ export default function AuditLogsPage() {
   const [currentPage, setCurrentPage] = useState(1)
   const [pageSize, setPageSize] = useState(25)
 
-  const loadLogs = useCallback(async () => {
-    setLoading(true)
-    try {
-      const { data } = await api.get<AuditLog[]>('/audit-logs')
-      setLogs(data)
-    } catch {
-      setAlertInfo({ variant: 'error', message: 'Error al consultar el registro de auditoría.' })
-    } finally {
-      setLoading(false)
-    }
-  }, [])
-
-  useEffect(() => {
-    const timer = window.setTimeout(() => void loadLogs(), 0)
-    return () => window.clearTimeout(timer)
-  }, [loadLogs])
+  const debouncedSearch = useDebouncedValue(searchTerm)
+  const { items: paginatedLogs, loading, error: listError, load: loadLogs, totalItems, totalPages, page } = usePagedList<AuditLog>(
+    '/audit-logs/paged', { search: debouncedSearch || undefined, action: selectedAction || undefined, page: currentPage, pageSize })
+  const actionQuery = useQuery({ queryKey: ['audit-actions'], queryFn: async ({ signal }) =>
+    (await api.get<string[]>('/audit-logs/actions', { signal })).data })
+  const distinctActions = actionQuery.data ?? []
 
   const verifyIntegrity = async () => {
     setVerifying(true)
@@ -122,33 +96,6 @@ export default function AuditLogsPage() {
       setExporting(false)
     }
   }
-
-  // Filter list
-  const filteredLogs = useMemo(() => {
-    return logs.filter((log) => {
-      const matchesSearch =
-        searchTerm === '' ||
-        log.action.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (log.entityName && log.entityName.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (log.correlativeNumber && log.correlativeNumber.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        log.userFullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (log.userName && log.userName.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (log.hash && log.hash.toLowerCase().includes(searchTerm.toLowerCase()))
-
-      const matchesAction = selectedAction === '' || log.action === selectedAction
-      return matchesSearch && matchesAction
-    })
-  }, [logs, searchTerm, selectedAction])
-
-  const distinctActions = useMemo(() => {
-    return Array.from(new Set(logs.map((l) => l.action))).filter(Boolean)
-  }, [logs])
-
-  const totalPages = Math.ceil(filteredLogs.length / pageSize) || 1
-  const paginatedLogs = useMemo(() => {
-    const start = (currentPage - 1) * pageSize
-    return filteredLogs.slice(start, start + pageSize)
-  }, [filteredLogs, currentPage, pageSize])
 
   const formatJson = (raw: string | null) => {
     if (!raw) return 'Sin cambios detallados'
@@ -231,6 +178,8 @@ export default function AuditLogsPage() {
         </div>
       )}
 
+      {listError && <InlineAlert variant="error" message="No se pudo cargar la página de auditoría. Usa Actualizar para reintentar." />}
+
       {/* Filter and Search Bar */}
       <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 p-4 rounded-xl border border-border bg-card shadow-xs">
         <div className="sm:col-span-8 relative">
@@ -270,7 +219,7 @@ export default function AuditLogsPage() {
           <h3 className="font-semibold text-xs text-foreground uppercase tracking-wider">
             Eventos Registrados
           </h3>
-          <span className="text-xs text-muted-foreground">{filteredLogs.length} registro(s)</span>
+          <span className="text-xs text-muted-foreground">{totalItems} registro(s)</span>
         </div>
 
         {loading ? (
@@ -280,7 +229,7 @@ export default function AuditLogsPage() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-xs">
+            <table className="w-full min-w-[900px] text-xs">
               <thead className="bg-muted/40 font-semibold text-muted-foreground uppercase tracking-wider">
                 <tr>
                   <th className="text-left p-3.5 w-40">Fecha & Hora</th>
@@ -355,9 +304,10 @@ export default function AuditLogsPage() {
         )}
 
         <Pagination
-          currentPage={currentPage}
+          currentPage={page}
+          disabled={loading}
           totalPages={totalPages}
-          totalItems={filteredLogs.length}
+          totalItems={totalItems}
           pageSize={pageSize}
           onPageChange={setCurrentPage}
           onPageSizeChange={(size) => {

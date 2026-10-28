@@ -15,11 +15,16 @@ namespace hotel_erp.Api.Controllers;
 public class InvoicesController(
     IInvoiceRepository repository,
     InvoiceApplicationService invoiceService,
+    HotelListQueryService lists,
     IMapper mapper) : ControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<IEnumerable<InvoiceDto>>> GetAll()
         => Ok(mapper.Map<IEnumerable<InvoiceDto>>(await repository.GetAllAsync()));
+
+    [HttpGet("paged")]
+    public async Task<ActionResult<PagedResult<InvoiceDto>>> GetPage([FromQuery] InvoicePageQuery query)
+        => Ok(await lists.InvoicesAsync(query, HttpContext.RequestAborted));
 
     [HttpGet("{id}")]
     public async Task<ActionResult<InvoiceDto>> GetById(Guid id)

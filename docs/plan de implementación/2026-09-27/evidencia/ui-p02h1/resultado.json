@@ -1,0 +1,15 @@
+{
+  "status": "passed",
+  "synthetic_database": true,
+  "contains_secret_values": false,
+  "guest_pagination_next_page": true,
+  "company_filter_from_later_page": true,
+  "empty_search_and_reset": true,
+  "audit_route_loaded": true,
+  "invoice_filters_empty_result": true,
+  "desktop_and_mobile_screenshots": 6,
+  "guest_mobile_document_overflow": false,
+  "audit_mobile_document_overflow": false,
+  "invoice_mobile_document_overflow": false,
+  "javascript_errors": 0
+}

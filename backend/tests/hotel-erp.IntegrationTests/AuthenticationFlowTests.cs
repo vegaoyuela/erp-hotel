@@ -562,6 +562,7 @@ public partial class AuthenticationFlowTests
             database.ConnectionString);
 
         await AssertExplicitPersistenceConsumersAsync(client, factory.Services, currentSession.AccessToken!);
+        await AssertApiContractAndPaginationAsync(client, factory.Services, currentSession.AccessToken!);
 
         using var retirementRequest = Authorized(HttpMethod.Post, "/api/settings/business/retire", currentSession.AccessToken!);
         retirementRequest.Content = JsonContent.Create(new

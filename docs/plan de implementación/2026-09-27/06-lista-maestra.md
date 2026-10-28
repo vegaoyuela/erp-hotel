@@ -39,8 +39,8 @@ Pendientes externos: [registro único de bloqueos](08-registro-pendientes.md). E
 - [x] P02-01 Extraer casos de uso críticos de controladores. Finanzas, documentos fiscales, reservas, check-in/out, folios, caja, compras, inventario y respaldo delegan su mutación a servicios.
 - [x] P02-02 Unificar unidad de trabajo y retirar guardados parciales. **Completada el 28 de octubre:** 56 guardados implícitos retirados, consumidores migrados a `IUnitOfWork`, rollback y persistencia explícita verificados sobre PostgreSQL.
 - [x] P02-03 Inyectar reloj, cálculo, correlativo, auditoría, impresión y respaldo. **Completada en código el 28 de octubre:** contratos registrados y consumidores migrados; sustitución de cálculo/auditoría con rollback y transporte de impresión simulado verificados. La prueba física permanece en Windows.
-- [ ] P02-04 Completar OpenAPI, `ProblemDetails`, paginación, fechas y enums. **Parcial:** errores 4xx normalizados con código y `traceId`.
-- [ ] P02-05 Generar/validar tipos frontend desde el contrato.
+- [ ] P02-04 Completar OpenAPI, `ProblemDetails`, paginación, fechas y enums. **Parcial (P02-H1):** contrato OpenAPI versionado, seguridad/errores, convenciones de fechas/enums y paginación SQL de huéspedes, facturas y auditoría; faltan las demás colecciones y respuestas explícitas de éxito.
+- [ ] P02-05 Generar/validar tipos frontend desde el contrato. **Parcial (P02-H1):** snapshot y tipos generados, comparación contra API real en QA y consumidores de huéspedes/facturas/auditoría migrados; falta sustituir los contratos manuales restantes.
 - [ ] P02-06 Completar permisos y motivos/aprobaciones sensibles.
 - [ ] P02-07 Rotar secretos y separar migrador/aplicación/respaldo/bootstrap.
 - [x] P02-08 Crear verificador/exportador de cadena de auditoría.

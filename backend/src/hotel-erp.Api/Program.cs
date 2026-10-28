@@ -130,9 +130,31 @@ builder.Services.AddControllers(options => options.Filters.Add<ApiProblemDetails
     {
         options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
         options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
-        options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+        options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter(allowIntegerValues: false));
     });
-builder.Services.AddOpenApi();
+builder.Services.AddScoped<HotelListQueryService>();
+builder.Services.AddOpenApi(options =>
+{
+    options.AddOperationTransformer<ApiOpenApiTransformer>();
+    options.AddDocumentTransformer((document, context, token) =>
+    {
+        document.Info.Title = "Hotel ERP API";
+        document.Info.Version = "v1";
+        document.Info.Description = "Fechas operativas: Honduras. DateOnly: YYYY-MM-DD; timestamps: ISO 8601. "
+            + "Los endpoints /paged usan páginas desde 1, tamaños 1–100 y orden estable; "
+            + "el día final del filtro de facturas se incluye completo. Los enums JSON usan nombres. "
+            + "Los errores incluyen code y traceId.";
+        document.Components ??= new Microsoft.OpenApi.OpenApiComponents();
+        document.Components.SecuritySchemes ??= new Dictionary<string, Microsoft.OpenApi.IOpenApiSecurityScheme>();
+        document.Components.SecuritySchemes["Bearer"] = new Microsoft.OpenApi.OpenApiSecurityScheme
+        {
+            Type = Microsoft.OpenApi.SecuritySchemeType.Http,
+            Scheme = "bearer",
+            BearerFormat = "JWT"
+        };
+        return Task.CompletedTask;
+    });
+});
 builder.Services.AddProblemDetails(options =>
 {
     options.CustomizeProblemDetails = context =>

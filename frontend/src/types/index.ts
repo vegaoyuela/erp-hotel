@@ -1,3 +1,7 @@
+import type { components } from './api.generated'
+
+import type { ApiResponse as Wire } from './api'
+
 export interface User {
   id: string
   username: string
@@ -68,29 +72,7 @@ export interface Reservation {
   version: number
 }
 
-export interface Guest {
-  id: string
-  firstName: string
-  lastName: string
-  fullName: string
-  email?: string
-  phone?: string
-  dateOfBirth?: string
-  nationality?: string
-  documentType?: string
-  documentNumber?: string
-  origin?: string
-  hasVehicle: boolean
-  vehiclePlate?: string
-  company?: string
-  guestRTN?: string
-  preferences?: string
-  classification?: string
-  taxpayerType?: string
-  exonerationOrderNumber?: string
-  sefinExonerationCertificateNumber?: string
-  sagRegistryNumber?: string
-}
+export type Guest = Wire<components['schemas']['GuestDto']>
 
 export interface Customer {
   id: string
@@ -154,68 +136,10 @@ export interface CAI {
   isExpiringSoon: boolean
 }
 
-export interface Invoice {
-  id: string
-  caiId: string
-  documentAuthorizationId?: string
-  guestId?: string
-  folioId?: string
-  caiNumber: string
-  caiNumberSnapshot?: string
-  authorizationRangeSnapshot?: string
-  authorizationDueDateSnapshot?: string
-  correlativeNumber: string
-  invoiceDate: string
-  customerId: string
-  customerName: string
-  rtnCliente?: string
-  customerAddress?: string
-  subTotal: number
-  isvAmount: number
-  isv15Amount: number
-  isv18Amount: number
-  touristTaxAmount: number
-  discountsAmount: number
-  appliedDiscountId?: string
-  appliedDiscountNameSnapshot?: string
-  appliedDiscountPercentageSnapshot?: number
-  totalAmount: number
-  paidAmount: number
-  creditedAmount: number
-  balanceDue: number
-  taxableAmount: number
-  exemptAmount: number
-  exoneratedAmount: number
-  taxpayerType: string
-  exonerationOrderNumber?: string
-  sefinExonerationCertificateNumber?: string
-  sagRegistryNumber?: string
-  isIsvExempt: boolean
-  isTouristTaxExempt: boolean
-  originalInvoiceId?: string
-  originalCorrelativeNumber?: string
-  reason?: string
-  documentType: string
-  status: string
-  paymentMethod?: string
-  cashReceived?: number
-  cashChange?: number
-  items: InvoiceItem[]
-}
+export type Invoice = Wire<components['schemas']['InvoiceDto']>
 
-export interface InvoiceItem {
-  id?: string
-  originalInvoiceItemId?: string
-  folioItemId?: string
-  description: string
-  quantity: number
-  unitPrice: number
-  lineTotal: number
-  isExempt: boolean
-  isvRate: number
-  isTouristTaxable: boolean
-  discountPercentage: number
-}
+type InvoiceItemResponse = Wire<components['schemas']['InvoiceItemDto']>
+export type InvoiceItem = Omit<InvoiceItemResponse, 'id' | 'originalInvoiceItemId' | 'folioItemId'> & Partial<Pick<InvoiceItemResponse, 'id' | 'originalInvoiceItemId' | 'folioItemId'>>
 
 export interface CashRegister {
   id: string

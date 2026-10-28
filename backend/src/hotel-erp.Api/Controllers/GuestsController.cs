@@ -1,3 +1,4 @@
+using hotel_erp.Api.Services;
 using hotel_erp.Api.Dtos.Customer;
 using AutoMapper;
 using hotel_erp.Api.Authorization;
@@ -20,10 +21,12 @@ namespace hotel_erp.Api.Controllers
         private readonly IMapper _mapper;
 
         private readonly IUnitOfWork _unitOfWork;
+        private readonly HotelListQueryService _lists;
 
-        public GuestsController(IGuestRepository repo, IReservationRepository reservationRepo, IInvoiceRepository invoiceRepo, IMapper mapper, IUnitOfWork unitOfWork)
+        public GuestsController(IGuestRepository repo, IReservationRepository reservationRepo, IInvoiceRepository invoiceRepo, IMapper mapper, IUnitOfWork unitOfWork, HotelListQueryService lists)
         {
             _unitOfWork = unitOfWork;
+            _lists = lists;
             _repo = repo;
             _reservationRepo = reservationRepo;
             _invoiceRepo = invoiceRepo;
@@ -37,6 +40,10 @@ namespace hotel_erp.Api.Controllers
                 return Ok(_mapper.Map<IEnumerable<GuestDto>>(await _repo.SearchAsync(search)));
             return Ok(_mapper.Map<IEnumerable<GuestDto>>(await _repo.GetAllAsync()));
         }
+
+        [HttpGet("paged")]
+        public async Task<ActionResult<PagedResult<GuestDto>>> GetPage([FromQuery] GuestPageQuery query)
+            => Ok(await _lists.GuestsAsync(query, HttpContext.RequestAborted));
 
         [HttpGet("{id}")]
         public async Task<ActionResult<GuestDto>> GetById(Guid id)

@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState } from 'react'
+import { usePagedList, useDebouncedValue } from '@/hooks/usePagedList'
 import api from '@/lib/axios'
 import { getApiErrorMessage } from '@/lib/errors'
 import type { Guest } from '@/types'
@@ -54,12 +55,10 @@ const defaultForm = {
 
 export default function GuestsPage() {
   const canManageReservations = useAuthStore((state) => state.hasPermission('manage_reservations'))
-  const [guests, setGuests] = useState<Guest[]>([])
   const [search, setSearch] = useState('')
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [form, setForm] = useState(defaultForm)
-  const [loading, setLoading] = useState(true)
   const [deleteTarget, setDeleteTarget] = useState<Guest | null>(null)
   const [alertInfo, setAlertInfo] = useState<{ variant: 'error' | 'success' | 'info'; message: string } | null>(null)
   const [actionLoading, setActionLoading] = useState(false)
@@ -68,22 +67,9 @@ export default function GuestsPage() {
   const [currentPage, setCurrentPage] = useState(1)
   const [pageSize, setPageSize] = useState(15)
 
-  const load = useCallback(async () => {
-    setLoading(true)
-    try {
-      const { data } = await api.get<Guest[]>('/guests', { params: { search: search || undefined } })
-      setGuests(data)
-    } catch {
-      setAlertInfo({ variant: 'error', message: 'Error al consultar el directorio de huéspedes.' })
-    } finally {
-      setLoading(false)
-    }
-  }, [search])
-
-  useEffect(() => {
-    const timer = window.setTimeout(() => void load(), 0)
-    return () => window.clearTimeout(timer)
-  }, [load])
+  const debouncedSearch = useDebouncedValue(search)
+  const { items: paginatedGuests, loading, error: listError, load, totalItems, totalPages, page } = usePagedList<Guest>(
+    '/guests/paged', { search: debouncedSearch || undefined, page: currentPage, pageSize })
 
   const save = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -153,24 +139,6 @@ export default function GuestsPage() {
     }
   }
 
-  const filteredGuests = useMemo(() => {
-    return guests.filter((g) => {
-      const q = search.toLowerCase()
-      return (
-        g.fullName.toLowerCase().includes(q) ||
-        (g.documentNumber && g.documentNumber.includes(q)) ||
-        (g.phone && g.phone.includes(q)) ||
-        (g.company && g.company.toLowerCase().includes(q))
-      )
-    })
-  }, [guests, search])
-
-  const totalPages = Math.ceil(filteredGuests.length / pageSize) || 1
-  const paginatedGuests = useMemo(() => {
-    const start = (currentPage - 1) * pageSize
-    return filteredGuests.slice(start, start + pageSize)
-  }, [filteredGuests, currentPage, pageSize])
-
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -208,6 +176,8 @@ export default function GuestsPage() {
       {alertInfo && (
         <InlineAlert variant={alertInfo.variant} message={alertInfo.message} onClose={() => setAlertInfo(null)} />
       )}
+
+      {listError && <InlineAlert variant="error" message="No se pudo cargar la página. Usa Actualizar para reintentar." />}
 
       {/* Form Card */}
       {showForm && canManageReservations && (
@@ -410,7 +380,7 @@ export default function GuestsPage() {
           <h3 className="font-semibold text-xs text-foreground uppercase tracking-wider">
             Listado de Huéspedes
           </h3>
-          <span className="text-xs text-muted-foreground">{filteredGuests.length} huésped(es)</span>
+          <span className="text-xs text-muted-foreground">{totalItems} huésped(es)</span>
         </div>
 
         {loading ? (
@@ -420,7 +390,7 @@ export default function GuestsPage() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-xs">
+            <table className="w-full min-w-[760px] text-xs">
               <thead className="bg-muted/40 font-semibold text-muted-foreground uppercase tracking-wider">
                 <tr>
                   <th className="text-left p-3.5">Huésped</th>
@@ -498,9 +468,10 @@ export default function GuestsPage() {
         )}
 
         <Pagination
-          currentPage={currentPage}
+          currentPage={page}
+          disabled={loading}
           totalPages={totalPages}
-          totalItems={filteredGuests.length}
+          totalItems={totalItems}
           pageSize={pageSize}
           onPageChange={setCurrentPage}
           onPageSizeChange={(size) => {

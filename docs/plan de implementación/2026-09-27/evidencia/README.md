@@ -165,3 +165,21 @@ Se incorporaron cinco contratos para los consumidores de cálculo, auditoría, g
 | [p02g-qa-resumen.json](p02g-qa-resumen.json) | Hashes y resultado estructurado; diferencia pruebas de transporte simulado y validación física pendiente. |
 
 P02-03 queda completada en código. Los pendientes de contratos API, seguridad, matriz formal, revisión independiente y Windows permanecen en la [lista maestra](../06-lista-maestra.md).
+
+
+### P02-H1 — contrato API y paginación (28 de octubre de 2026)
+
+Huéspedes, facturas y auditoría consultan páginas y filtros en PostgreSQL. El contrato real obtenido durante integración se compara con el snapshot y los tipos TypeScript generados. Se comprobó también el rechazo de una divergencia deliberada. P02-04/P02-05 permanecen parciales por los consumidores y respuestas restantes.
+
+| Archivo | Resultado |
+|---|---|
+| [p02h1-qa.log](p02h1-qa.log) | Build sin advertencias, 109 unitarias, 5 integraciones PostgreSQL, 5 validaciones del expediente, auditorías npm sin alertas, contrato, lint y build. |
+| [p02h1-ui-qa.log](p02h1-ui-qa.log) | Lint, build y contrato aprobados después del ajuste final de tablas móviles. |
+| [p02h1-modelo-ef.log](p02h1-modelo-ef.log) | Sin migraciones pendientes por este cambio. |
+| [p02h1-paginacion.json](p02h1-paginacion.json) | 37 huéspedes sintéticos, página de 10, bytes antes/después; total de 255 eventos de auditoría. |
+| [p02h1-contrato-negativo.json](p02h1-contrato-negativo.json) | El comparador rechaza un contrato deliberadamente modificado. |
+| [p02h1-base-qa.json](p02h1-base-qa.json) | 42 tablas, 345 filas, 11 migraciones y cero bases temporales residuales. |
+| [ui-p02h1/resultado.json](ui-p02h1/resultado.json) | Flujos de navegador y seis capturas de escritorio/móvil; cero errores JavaScript. |
+| [p02h1-qa-resumen.json](p02h1-qa-resumen.json) | Resumen verificable y hashes de fuentes, contrato, pruebas y evidencia. |
+
+El [detalle de entrega](../p02-base-tecnica/p02-h1-contrato-paginacion.md) registra rutas, comandos, capturas y P02-H2. La prueba PowerShell y la impresión física continúan pendientes en Windows.
