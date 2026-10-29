@@ -1,7 +1,9 @@
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useMemo } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { useDebouncedValue, usePagedList } from '@/hooks/usePagedList'
 import api from '@/lib/axios'
 import { getApiErrorMessage } from '@/lib/errors'
-import type { AccountingEntry, AccountingAccount } from '@/types'
+import type { AccountingEntry, AccountingAccount, AccountingEntryList, JournalSummary } from '@/types'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { InlineAlert } from '@/components/ui/InlineAlert'
@@ -95,9 +97,7 @@ function AccountCombobox({
 }
 
 export default function JournalEntriesPage() {
-  const [entries, setEntries] = useState<AccountingEntry[]>([])
-  const [accounts, setAccounts] = useState<AccountingAccount[]>([])
-  const [loading, setLoading] = useState(true)
+  const [detailLoading, setDetailLoading] = useState(false)
   const [selected, setSelected] = useState<AccountingEntry | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
 
@@ -117,26 +117,29 @@ export default function JournalEntriesPage() {
   const [alertInfo, setAlertInfo] = useState<{ variant: 'error' | 'success' | 'info'; message: string } | null>(null)
   const [actionLoading, setActionLoading] = useState(false)
 
-  const loadData = useCallback(async () => {
-    setLoading(true)
+  const debouncedSearch = useDebouncedValue(searchTerm)
+  const listQuery = usePagedList<AccountingEntryList>('/accounts/journal-entries/paged', {
+    page: currentPage, pageSize, search: debouncedSearch || undefined,
+  })
+  const summaryQuery = useQuery({ queryKey: ['journal-summary'], retry: false, queryFn: async ({ signal }) =>
+    (await api.get<JournalSummary>('/accounts/journal-entries/summary', { signal })).data })
+  const accountsQuery = useQuery({ queryKey: ['journal-accounts'], enabled: showCreateModal, retry: false, queryFn: async ({ signal }) =>
+    (await api.get<AccountingAccount[]>('/accounts/flat', { signal })).data })
+  const accounts = accountsQuery.data ?? []
+  const paginatedEntries = listQuery.items
+  const loading = listQuery.loading
+  const grandTotals = summaryQuery.data
+  const loadData = async () => {
+    await Promise.all([listQuery.load(), summaryQuery.refetch(), ...(showCreateModal ? [accountsQuery.refetch()] : [])])
+  }
+  const viewEntry = async (id: string) => {
+    setDetailLoading(true)
     try {
-      const [entriesRes, accountsRes] = await Promise.all([
-        api.get<AccountingEntry[]>('/accounts/journal-entries'),
-        api.get<AccountingAccount[]>('/accounts/flat'),
-      ])
-      setEntries(entriesRes.data)
-      setAccounts(accountsRes.data)
-    } catch {
-      setAlertInfo({ variant: 'error', message: 'Error al consultar el libro diario y catálogo contable.' })
-    } finally {
-      setLoading(false)
-    }
-  }, [])
-
-  useEffect(() => {
-    const timer = window.setTimeout(() => void loadData(), 0)
-    return () => window.clearTimeout(timer)
-  }, [loadData])
+      setSelected((await api.get<AccountingEntry>(`/accounts/journal-entries/${id}`)).data)
+    } catch (error) {
+      setAlertInfo({ variant: 'error', message: getApiErrorMessage(error, 'No se pudo cargar el detalle del asiento.') })
+    } finally { setDetailLoading(false) }
+  }
 
   // Calculation for Double Entry Live Balance
   const formTotals = useMemo(() => {
@@ -246,31 +249,6 @@ export default function JournalEntriesPage() {
     }
   }
 
-  const filteredEntries = useMemo(() => {
-    return entries.filter(
-      (e) =>
-        e.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        e.entryType.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        e.items.some((it) => it.accountName.toLowerCase().includes(searchTerm.toLowerCase()) || it.accountNumber.includes(searchTerm))
-    )
-  }, [entries, searchTerm])
-
-  const totalPages = Math.ceil(filteredEntries.length / pageSize) || 1
-  const paginatedEntries = useMemo(() => {
-    const start = (currentPage - 1) * pageSize
-    return filteredEntries.slice(start, start + pageSize)
-  }, [filteredEntries, currentPage, pageSize])
-
-  const grandTotals = useMemo(() => {
-    return entries.reduce(
-      (acc, e) => ({
-        debit: acc.debit + e.totalDebit,
-        credit: acc.credit + e.totalCredit,
-      }),
-      { debit: 0, credit: 0 }
-    )
-  }, [entries])
-
   if (selected) {
     return (
       <div className="space-y-6 animate-in fade-in">
@@ -306,8 +284,8 @@ export default function JournalEntriesPage() {
           </div>
         </div>
 
-        <div className="border border-border rounded-xl bg-card overflow-hidden shadow-xs">
-          <table className="w-full text-xs">
+        <div className="border border-border rounded-xl bg-card overflow-x-auto shadow-xs">
+          <table className="w-full min-w-[780px] text-xs">
             <thead className="bg-muted/40 font-semibold text-muted-foreground uppercase tracking-wider">
               <tr>
                 <th className="text-left p-3.5 w-32">Código</th>
@@ -380,25 +358,27 @@ export default function JournalEntriesPage() {
         <InlineAlert variant={alertInfo.variant} message={alertInfo.message} onClose={() => setAlertInfo(null)} />
       )}
 
+      {(listQuery.error || summaryQuery.error || accountsQuery.error) && <InlineAlert variant="error" message="No se pudo cargar la consulta contable. Usa Actualizar para reintentar." />}
+
       {/* Summary Grand Totals & Search Bar */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="border border-border rounded-xl p-4 bg-card shadow-xs flex items-center justify-between">
           <div>
             <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Total Débitos Registrados</p>
-            <p className="text-xl font-bold text-foreground mt-0.5 font-mono">{formatCurrency(grandTotals.debit)}</p>
+            <p className="text-xl font-bold text-foreground mt-0.5 font-mono">{grandTotals ? formatCurrency(grandTotals.debit) : '—'}</p>
           </div>
         </div>
         <div className="border border-border rounded-xl p-4 bg-card shadow-xs flex items-center justify-between">
           <div>
             <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Total Créditos Registrados</p>
-            <p className="text-xl font-bold text-foreground mt-0.5 font-mono">{formatCurrency(grandTotals.credit)}</p>
+            <p className="text-xl font-bold text-foreground mt-0.5 font-mono">{grandTotals ? formatCurrency(grandTotals.credit) : '—'}</p>
           </div>
         </div>
         <div className="border border-border rounded-xl p-4 bg-card shadow-xs flex items-center justify-between">
           <div>
             <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Estado de Cuadre Global</p>
             <div className="flex items-center gap-1.5 mt-1 text-sm font-bold">
-              {Math.abs(grandTotals.debit - grandTotals.credit) < 0.01 ? (
+              {!grandTotals ? <span className="text-muted-foreground">Sin datos de totales</span> : Math.abs(grandTotals.debit - grandTotals.credit) < 0.01 ? (
                 <span className="text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
                   <CheckCircle2 size={16} /> Partida Doble Cuadrada
                 </span>
@@ -417,7 +397,7 @@ export default function JournalEntriesPage() {
         <div className="relative">
           <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="Buscar por concepto, tipo de asiento, código o nombre de cuenta..."
+            aria-label="Buscar asientos" maxLength={100} placeholder="Buscar por concepto, tipo de asiento, código o nombre de cuenta..."
             value={searchTerm}
             onChange={(e) => {
               setSearchTerm(e.target.value)
@@ -432,7 +412,7 @@ export default function JournalEntriesPage() {
       <div className="border border-border rounded-xl bg-card overflow-hidden shadow-xs flex flex-col">
         <div className="p-3.5 border-b border-border bg-muted/20 flex items-center justify-between">
           <h3 className="font-semibold text-xs text-foreground uppercase tracking-wider">Comprobantes de Diario</h3>
-          <span className="text-xs text-muted-foreground">{filteredEntries.length} asiento(s)</span>
+          <span className="text-xs text-muted-foreground">{listQuery.totalItems} asiento(s)</span>
         </div>
 
         {loading ? (
@@ -442,7 +422,7 @@ export default function JournalEntriesPage() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-xs">
+            <table className="w-full min-w-[780px] text-xs">
               <thead className="bg-muted/40 font-semibold text-muted-foreground uppercase tracking-wider">
                 <tr>
                   <th className="text-left p-3.5 w-28">Fecha</th>
@@ -470,12 +450,13 @@ export default function JournalEntriesPage() {
                     <td className="p-3.5 text-right font-mono font-bold text-foreground">
                       {formatCurrency(e.totalCredit)}
                     </td>
-                    <td className="p-3.5 text-center text-muted-foreground font-semibold">{e.items.length}</td>
+                    <td className="p-3.5 text-center text-muted-foreground font-semibold">{e.itemCount}</td>
                     <td className="p-3.5 text-right">
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => setSelected(e)}
+                        disabled={detailLoading}
+                        onClick={() => void viewEntry(e.id)}
                         className="h-7 text-xs gap-1"
                       >
                         <FileText size={12} /> Ver
@@ -483,7 +464,7 @@ export default function JournalEntriesPage() {
                     </td>
                   </tr>
                 ))}
-                {paginatedEntries.length === 0 && (
+                {!listQuery.error && paginatedEntries.length === 0 && (
                   <tr>
                     <td colSpan={7} className="p-8 text-center text-muted-foreground">
                       No se encontraron asientos contables con los filtros seleccionados.
@@ -496,9 +477,10 @@ export default function JournalEntriesPage() {
         )}
 
         <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          totalItems={filteredEntries.length}
+          currentPage={listQuery.page}
+          disabled={loading}
+          totalPages={listQuery.totalPages}
+          totalItems={listQuery.totalItems}
           pageSize={pageSize}
           onPageChange={setCurrentPage}
           onPageSizeChange={(size) => {

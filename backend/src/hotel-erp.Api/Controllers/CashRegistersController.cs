@@ -3,6 +3,7 @@ using AutoMapper;
 using hotel_erp.Api.Authorization;
 using hotel_erp.Api.Database;
 using hotel_erp.Api.Dtos.Cash;
+using hotel_erp.Api.Dtos.Common;
 using hotel_erp.Api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,7 +17,8 @@ namespace hotel_erp.Api.Controllers;
 public class CashRegistersController(
     ApplicationDbContext context,
     CashRegisterApplicationService cashRegisterService,
-    IMapper mapper) : ControllerBase
+    IMapper mapper,
+    HotelListQueryService lists) : ControllerBase
 {
     [HttpGet]
     [Authorize(Policy = PermissionNames.ManageCash)]
@@ -35,7 +37,33 @@ public class CashRegistersController(
             CashRegisterApplicationService.ToDto(register, register.CashMovements.SingleOrDefault())));
     }
 
+    [HttpGet("paged")]
+    [Authorize(Policy = PermissionNames.ManageCash)]
+    public async Task<ActionResult<PagedResult<CashRegisterDto>>> GetPage([FromQuery] SearchPageQuery query)
+        => Ok(await lists.CashRegistersAsync(query, HttpContext.RequestAborted));
+
+    [HttpGet("{id:guid}")]
+    [Authorize(Policy = PermissionNames.ManageCash)]
+    [ProducesResponseType(typeof(CashRegisterDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<CashRegisterDto>> GetById(Guid id)
+    {
+        var register = await lists.CashRegisterAsync(id, HttpContext.RequestAborted);
+        return register is null ? NotFound() : Ok(register);
+    }
+
+    [HttpGet("{id:guid}/movements/paged")]
+    [Authorize(Policy = PermissionNames.ManageCash)]
+    [ProducesResponseType(typeof(PagedResult<CashMovementDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<PagedResult<CashMovementDto>>> GetMovementsPage(Guid id, [FromQuery] CashMovementPageQuery query)
+    {
+        if (!await context.CashRegisters.AnyAsync(register => register.Id == id, HttpContext.RequestAborted)) return NotFound();
+        return Ok(await lists.CashMovementsAsync(id, query, HttpContext.RequestAborted));
+    }
+
     [HttpPost]
+    [ProducesResponseType(typeof(CashRegisterDto), StatusCodes.Status201Created)]
     [Authorize(Policy = PermissionNames.ManageCash)]
     public async Task<ActionResult<CashRegisterDto>> Create([FromBody] CreateCashRegisterRequest request)
     {
@@ -47,8 +75,11 @@ public class CashRegistersController(
     }
 
     [HttpPost("{id}/open")]
+    [ProducesResponseType(typeof(CashRegisterOperationDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     [Authorize(Policy = PermissionNames.ManageCash)]
-    public async Task<ActionResult> Open(
+    public async Task<ActionResult<CashRegisterOperationDto>> Open(
         Guid id,
         [FromBody] OpenCashRegisterRequest request,
         [FromHeader(Name = "Idempotency-Key")] string? idempotencyKey)
@@ -63,8 +94,11 @@ public class CashRegistersController(
     }
 
     [HttpPost("{id}/close")]
+    [ProducesResponseType(typeof(CashRegisterOperationDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     [Authorize(Policy = PermissionNames.ManageCash)]
-    public async Task<ActionResult> Close(
+    public async Task<ActionResult<CashRegisterOperationDto>> Close(
         Guid id,
         [FromBody] CloseCashRegisterRequest request,
         [FromHeader(Name = "Idempotency-Key")] string? idempotencyKey)

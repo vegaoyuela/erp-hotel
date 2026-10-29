@@ -84,15 +84,7 @@ export type Invoice = Wire<components['schemas']['InvoiceDto']>
 type InvoiceItemResponse = Wire<components['schemas']['InvoiceItemDto']>
 export type InvoiceItem = Omit<InvoiceItemResponse, 'id' | 'originalInvoiceItemId' | 'folioItemId'> & Partial<Pick<InvoiceItemResponse, 'id' | 'originalInvoiceItemId' | 'folioItemId'>>
 
-export interface CashRegister {
-  id: string
-  name: string
-  description?: string
-  isActive: boolean
-  isOpen: boolean
-  currentBalance: number
-  lastMovementDate?: string | null
-}
+export type CashRegister = Wire<components['schemas']['CashRegisterDto']>
 
 export interface PaymentApplication {
   id: string
@@ -150,60 +142,13 @@ export interface Payment {
   refunds: Refund[]
 }
 
-export interface EligibleCardPayment {
-  id: string
-  paymentNumber: string
-  paymentDate: string
-  externalReference: string
-  amount: number
-  refundedAmount: number
-  settledAmount: number
-  availableAmount: number
-}
+export type EligibleCardPayment = Wire<components['schemas']['EligibleCardPaymentDto']>
 
-export interface CardSettlementApplication {
-  id: string
-  paymentId: string
-  paymentNumber: string
-  paymentDate: string
-  paymentReference: string
-  amount: number
-}
+export type CardSettlementApplication = Wire<components['schemas']['CardSettlementApplicationDto']>
 
-export interface CardSettlement {
-  id: string
-  settlementNumber: string
-  recordedByUserId: string
-  recordedByUserName: string
-  currency: 'HNL'
-  grossAmount: number
-  bankDepositAmount: number
-  commissionAmount: number
-  withholdingAmount: number
-  externalReference: string
-  settlementDate: string
-  status: 'Confirmado' | 'Anulado'
-  accountingEntryId?: string | null
-  applications: CardSettlementApplication[]
-}
+export type CardSettlement = Wire<components['schemas']['CardSettlementDto']>
 
-export interface CashMovement {
-  id: string
-  cashRegisterId: string
-  cashRegisterName: string
-  userId: string
-  userName: string
-  movementType: string
-  amount: number
-  description?: string
-  movementDate: string
-  balanceAfter: number
-  referenceId?: string | null
-  expectedAmount?: number | null
-  countedAmount?: number | null
-  difference?: number | null
-  notes?: string | null
-}
+export type CashMovement = Wire<components['schemas']['CashMovementDto']>
 
 export interface DocumentAuthorization {
   id: string
@@ -297,26 +242,9 @@ export interface AccountingAccount {
   children: AccountingAccount[]
 }
 
-export interface AccountingEntry {
-  id: string
-  transactionDate: string
-  description: string
-  entryType: string
-  referenceId?: string
-  totalDebit: number
-  totalCredit: number
-  items: EntryItem[]
-}
+export type AccountingEntry = Wire<components['schemas']['AccountingEntryDto']>
 
-export interface EntryItem {
-  id: string
-  accountId: string
-  accountNumber: string
-  accountName: string
-  debit: number
-  credit: number
-  description?: string
-}
+export type EntryItem = Wire<components['schemas']['EntryItemDto']>
 
 export interface DashboardStat {
   title: string
@@ -407,18 +335,7 @@ export type FolioItem = Wire<components['schemas']['FolioItemDto']>
 
 export type Folio = Wire<components['schemas']['FolioDto']>
 
-export interface BackupLog {
-  id: string
-  startedAt: string
-  completedAt: string | null
-  fileName: string
-  sizeBytes: number
-  sha256Hash: string | null
-  status: string
-  uploadedAt: string | null
-  uploadAttempts: number
-  errorMessage: string | null
-}
+export type BackupLog = Wire<components['schemas']['BackupLogDto']>
 
 export interface Role {
   id: string
@@ -446,3 +363,11 @@ export interface UpdateUserRequest {
 
 export type FolioList = Wire<components['schemas']['FolioListDto']>
 export type InventorySummary = Wire<components['schemas']['InventorySummaryDto']>
+
+export type CashRegisterOperation = Wire<components['schemas']['CashRegisterOperationDto']>
+
+export type AccountingEntryList = Wire<components['schemas']['AccountingEntryListDto']>
+
+export type JournalSummary = Wire<components['schemas']['JournalSummaryDto']>
+
+export type EligibleCardSummary = Wire<components['schemas']['EligibleCardSummaryDto']>

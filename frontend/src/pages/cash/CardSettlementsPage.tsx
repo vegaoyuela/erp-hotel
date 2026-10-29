@@ -1,4 +1,7 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { useDebouncedValue, usePagedList } from '@/hooks/usePagedList'
+import { Pagination } from '@/components/ui/Pagination'
 import axios from 'axios'
 import {
   BadgeDollarSign,
@@ -11,7 +14,7 @@ import {
 } from 'lucide-react'
 import api from '@/lib/axios'
 import { getApiErrorMessage } from '@/lib/errors'
-import type { CardSettlement, EligibleCardPayment } from '@/types'
+import type { CardSettlement, EligibleCardPayment, EligibleCardSummary } from '@/types'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { InlineAlert } from '@/components/ui/InlineAlert'
@@ -56,52 +59,41 @@ const compactNumber = (value: string) =>
   value.length > 20 ? `${value.slice(0, 7)}…${value.slice(-8)}` : value
 
 export default function CardSettlementsPage() {
-  const [eligiblePayments, setEligiblePayments] = useState<EligibleCardPayment[]>([])
-  const [settlements, setSettlements] = useState<CardSettlement[]>([])
-  const [selected, setSelected] = useState<Record<string, boolean>>({})
+  const [eligibleSearch, setEligibleSearch] = useState('')
+  const [historySearch, setHistorySearch] = useState('')
+  const [eligiblePage, setEligiblePage] = useState(1)
+  const [eligiblePageSize, setEligiblePageSize] = useState(15)
+  const [historyPage, setHistoryPage] = useState(1)
+  const [historyPageSize, setHistoryPageSize] = useState(15)
+  const [selected, setSelected] = useState<Record<string, EligibleCardPayment>>({})
   const [settlementDate, setSettlementDate] = useState(hondurasToday)
   const [externalReference, setExternalReference] = useState('')
   const [commissionAmount, setCommissionAmount] = useState('0.00')
   const [withholdingAmount, setWithholdingAmount] = useState('0.00')
-  const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [alertInfo, setAlertInfo] = useState<{
     variant: 'error' | 'success' | 'info'
     message: string
   } | null>(null)
 
-  const load = useCallback(async () => {
-    setLoading(true)
-    try {
-      const [eligibleResponse, settlementsResponse] = await Promise.all([
-        api.get<EligibleCardPayment[]>('/card-settlements/eligible-payments'),
-        api.get<CardSettlement[]>('/card-settlements'),
-      ])
-      setEligiblePayments(eligibleResponse.data)
-      setSettlements(settlementsResponse.data)
-      const availableIds = new Set(eligibleResponse.data.map((payment) => payment.id))
-      setSelected((current) => Object.fromEntries(
-        Object.entries(current).filter(([id, checked]) => checked && availableIds.has(id))
-      ))
-    } catch (error) {
-      setAlertInfo({
-        variant: 'error',
-        message: getApiErrorMessage(error, 'No se pudieron cargar las liquidaciones de tarjeta.'),
-      })
-    } finally {
-      setLoading(false)
-    }
-  }, [])
-
-  useEffect(() => {
-    const timer = window.setTimeout(() => void load(), 0)
-    return () => window.clearTimeout(timer)
-  }, [load])
-
-  const selectedPayments = useMemo(
-    () => eligiblePayments.filter((payment) => selected[payment.id]),
-    [eligiblePayments, selected]
-  )
+  const debouncedEligibleSearch = useDebouncedValue(eligibleSearch)
+  const debouncedHistorySearch = useDebouncedValue(historySearch)
+  const eligibleQuery = usePagedList<EligibleCardPayment>('/card-settlements/eligible-payments/paged', {
+    page: eligiblePage, pageSize: eligiblePageSize, search: debouncedEligibleSearch || undefined,
+  })
+  const historyQuery = usePagedList<CardSettlement>('/card-settlements/paged', {
+    page: historyPage, pageSize: historyPageSize, search: debouncedHistorySearch || undefined,
+  })
+  const summaryQuery = useQuery({ queryKey: ['card-eligible-summary'], retry: false, queryFn: async ({ signal }) =>
+    (await api.get<EligibleCardSummary>('/card-settlements/eligible-payments/summary', { signal })).data })
+  const eligiblePayments = eligibleQuery.items
+  const settlements = historyQuery.items
+  const loading = eligibleQuery.loading || historyQuery.loading || summaryQuery.isFetching
+  const load = async () => {
+    setSelected({})
+    await Promise.all([eligibleQuery.load(), historyQuery.load(), summaryQuery.refetch()])
+  }
+  const selectedPayments = useMemo(() => Object.values(selected), [selected])
   const grossAmount = roundCurrency(
     selectedPayments.reduce((total, payment) => total + payment.availableAmount, 0)
   )
@@ -113,17 +105,27 @@ export default function CardSettlementsPage() {
   const bankDepositAmount = componentsValid
     ? roundCurrency(grossAmount - commission - withholding)
     : 0
-  const pendingTotal = roundCurrency(
-    eligiblePayments.reduce((total, payment) => total + payment.availableAmount, 0)
-  )
-
+  const pendingTotal = summaryQuery.data?.availableAmount
+  const pageSelected = eligiblePayments.length > 0 && eligiblePayments.every(payment => !!selected[payment.id])
   const togglePayment = (paymentId: string) => {
-    setSelected((current) => ({ ...current, [paymentId]: !current[paymentId] }))
+    const payment = eligiblePayments.find(candidate => candidate.id === paymentId)
+    if (!payment) return
+    setSelected(current => {
+      const next = { ...current }
+      if (next[paymentId]) delete next[paymentId]
+      else next[paymentId] = payment
+      return next
+    })
   }
-
   const selectAll = () => {
-    const shouldSelect = selectedPayments.length !== eligiblePayments.length
-    setSelected(Object.fromEntries(eligiblePayments.map((payment) => [payment.id, shouldSelect])))
+    setSelected(current => {
+      const next = { ...current }
+      for (const payment of eligiblePayments) {
+        if (pageSelected) delete next[payment.id]
+        else next[payment.id] = payment
+      }
+      return next
+    })
   }
 
   const createSettlement = async () => {
@@ -217,11 +219,16 @@ export default function CardSettlementsPage() {
         />
       )}
 
+      {(eligibleQuery.error || historyQuery.error || summaryQuery.error) && <InlineAlert variant="error" message="No se pudo cargar la consulta de liquidaciones. Usa Actualizar para reintentar." />}
+      {selectedPayments.length > 0 && <div className="flex flex-wrap items-center gap-3 text-sm">
+        <span>La selección se conserva entre páginas; Actualizar limpia el lote.</span>
+        <Button variant="outline" size="sm" disabled={submitting} onClick={() => setSelected({})}>Limpiar selección</Button>
+      </div>}
       <div className="grid gap-4 sm:grid-cols-3">
         <div className="rounded-xl border border-border bg-card p-5 shadow-xs">
           <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Pendiente por liquidar</p>
-          <p className="mt-1 text-2xl font-bold text-foreground">L {pendingTotal.toFixed(2)}</p>
-          <p className="text-xs text-muted-foreground">{eligiblePayments.length} cobros disponibles</p>
+          <p className="mt-1 text-2xl font-bold text-foreground">{pendingTotal == null ? '—' : `L ${pendingTotal.toFixed(2)}`}</p>
+          <p className="text-xs text-muted-foreground">{summaryQuery.data?.totalPayments ?? '—'} cobros disponibles</p>
         </div>
         <div className="rounded-xl border border-border bg-card p-5 shadow-xs">
           <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Seleccionado</p>
@@ -235,33 +242,37 @@ export default function CardSettlementsPage() {
         </div>
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1.5fr)_minmax(320px,0.7fr)]">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.5fr)_minmax(320px,0.7fr)]">
         <section className="overflow-hidden rounded-xl border border-border bg-card shadow-xs" aria-labelledby="eligible-title">
-          <div className="flex items-center justify-between border-b border-border bg-muted/20 p-4">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border bg-muted/20 p-4">
             <div>
               <h2 id="eligible-title" className="font-semibold text-foreground">Cobros disponibles</h2>
               <p className="text-xs text-muted-foreground">Seleccione los comprobantes incluidos por el adquirente.</p>
             </div>
             {eligiblePayments.length > 0 && (
               <Button size="sm" variant="outline" onClick={selectAll} disabled={submitting}>
-                {selectedPayments.length === eligiblePayments.length ? 'Quitar todos' : 'Seleccionar todos'}
+                {pageSelected ? 'Quitar esta página' : 'Seleccionar esta página'}
               </Button>
             )}
           </div>
 
-          {loading ? (
+          <div className="p-4 border-b border-border">
+            <Input aria-label="Buscar cobros disponibles" maxLength={100} value={eligibleSearch} disabled={submitting}
+              onChange={event => { setEligibleSearch(event.target.value); setEligiblePage(1) }} placeholder="Buscar pago o referencia POS..." />
+          </div>
+          {eligibleQuery.loading ? (
             <div className="flex items-center justify-center gap-2 py-16 text-sm text-muted-foreground">
               <Loader2 size={20} className="animate-spin text-[#C69C4B]" /> Cargando cobros...
             </div>
           ) : eligiblePayments.length === 0 ? (
             <div className="px-6 py-14 text-center">
               <Check size={28} className="mx-auto mb-2 text-emerald-600" />
-              <p className="font-medium text-foreground">No hay cobros pendientes</p>
-              <p className="mt-1 text-sm text-muted-foreground">Los pagos con tarjeta ya están conciliados o fueron reembolsados.</p>
+              <p className="font-medium text-foreground">{eligibleQuery.error ? 'Consulta no disponible' : eligibleSearch ? 'No hay cobros con esa búsqueda' : 'No hay cobros pendientes'}</p>
+              <p className="mt-1 text-sm text-muted-foreground">{eligibleQuery.error ? 'Use Actualizar para reintentar.' : eligibleSearch ? 'Cambie la búsqueda para ver otros cobros.' : 'Los pagos con tarjeta ya están conciliados o fueron reembolsados.'}</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="w-full min-w-[740px] text-sm">
                 <thead className="bg-muted/40 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                   <tr>
                     <th className="w-12 p-3.5 text-center">Incluir</th>
@@ -294,6 +305,9 @@ export default function CardSettlementsPage() {
               </table>
             </div>
           )}
+          <Pagination currentPage={eligibleQuery.page} totalPages={eligibleQuery.totalPages} totalItems={eligibleQuery.totalItems}
+            pageSize={eligiblePageSize} disabled={eligibleQuery.loading || submitting} onPageChange={setEligiblePage}
+            onPageSizeChange={size => { setEligiblePageSize(size); setEligiblePage(1) }} />
         </section>
 
         <section className="h-fit rounded-xl border border-border bg-card p-5 shadow-xs" aria-labelledby="settlement-form-title">
@@ -341,11 +355,14 @@ export default function CardSettlementsPage() {
           <h2 id="history-title" className="flex items-center gap-2 font-semibold text-foreground"><ReceiptText size={17} className="text-[#C69C4B]" /> Historial de liquidaciones</h2>
           <p className="text-xs text-muted-foreground">Trazabilidad del bruto, el depósito y los descuentos del adquirente.</p>
         </div>
-        {settlements.length === 0 ? (
-          <div className="p-10 text-center text-sm text-muted-foreground">Todavía no hay liquidaciones registradas.</div>
+        <div className="p-4 border-b border-border">
+          <Input aria-label="Buscar liquidaciones" maxLength={100} value={historySearch} onChange={event => { setHistorySearch(event.target.value); setHistoryPage(1) }} placeholder="Buscar liquidación o referencia del adquirente..." />
+        </div>
+        {historyQuery.loading ? <p role="status" className="p-10 text-center text-sm text-muted-foreground">Cargando liquidaciones…</p> : settlements.length === 0 ? (
+          <div className="p-10 text-center text-sm text-muted-foreground">No hay liquidaciones con los criterios seleccionados.</div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full min-w-[740px] text-sm">
               <thead className="bg-muted/40 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 <tr><th className="p-3.5 text-left">Liquidación</th><th className="p-3.5 text-left">Fecha / referencia</th><th className="p-3.5 text-right">Bruto</th><th className="p-3.5 text-right">Comisión</th><th className="p-3.5 text-right">Retención</th><th className="p-3.5 text-right">Depósito</th><th className="p-3.5 text-left">Pagos</th></tr>
               </thead>
@@ -365,6 +382,9 @@ export default function CardSettlementsPage() {
             </table>
           </div>
         )}
+        <Pagination currentPage={historyQuery.page} totalPages={historyQuery.totalPages} totalItems={historyQuery.totalItems}
+          pageSize={historyPageSize} disabled={historyQuery.loading || submitting} onPageChange={setHistoryPage}
+          onPageSizeChange={size => { setHistoryPageSize(size); setHistoryPage(1) }} />
       </section>
     </div>
   )

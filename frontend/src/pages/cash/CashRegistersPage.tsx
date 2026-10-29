@@ -1,20 +1,14 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useEffect, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { useDebouncedValue, usePagedList } from '@/hooks/usePagedList'
+import { Pagination } from '@/components/ui/Pagination'
 import api from '@/lib/axios'
-import type { CashRegister, CashMovement } from '@/types'
+import type { CashRegister, CashMovement, CashRegisterOperation } from '@/types'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { InlineAlert } from '@/components/ui/InlineAlert'
 import { getApiErrorMessage } from '@/lib/errors'
 import { DollarSign, Plus, Lock, Unlock, ArrowDownRight, ArrowUpRight, Loader2 } from 'lucide-react'
-
-interface CashRegisterOperation {
-  movementId: string
-  message: string
-  currentBalance: number
-  expectedAmount?: number | null
-  countedAmount?: number | null
-  difference?: number | null
-}
 
 const idempotencyStorageKey = (action: 'open' | 'close', registerId: string) =>
   `cash-register:${registerId}:${action}:idempotency-key`
@@ -33,9 +27,12 @@ function clearIdempotencyKey(action: 'open' | 'close', registerId: string) {
 }
 
 export default function CashRegistersPage() {
-  const [registers, setRegisters] = useState<CashRegister[]>([])
-  const [movements, setMovements] = useState<CashMovement[]>([])
-  const [selectedRegister, setSelectedRegister] = useState<string | null>(null)
+  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [registerSearch, setRegisterSearch] = useState('')
+  const [registerPage, setRegisterPage] = useState(1)
+  const [registerPageSize, setRegisterPageSize] = useState(10)
+  const [movementPage, setMovementPage] = useState(1)
+  const [movementPageSize, setMovementPageSize] = useState(15)
   const [showOpen, setShowOpen] = useState(false)
   const [openAmount, setOpenAmount] = useState('0')
   const [showClose, setShowClose] = useState(false)
@@ -44,39 +41,37 @@ export default function CashRegistersPage() {
   const [showNewRegister, setShowNewRegister] = useState(false)
   const [newRegisterName, setNewRegisterName] = useState('')
   const [newRegisterDesc, setNewRegisterDesc] = useState('')
-  const [loading, setLoading] = useState(false)
   const [actionLoading, setActionLoading] = useState(false)
   const [alertInfo, setAlertInfo] = useState<{ variant: 'error' | 'success'; message: string } | null>(null)
 
-  const loadMovements = useCallback(async (id: string) => {
-    setLoading(true)
-    try {
-      setSelectedRegister(id)
-      const { data } = await api.get<CashMovement[]>(`/cash-registers/${id}/movements`)
-      setMovements(data)
-    } catch (error) {
-      setAlertInfo({ variant: 'error', message: getApiErrorMessage(error, 'Error al cargar los movimientos de la caja.') })
-    } finally {
-      setLoading(false)
-    }
-  }, [])
-
-  const load = useCallback(async () => {
-    try {
-      const { data } = await api.get<CashRegister[]>('/cash-registers')
-      setRegisters(data)
-      if (data.length > 0 && !selectedRegister) {
-        await loadMovements(data[0].id)
-      }
-    } catch (error) {
-      setAlertInfo({ variant: 'error', message: getApiErrorMessage(error, 'Error al cargar las cajas registradoras.') })
-    }
-  }, [loadMovements, selectedRegister])
-
+  const debouncedSearch = useDebouncedValue(registerSearch)
+  const registerQuery = usePagedList<CashRegister>('/cash-registers/paged', {
+    page: registerPage, pageSize: registerPageSize, search: debouncedSearch || undefined,
+  })
+  const registers = registerQuery.items
   useEffect(() => {
-    const timer = window.setTimeout(() => void load(), 0)
+    if (selectedId || !registers[0]) return
+    const firstId = registers[0].id
+    const timer = window.setTimeout(() => setSelectedId(firstId), 0)
     return () => window.clearTimeout(timer)
-  }, [load])
+  }, [selectedId, registers])
+  const selectedRegister = selectedId
+  const detailQuery = useQuery({ queryKey: ['cash-register-detail', selectedRegister], enabled: !!selectedRegister, retry: false,
+    queryFn: async ({ signal }) => (await api.get<CashRegister>(`/cash-registers/${selectedRegister}`, { signal })).data })
+  const movementQuery = usePagedList<CashMovement>(`/cash-registers/${selectedRegister}/movements/paged`, {
+    page: movementPage, pageSize: movementPageSize,
+  }, { enabled: !!selectedRegister })
+  const movements = movementQuery.items
+  const loading = movementQuery.loading
+  const loadMovements = (id: string) => {
+    setSelectedId(id)
+    setMovementPage(1)
+    setShowOpen(false)
+    setShowClose(false)
+  }
+  const load = async () => {
+    await Promise.all([registerQuery.load(), ...(selectedRegister ? [detailQuery.refetch(), movementQuery.load()] : [])])
+  }
 
   const openRegister = async () => {
     if (!selectedRegister) return
@@ -96,7 +91,7 @@ export default function CashRegistersPage() {
       clearIdempotencyKey('open', selectedRegister)
       setShowOpen(false)
       setAlertInfo({ variant: 'success', message: `${data.message}. Saldo inicial: L ${data.currentBalance.toFixed(2)}.` })
-      await Promise.all([load(), loadMovements(selectedRegister)])
+      await load()
     } catch (error) {
       setAlertInfo({ variant: 'error', message: getApiErrorMessage(error, 'Error al realizar la apertura de caja.') })
     } finally {
@@ -131,7 +126,7 @@ export default function CashRegistersPage() {
         variant: 'success',
         message: `${data.message}. Sistema: L ${(data.expectedAmount ?? 0).toFixed(2)}, contado: L ${(data.countedAmount ?? 0).toFixed(2)}, diferencia: L ${(data.difference ?? 0).toFixed(2)}.`,
       })
-      await Promise.all([load(), loadMovements(selectedRegister)])
+      await load()
     } catch (error) {
       setAlertInfo({ variant: 'error', message: getApiErrorMessage(error, 'Error al realizar el cierre de caja.') })
     } finally {
@@ -156,7 +151,7 @@ export default function CashRegistersPage() {
     }
   }
 
-  const activeRegisterObj = registers.find((r) => r.id === selectedRegister)
+  const activeRegisterObj = detailQuery.data
   const currentBalance = activeRegisterObj?.currentBalance ?? 0
   const countedValue = Number(countedAmount)
   const liveDifference = Number.isFinite(countedValue)
@@ -224,12 +219,21 @@ export default function CashRegistersPage() {
         </div>
       )}
 
+      {(registerQuery.error || detailQuery.error || movementQuery.error) && <InlineAlert variant="error" message="No se pudo cargar la consulta de caja. Usa Actualizar para reintentar." />}
+      <div className="flex flex-wrap items-center gap-2">
+        <Input aria-label="Buscar cajas" maxLength={100} placeholder="Buscar caja por nombre o ubicación..." className="sm:max-w-md" value={registerSearch}
+          onChange={event => { setRegisterSearch(event.target.value); setRegisterPage(1) }} />
+        <Button variant="outline" disabled={registerQuery.loading || actionLoading} onClick={() => void load()}>Actualizar</Button>
+      </div>
+      {registerQuery.loading && <p role="status" className="text-sm text-muted-foreground">Cargando cajas…</p>}
+      {!registerQuery.loading && !registerQuery.error && registers.length === 0 && <p className="text-sm text-muted-foreground">No hay cajas con esa búsqueda.</p>}
       {/* Register Selector Tabs */}
       <div className="flex items-center gap-2 flex-wrap border-b border-border pb-3">
         {registers.map((r) => (
           <Button
             key={r.id}
             variant={selectedRegister === r.id ? 'default' : 'outline'}
+            disabled={actionLoading}
             onClick={() => loadMovements(r.id)}
             className="text-sm font-medium"
           >
@@ -238,6 +242,11 @@ export default function CashRegistersPage() {
         ))}
       </div>
 
+      <Pagination currentPage={registerQuery.page} totalPages={registerQuery.totalPages} totalItems={registerQuery.totalItems}
+        pageSize={registerPageSize} disabled={registerQuery.loading || actionLoading} onPageChange={setRegisterPage}
+        onPageSizeChange={size => { setRegisterPageSize(size); setRegisterPage(1) }} />
+
+      {detailQuery.isFetching && <p role="status" className="text-sm text-muted-foreground">Actualizando saldo de caja…</p>}
       {selectedRegister && activeRegisterObj && (
         <div className="space-y-6">
           {/* Register Status Banner */}
@@ -267,7 +276,7 @@ export default function CashRegistersPage() {
                   L {currentBalance.toFixed(2)}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  {movements.length} {movements.length === 1 ? 'movimiento acumulado' : 'movimientos acumulados'}
+                  {movementQuery.totalItems} {movementQuery.totalItems === 1 ? 'movimiento acumulado' : 'movimientos acumulados'}
                 </p>
               </div>
             </div>
@@ -277,7 +286,7 @@ export default function CashRegistersPage() {
                 <Button
                   variant="destructive"
                   className="w-full gap-1.5"
-                  disabled={actionLoading}
+                  disabled={actionLoading || detailQuery.isFetching || !!detailQuery.error}
                   onClick={() => {
                     setShowClose(!showClose)
                     setShowOpen(false)
@@ -291,7 +300,7 @@ export default function CashRegistersPage() {
                 <Button
                   variant="outline"
                   className="w-full gap-1.5"
-                  disabled={actionLoading}
+                  disabled={actionLoading || detailQuery.isFetching || !!detailQuery.error}
                   onClick={() => {
                     setShowOpen(!showOpen)
                     setShowClose(false)
@@ -396,7 +405,7 @@ export default function CashRegistersPage() {
             <div className="p-4 border-b border-border/80 bg-muted/20 flex items-center justify-between">
               <h3 className="font-semibold text-sm text-foreground">Movimientos Registrados</h3>
               <span className="text-xs text-muted-foreground">
-                {movements.length} {movements.length === 1 ? 'registro' : 'registros'}
+                {movementQuery.totalItems} {movementQuery.totalItems === 1 ? 'registro' : 'registros'}
               </span>
             </div>
 
@@ -407,7 +416,7 @@ export default function CashRegistersPage() {
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="w-full text-sm">
+                <table className="w-full min-w-[850px] text-sm">
                   <thead className="bg-muted/40 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     <tr>
                       <th className="text-left p-3.5">Fecha y Hora</th>
@@ -475,7 +484,7 @@ export default function CashRegistersPage() {
                         </tr>
                       )
                     })}
-                    {movements.length === 0 && (
+                    {!movementQuery.error && movements.length === 0 && (
                       <tr>
                         <td colSpan={6} className="p-8 text-center text-muted-foreground">
                           No hay movimientos registrados en esta caja.
@@ -486,6 +495,9 @@ export default function CashRegistersPage() {
                 </table>
               </div>
             )}
+            <Pagination currentPage={movementQuery.page} totalPages={movementQuery.totalPages} totalItems={movementQuery.totalItems}
+              pageSize={movementPageSize} disabled={loading || actionLoading} onPageChange={setMovementPage}
+              onPageSizeChange={size => { setMovementPageSize(size); setMovementPage(1) }} />
           </div>
         </div>
       )}

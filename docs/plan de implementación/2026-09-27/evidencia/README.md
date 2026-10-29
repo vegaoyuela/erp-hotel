@@ -201,3 +201,21 @@ Cinco nuevas colecciones paginadas en PostgreSQL: reservas, folios, clientes, pr
 | [p02h2a-qa-resumen.json](p02h2a-qa-resumen.json) | Resumen y SHA-256 de fuentes, contrato, pruebas y evidencia. |
 
 El [detalle H2A](../p02-base-tecnica/p02-h2a-operacion-inventario.md) conserva las diez capturas y H2B. Windows e impresión física siguen aplazados por el usuario, con recordatorio diario.
+
+
+### P02-H2B — consultas financieras y respaldo (29 de octubre de 2026)
+
+Seis colecciones paginadas, totales globales SQL y selección de cobros entre páginas; doce tipos frontend migrados al contrato.
+
+| Archivo | Resultado |
+|---|---|
+| [p02h2b-qa.log](p02h2b-qa.log) | Build sin advertencias, 109 unitarias, 5 integraciones, 5 validaciones del expediente, npm audit sin alertas, contrato real, lint y build. |
+| [p02h2b-modelo-ef.log](p02h2b-modelo-ef.log) | No requiere migración. |
+| [p02h2b-base-qa.json](p02h2b-base-qa.json) | 42 tablas, 345 filas, 11 migraciones y cero bases temporales residuales. |
+| [p02h2b-paginacion.json](p02h2b-paginacion.json) | Conteos, bytes y pruebas de saldo disponible/caja y totales contables. |
+| [p02h2b-inventario-contratos.json](p02h2b-inventario-contratos.json) | Tipos migrados, 29 lecturas de arrays y 53 respuestas a revisar en H2C. |
+| [p02h2b-impeccable.json](p02h2b-impeccable.json) | Detector sobre cuatro pantallas: cero hallazgos. |
+| [ui-p02h2b/resultado.json](ui-p02h2b/resultado.json) | Ocho capturas, cero errores JavaScript y liquidación HTTP 201 de L 170 con dos aplicaciones de páginas distintas. |
+| [p02h2b-qa-resumen.json](p02h2b-qa-resumen.json) | Resumen y hashes de código, contrato, pruebas y evidencia. |
+
+El [detalle H2B](../p02-base-tecnica/p02-h2b-finanzas-respaldos.md) conserva permisos, límites y H2C. Windows e impresión siguen pendientes por decisión del usuario; el recordatorio diario permanece activo.

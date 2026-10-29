@@ -1,0 +1,30 @@
+{
+  "status": "passed",
+  "synthetic_database": true,
+  "contains_secret_values": false,
+  "flows": {
+    "cash_balance_independent_of_both_pages_and_selection": true,
+    "journal_totals_independent_of_page_filter_and_detail_loaded": true,
+    "backup_history_beyond_twenty_and_combined_filters": true,
+    "card_selection_and_global_pending_survive_pages_and_search": true,
+    "cross_page_settlement_persisted_with_two_payments": true,
+    "backup_list_error_and_refresh_recovery": true,
+    "paged_list_requests_only": true
+  },
+  "mobile_document_overflow": {
+    "caja": false,
+    "asientos": false,
+    "respaldos": false,
+    "liquidaciones": false
+  },
+  "settlement_proof": {
+    "grossAmount": 170,
+    "bankDepositAmount": 163,
+    "commissionAmount": 5,
+    "withholdingAmount": 2,
+    "applications": 2,
+    "http_status": 201
+  },
+  "javascript_errors": 0,
+  "screenshots": 8
+}

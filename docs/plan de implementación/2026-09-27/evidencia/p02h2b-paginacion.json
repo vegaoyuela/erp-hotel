@@ -1,0 +1,57 @@
+{
+  "syntheticDatabase": true,
+  "lists": [
+    {
+      "path": "/api/cash-registers/paged?search=H2B-QA",
+      "matchedRows": 31,
+      "legacyRows": 35,
+      "pageRows": 10,
+      "legacyBytes": 5844,
+      "pageBytes": 1666
+    },
+    {
+      "path": "/api/cash-registers/01a188c7-623a-7b97-a022-0719becc6ad3/movements/paged?search=H2B-QA",
+      "matchedRows": 31,
+      "legacyRows": 31,
+      "pageRows": 10,
+      "legacyBytes": 13334,
+      "pageBytes": 4365
+    },
+    {
+      "path": "/api/card-settlements/paged?search=H2B-QA",
+      "matchedRows": 31,
+      "legacyRows": 33,
+      "pageRows": 10,
+      "legacyBytes": 21749,
+      "pageBytes": 6635
+    },
+    {
+      "path": "/api/card-settlements/eligible-payments/paged?search=H2B-QA",
+      "matchedRows": 31,
+      "legacyRows": 31,
+      "pageRows": 10,
+      "legacyBytes": 7382,
+      "pageBytes": 2448
+    },
+    {
+      "path": "/api/accounts/journal-entries/paged?search=H2B-QA",
+      "matchedRows": 31,
+      "legacyRows": 52,
+      "pageRows": 10,
+      "legacyBytes": 38356,
+      "pageBytes": 1935
+    },
+    {
+      "path": "/api/backup/logs/paged?search=H2B-QA",
+      "matchedRows": 31,
+      "legacyRows": 32,
+      "pageRows": 10,
+      "legacyBytes": 7834,
+      "pageBytes": 2465
+    }
+  ],
+  "partialPaymentAvailable": 70,
+  "cashBalance": 130,
+  "journalDebit": 5540.25,
+  "journalCredit": 5540.25
+}

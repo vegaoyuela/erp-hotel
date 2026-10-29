@@ -4,6 +4,7 @@ using hotel_erp.Api.Authorization;
 using hotel_erp.Api.Database;
 using hotel_erp.Api.Database.Entities;
 using hotel_erp.Api.Dtos.Payments;
+using hotel_erp.Api.Dtos.Common;
 using hotel_erp.Api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -19,13 +20,16 @@ namespace hotel_erp.Api.Controllers
         private readonly ApplicationDbContext _context;
         private readonly CardSettlementApplicationService _settlementService;
         private readonly IMapper _mapper;
+        private readonly HotelListQueryService _lists;
 
         public CardSettlementsController(
             ApplicationDbContext context,
             CardSettlementApplicationService settlementService,
-            IMapper mapper)
+            IMapper mapper,
+            HotelListQueryService lists)
         {
             _context = context;
+            _lists = lists;
             _settlementService = settlementService;
             _mapper = mapper;
         }
@@ -41,7 +45,21 @@ namespace hotel_erp.Api.Controllers
             return Ok(_mapper.Map<IEnumerable<CardSettlementDto>>(settlements));
         }
 
+        [HttpGet("paged")]
+        public async Task<ActionResult<PagedResult<CardSettlementDto>>> GetPage([FromQuery] SearchPageQuery query)
+            => Ok(await _lists.CardSettlementsAsync(query, HttpContext.RequestAborted));
+
+        [HttpGet("eligible-payments/paged")]
+        public async Task<ActionResult<PagedResult<EligibleCardPaymentDto>>> GetEligiblePage([FromQuery] SearchPageQuery query)
+            => Ok(await _lists.EligibleCardPaymentsAsync(query, HttpContext.RequestAborted));
+
+        [HttpGet("eligible-payments/summary")]
+        public async Task<ActionResult<EligibleCardSummaryDto>> GetEligibleSummary()
+            => Ok(await _lists.EligibleCardSummaryAsync(HttpContext.RequestAborted));
+
         [HttpGet("{id:guid}")]
+        [ProducesResponseType(typeof(CardSettlementDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<CardSettlementDto>> GetById(Guid id)
         {
             var settlement = await DetailedSettlements()
@@ -99,6 +117,9 @@ namespace hotel_erp.Api.Controllers
         }
 
         [HttpPost]
+        [ProducesResponseType(typeof(CardSettlementDto), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
         public async Task<ActionResult<CardSettlementDto>> Create(
             [FromBody] CreateCardSettlementRequest request,
             [FromHeader(Name = "Idempotency-Key")] string? idempotencyKey)

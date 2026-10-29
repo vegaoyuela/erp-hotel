@@ -1,4 +1,7 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState } from 'react'
+import { useDebouncedValue, usePagedList } from '@/hooks/usePagedList'
+import { Pagination } from '@/components/ui/Pagination'
+import { Input } from '@/components/ui/input'
 import api from '@/lib/axios'
 import type { BackupLog } from '@/types'
 import { Button } from '@/components/ui/button'
@@ -7,30 +10,17 @@ import { InlineAlert } from '@/components/ui/InlineAlert'
 import { getApiErrorMessage } from '@/lib/errors'
 
 export default function BackupsPage() {
-  const [logs, setLogs] = useState<BackupLog[]>([])
+  const [search, setSearch] = useState('')
+  const [status, setStatus] = useState('')
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pageSize, setPageSize] = useState(15)
   const [loading, setLoading] = useState(false)
-  const [fetching, setFetching] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
 
-  const loadLogs = useCallback(async () => {
-    setFetching(true)
-    setError(null)
-    try {
-      const { data } = await api.get<BackupLog[]>('/backup/logs')
-      setLogs(data)
-    } catch (error: unknown) {
-      console.error('Error cargando historial de respaldos', error)
-      setError(getApiErrorMessage(error, 'No fue posible cargar el historial de respaldos.'))
-    } finally {
-      setFetching(false)
-    }
-  }, [])
-
-  useEffect(() => {
-    const timer = window.setTimeout(() => void loadLogs(), 0)
-    return () => window.clearTimeout(timer)
-  }, [loadLogs])
+  const debouncedSearch = useDebouncedValue(search)
+  const { items: logs, loading: fetching, error: listError, load: loadLogs, page, totalItems, totalPages } = usePagedList<BackupLog>(
+    '/backup/logs/paged', { page: currentPage, pageSize, search: debouncedSearch || undefined, status: status || undefined })
 
   const createBackup = async () => {
     setLoading(true)
@@ -81,7 +71,7 @@ export default function BackupsPage() {
             Copias de seguridad de PostgreSQL y sincronización en la nube.
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Button variant="outline" onClick={loadLogs} disabled={fetching}>
             <RotateCw size={15} className={fetching ? 'animate-spin mr-1.5' : 'mr-1.5'} />
             Actualizar
@@ -115,10 +105,17 @@ export default function BackupsPage() {
         />
       )}
 
+      {listError && <InlineAlert variant="error" message="No se pudo cargar el historial. Usa Actualizar para reintentar." />}
+      <div className="flex flex-col gap-2 sm:flex-row">
+        <Input aria-label="Buscar respaldos" maxLength={100} placeholder="Buscar por archivo..." className="sm:max-w-md" value={search} onChange={event => { setSearch(event.target.value); setCurrentPage(1) }} />
+        <select aria-label="Estado del respaldo" value={status} onChange={event => { setStatus(event.target.value); setCurrentPage(1) }} className="rounded-md border border-input bg-background px-3 py-2 text-sm">
+          <option value="">Todos los estados</option><option value="CreatedLocal">Creado localmente</option><option value="PendingUpload">Pendiente de subida</option><option value="UploadedToDrive">Subido a Drive</option><option value="UploadFailed">Subida fallida</option><option value="Failed">Fallido</option>
+        </select>
+      </div>
       <div className="border border-border rounded-xl bg-card overflow-hidden shadow-xs">
         <div className="p-4 border-b border-border/80 bg-muted/20 flex items-center justify-between">
           <h3 className="font-semibold text-sm text-foreground">Historial de Respaldos</h3>
-          <span className="text-xs text-muted-foreground">{logs.length} registro(s)</span>
+          <span className="text-xs text-muted-foreground">{totalItems} registro(s)</span>
         </div>
 
         {fetching ? (
@@ -128,7 +125,7 @@ export default function BackupsPage() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full min-w-[850px] text-sm">
               <thead className="bg-muted/40 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 <tr>
                   <th className="text-left p-3.5">Archivo</th>
@@ -168,7 +165,7 @@ export default function BackupsPage() {
                     </td>
                   </tr>
                 ))}
-                {logs.length === 0 && (
+                {!listError && logs.length === 0 && (
                   <tr>
                     <td colSpan={6} className="p-8 text-center text-muted-foreground">
                       No hay respaldos registrados en el sistema.
@@ -179,6 +176,8 @@ export default function BackupsPage() {
             </table>
           </div>
         )}
+        <Pagination currentPage={page} totalPages={totalPages} totalItems={totalItems} pageSize={pageSize} disabled={fetching}
+          onPageChange={setCurrentPage} onPageSizeChange={size => { setPageSize(size); setCurrentPage(1) }} />
       </div>
     </div>
   )

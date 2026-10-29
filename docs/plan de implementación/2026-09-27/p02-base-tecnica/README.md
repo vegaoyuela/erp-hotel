@@ -2,7 +2,7 @@
 
 **Inicio:** 27 de septiembre de 2026
 
-**Estado:** en ejecución; entregas P02-A a P02-H2A aprobadas por pruebas automáticas. Última ejecución: 29 de octubre de 2026.
+**Estado:** en ejecución; entregas P02-A a P02-H2B aprobadas por pruebas automáticas. Última ejecución: 29 de octubre de 2026.
 
 Este registro divide P02 en entregas comprobables. No se declara G2 mientras queden controladores con lógica de negocio, repositorios que confirman cambios por su cuenta o contratos sin prueba.
 
@@ -31,8 +31,8 @@ La versión anterior calculaba el hash con ticks de 100 ns antes de guardar un `
 | P02-01 | Completada | Finanzas, factura/notas, reservas, check-in/out, folios, caja, compras, inventario y respaldo delegan sus mutaciones a servicios. |
 | P02-02 | Completada | Persistencia explícita con `IUnitOfWork`, cero guardados/transacciones en repositorios y pruebas de aislamiento, rollback y regresión HTTP. |
 | P02-03 | Completada en código | Contratos inyectables de reloj, cálculo, correlativo, auditoría, impresión y respaldo; sustitución/rollback y transporte simulado probados. Prueba física pendiente en Windows. |
-| P02-04 | Parcial (P02-H2A) | Ocho colecciones paginadas, seguridad/errores, convenciones y respuestas operativas de reservas/folios probadas; faltan colecciones financieras y otros esquemas explícitos de éxito. |
-| P02-05 | Parcial (P02-H2A) | Contrato real validado en QA; migrados huéspedes, facturas, bitácora, reservas, clientes, folios e inventario. Faltan los contratos manuales restantes. |
+| P02-04 | Parcial (P02-H2B) | Catorce colecciones paginadas, agregados globales y resultados operativos/financieros tipados; faltan selectores y otros esquemas explícitos de éxito. |
+| P02-05 | Parcial (P02-H2B) | Contrato real validado en QA; se sumaron doce tipos de caja, liquidaciones, diario y respaldos a los módulos ya migrados. Quedan contratos manuales y selectores. |
 | P02-06 | Parcial previo | Existe matriz de permisos y prueba reflectiva; faltan motivos/aprobaciones por monto y revalidar todas las lecturas sensibles. |
 | P02-07 | Parcial previo | Existen roles PostgreSQL y migración separada; la rotación de secretos se ejecutará durante instalación Windows. |
 | P02-08 | Completada | Verificador, exportador, UI, compatibilidad histórica y pruebas. |
@@ -91,8 +91,12 @@ El [detalle de P02-H1](p02-h1-contrato-paginacion.md) contiene rutas, convencion
 
 El 29 de octubre se incorporaron páginas SQL para reservas, folios, clientes, productos y movimientos de inventario. Los indicadores usan agregados globales; el selector del Kardex busca y pagina sin cargar todos los productos. El listado de folios usa un DTO compacto y conserva referencias históricas. Los resultados de reservas y cargos de folio tienen esquemas explícitos y nueve tipos frontend adicionales derivan del contrato. El [detalle de H2A](p02-h2a-operacion-inventario.md) conserva QA, diez capturas y pendientes.
 
+## Entrega P02-H2B — finanzas y respaldo
+
+Se paginaron cajas, movimientos de caja, liquidaciones, cobros elegibles, asientos y logs de respaldo. Los saldos y agregados globales no dependen de la página; el lote conserva cobros elegidos en páginas distintas. Doce tipos frontend derivan de OpenAPI. El navegador registró una liquidación sintética de L 170 con dos aplicaciones y depósito L 163. El [detalle H2B](p02-h2b-finanzas-respaldos.md) contiene QA, ocho capturas y pendientes.
+
 ## Criterio para la siguiente entrega
 
-P02-H2B continuará con caja, liquidaciones, asientos, respaldos, selectores pendientes, respuestas de éxito explícitas y migración de los contratos manuales frontend. G2 sigue abierta hasta cubrir los pendientes de la tabla y obtener la revisión independiente.
+P02-H2C continuará con selectores de check-in/out, autorizaciones y cajas auxiliares, respuestas de éxito explícitas y contratos manuales restantes. G2 sigue abierta hasta cubrir los pendientes de la tabla y obtener la revisión independiente.
 
 La evidencia de QA y compatibilidad se conserva en el [expediente general](../evidencia/README.md#p02--base-técnica-primera-entrega).

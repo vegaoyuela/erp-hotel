@@ -130,6 +130,49 @@
         },
         "type": "object"
       },
+      "AccountingEntryListDto": {
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "entryType": {
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "itemCount": {
+            "format": "int32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          },
+          "totalCredit": {
+            "format": "double",
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ]
+          },
+          "totalDebit": {
+            "format": "double",
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ]
+          },
+          "transactionDate": {
+            "format": "date",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "AddFolioItemRequest": {
         "properties": {
           "description": {
@@ -386,6 +429,67 @@
               {
                 "$ref": "#/components/schemas/UserDto"
               }
+            ]
+          }
+        },
+        "type": "object"
+      },
+      "BackupLogDto": {
+        "properties": {
+          "completedAt": {
+            "format": "date-time",
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "errorMessage": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "fileName": {
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "sha256Hash": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "sizeBytes": {
+            "format": "int64",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          },
+          "startedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "uploadAttempts": {
+            "format": "int32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          },
+          "uploadedAt": {
+            "format": "date-time",
+            "type": [
+              "null",
+              "string"
             ]
           }
         },
@@ -967,6 +1071,53 @@
             ]
           },
           "name": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "CashRegisterOperationDto": {
+        "properties": {
+          "countedAmount": {
+            "format": "double",
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ]
+          },
+          "currentBalance": {
+            "format": "double",
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ]
+          },
+          "difference": {
+            "format": "double",
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ]
+          },
+          "expectedAmount": {
+            "format": "double",
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ]
+          },
+          "message": {
+            "type": "string"
+          },
+          "movementId": {
+            "format": "uuid",
             "type": "string"
           }
         },
@@ -3015,6 +3166,31 @@
         },
         "type": "object"
       },
+      "EligibleCardSummaryDto": {
+        "properties": {
+          "availableAmount": {
+            "format": "double",
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ]
+          },
+          "totalPayments": {
+            "format": "int32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          }
+        },
+        "required": [
+          "totalPayments",
+          "availableAmount"
+        ],
+        "type": "object"
+      },
       "EntryItemDto": {
         "properties": {
           "accountId": {
@@ -4061,6 +4237,31 @@
         ],
         "type": "object"
       },
+      "JournalSummaryDto": {
+        "properties": {
+          "credit": {
+            "format": "double",
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ]
+          },
+          "debit": {
+            "format": "double",
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ]
+          }
+        },
+        "required": [
+          "debit",
+          "credit"
+        ],
+        "type": "object"
+      },
       "LoginRequest": {
         "properties": {
           "password": {
@@ -4089,6 +4290,56 @@
         },
         "required": [
           "initialAmount"
+        ],
+        "type": "object"
+      },
+      "PagedResultOfAccountingEntryListDto": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/AccountingEntryListDto"
+            },
+            "type": "array"
+          },
+          "page": {
+            "format": "int32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          },
+          "pageSize": {
+            "format": "int32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          },
+          "totalItems": {
+            "format": "int32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          },
+          "totalPages": {
+            "format": "int32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "totalItems",
+          "totalPages"
         ],
         "type": "object"
       },
@@ -4142,11 +4393,261 @@
         ],
         "type": "object"
       },
+      "PagedResultOfBackupLogDto": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/BackupLogDto"
+            },
+            "type": "array"
+          },
+          "page": {
+            "format": "int32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          },
+          "pageSize": {
+            "format": "int32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          },
+          "totalItems": {
+            "format": "int32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          },
+          "totalPages": {
+            "format": "int32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "totalItems",
+          "totalPages"
+        ],
+        "type": "object"
+      },
+      "PagedResultOfCardSettlementDto": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/CardSettlementDto"
+            },
+            "type": "array"
+          },
+          "page": {
+            "format": "int32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          },
+          "pageSize": {
+            "format": "int32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          },
+          "totalItems": {
+            "format": "int32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          },
+          "totalPages": {
+            "format": "int32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "totalItems",
+          "totalPages"
+        ],
+        "type": "object"
+      },
+      "PagedResultOfCashMovementDto": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/CashMovementDto"
+            },
+            "type": "array"
+          },
+          "page": {
+            "format": "int32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          },
+          "pageSize": {
+            "format": "int32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          },
+          "totalItems": {
+            "format": "int32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          },
+          "totalPages": {
+            "format": "int32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "totalItems",
+          "totalPages"
+        ],
+        "type": "object"
+      },
+      "PagedResultOfCashRegisterDto": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/CashRegisterDto"
+            },
+            "type": "array"
+          },
+          "page": {
+            "format": "int32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          },
+          "pageSize": {
+            "format": "int32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          },
+          "totalItems": {
+            "format": "int32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          },
+          "totalPages": {
+            "format": "int32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "totalItems",
+          "totalPages"
+        ],
+        "type": "object"
+      },
       "PagedResultOfCustomerDto": {
         "properties": {
           "items": {
             "items": {
               "$ref": "#/components/schemas/CustomerDto"
+            },
+            "type": "array"
+          },
+          "page": {
+            "format": "int32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          },
+          "pageSize": {
+            "format": "int32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          },
+          "totalItems": {
+            "format": "int32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          },
+          "totalPages": {
+            "format": "int32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "totalItems",
+          "totalPages"
+        ],
+        "type": "object"
+      },
+      "PagedResultOfEligibleCardPaymentDto": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/EligibleCardPaymentDto"
             },
             "type": "array"
           },
@@ -7613,7 +8114,7 @@
           "required": true
         },
         "responses": {
-          "200": {
+          "201": {
             "content": {
               "application/json": {
                 "schema": {
@@ -7631,7 +8132,7 @@
                 }
               }
             },
-            "description": "OK"
+            "description": "Created"
           },
           "400": {
             "content": {
@@ -7881,6 +8382,589 @@
         ]
       }
     },
+    "/api/Accounts/journal-entries/paged": {
+      "get": {
+        "operationId": "Accounts_GetJournalPage",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "Search",
+            "schema": {
+              "maxLength": 100,
+              "minLength": 0,
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "Page",
+            "schema": {
+              "format": "int32",
+              "maximum": 1000000,
+              "minimum": 1,
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "PageSize",
+            "schema": {
+              "format": "int32",
+              "maximum": 100,
+              "minimum": 1,
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResultOfAccountingEntryListDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResultOfAccountingEntryListDto"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResultOfAccountingEntryListDto"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "errors": {
+                      "additionalProperties": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "type": [
+                        "null",
+                        "object"
+                      ]
+                    },
+                    "instance": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "format": "int32",
+                      "pattern": "^-?(?:0|[1-9]\\d*)$",
+                      "type": [
+                        "integer",
+                        "string"
+                      ]
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "code",
+                    "traceId"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Solicitud inválida; los errores de validación se indican por campo."
+          },
+          "401": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "errors": {
+                      "additionalProperties": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "type": [
+                        "null",
+                        "object"
+                      ]
+                    },
+                    "instance": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "format": "int32",
+                      "pattern": "^-?(?:0|[1-9]\\d*)$",
+                      "type": [
+                        "integer",
+                        "string"
+                      ]
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "code",
+                    "traceId"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Se requiere una sesión válida."
+          },
+          "403": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "errors": {
+                      "additionalProperties": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "type": [
+                        "null",
+                        "object"
+                      ]
+                    },
+                    "instance": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "format": "int32",
+                      "pattern": "^-?(?:0|[1-9]\\d*)$",
+                      "type": [
+                        "integer",
+                        "string"
+                      ]
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "code",
+                    "traceId"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "El operador carece de permisos o debe cambiar la contraseña."
+          },
+          "500": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "errors": {
+                      "additionalProperties": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "type": [
+                        "null",
+                        "object"
+                      ]
+                    },
+                    "instance": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "format": "int32",
+                      "pattern": "^-?(?:0|[1-9]\\d*)$",
+                      "type": [
+                        "integer",
+                        "string"
+                      ]
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "code",
+                    "traceId"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error interno normalizado; incluye traceId para seguimiento."
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Accounts: GetJournalPage",
+        "tags": [
+          "Accounts"
+        ]
+      }
+    },
+    "/api/Accounts/journal-entries/summary": {
+      "get": {
+        "operationId": "Accounts_GetJournalSummary",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JournalSummaryDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JournalSummaryDto"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/JournalSummaryDto"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "errors": {
+                      "additionalProperties": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "type": [
+                        "null",
+                        "object"
+                      ]
+                    },
+                    "instance": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "format": "int32",
+                      "pattern": "^-?(?:0|[1-9]\\d*)$",
+                      "type": [
+                        "integer",
+                        "string"
+                      ]
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "code",
+                    "traceId"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Solicitud inválida; los errores de validación se indican por campo."
+          },
+          "401": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "errors": {
+                      "additionalProperties": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "type": [
+                        "null",
+                        "object"
+                      ]
+                    },
+                    "instance": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "format": "int32",
+                      "pattern": "^-?(?:0|[1-9]\\d*)$",
+                      "type": [
+                        "integer",
+                        "string"
+                      ]
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "code",
+                    "traceId"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Se requiere una sesión válida."
+          },
+          "403": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "errors": {
+                      "additionalProperties": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "type": [
+                        "null",
+                        "object"
+                      ]
+                    },
+                    "instance": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "format": "int32",
+                      "pattern": "^-?(?:0|[1-9]\\d*)$",
+                      "type": [
+                        "integer",
+                        "string"
+                      ]
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "code",
+                    "traceId"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "El operador carece de permisos o debe cambiar la contraseña."
+          },
+          "500": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "errors": {
+                      "additionalProperties": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "type": [
+                        "null",
+                        "object"
+                      ]
+                    },
+                    "instance": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "format": "int32",
+                      "pattern": "^-?(?:0|[1-9]\\d*)$",
+                      "type": [
+                        "integer",
+                        "string"
+                      ]
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "code",
+                    "traceId"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error interno normalizado; incluye traceId para seguimiento."
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Accounts: GetJournalSummary",
+        "tags": [
+          "Accounts"
+        ]
+      }
+    },
     "/api/Accounts/journal-entries/{id}": {
       "get": {
         "operationId": "Accounts_GetJournalEntry",
@@ -8092,6 +9176,65 @@
               }
             },
             "description": "El operador carece de permisos o debe cambiar la contraseña."
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "errors": {
+                      "additionalProperties": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "type": [
+                        "null",
+                        "object"
+                      ]
+                    },
+                    "instance": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "format": "int32",
+                      "pattern": "^-?(?:0|[1-9]\\d*)$",
+                      "type": [
+                        "integer",
+                        "string"
+                      ]
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "code",
+                    "traceId"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not Found"
           },
           "500": {
             "content": {
@@ -10993,6 +12136,8 @@
             "schema": {
               "default": 20,
               "format": "int32",
+              "maximum": 100,
+              "minimum": 1,
               "pattern": "^-?(?:0|[1-9]\\d*)$",
               "type": [
                 "integer",
@@ -11003,6 +12148,32 @@
         ],
         "responses": {
           "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/BackupLogDto"
+                  },
+                  "type": "array"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/BackupLogDto"
+                  },
+                  "type": "array"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/BackupLogDto"
+                  },
+                  "type": "array"
+                }
+              }
+            },
             "description": "OK"
           },
           "400": {
@@ -11248,6 +12419,325 @@
           }
         ],
         "summary": "Backup: GetLogs",
+        "tags": [
+          "Backup"
+        ]
+      }
+    },
+    "/api/Backup/logs/paged": {
+      "get": {
+        "operationId": "Backup_GetLogsPage",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "Status",
+            "schema": {
+              "pattern": "^(CreatedLocal|PendingUpload|UploadedToDrive|UploadFailed|Failed)$",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "Search",
+            "schema": {
+              "maxLength": 100,
+              "minLength": 0,
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "Page",
+            "schema": {
+              "format": "int32",
+              "maximum": 1000000,
+              "minimum": 1,
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "PageSize",
+            "schema": {
+              "format": "int32",
+              "maximum": 100,
+              "minimum": 1,
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResultOfBackupLogDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResultOfBackupLogDto"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResultOfBackupLogDto"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "errors": {
+                      "additionalProperties": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "type": [
+                        "null",
+                        "object"
+                      ]
+                    },
+                    "instance": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "format": "int32",
+                      "pattern": "^-?(?:0|[1-9]\\d*)$",
+                      "type": [
+                        "integer",
+                        "string"
+                      ]
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "code",
+                    "traceId"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Solicitud inválida; los errores de validación se indican por campo."
+          },
+          "401": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "errors": {
+                      "additionalProperties": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "type": [
+                        "null",
+                        "object"
+                      ]
+                    },
+                    "instance": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "format": "int32",
+                      "pattern": "^-?(?:0|[1-9]\\d*)$",
+                      "type": [
+                        "integer",
+                        "string"
+                      ]
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "code",
+                    "traceId"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Se requiere una sesión válida."
+          },
+          "403": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "errors": {
+                      "additionalProperties": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "type": [
+                        "null",
+                        "object"
+                      ]
+                    },
+                    "instance": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "format": "int32",
+                      "pattern": "^-?(?:0|[1-9]\\d*)$",
+                      "type": [
+                        "integer",
+                        "string"
+                      ]
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "code",
+                    "traceId"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "El operador carece de permisos o debe cambiar la contraseña."
+          },
+          "500": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "errors": {
+                      "additionalProperties": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "type": [
+                        "null",
+                        "object"
+                      ]
+                    },
+                    "instance": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "format": "int32",
+                      "pattern": "^-?(?:0|[1-9]\\d*)$",
+                      "type": [
+                        "integer",
+                        "string"
+                      ]
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "code",
+                    "traceId"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error interno normalizado; incluye traceId para seguimiento."
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Backup: GetLogsPage",
         "tags": [
           "Backup"
         ]
@@ -41796,7 +43286,7 @@
           "required": true
         },
         "responses": {
-          "200": {
+          "201": {
             "content": {
               "application/json": {
                 "schema": {
@@ -41814,7 +43304,7 @@
                 }
               }
             },
-            "description": "OK"
+            "description": "Created"
           },
           "400": {
             "content": {
@@ -41992,6 +43482,124 @@
               }
             },
             "description": "El operador carece de permisos o debe cambiar la contraseña."
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "errors": {
+                      "additionalProperties": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "type": [
+                        "null",
+                        "object"
+                      ]
+                    },
+                    "instance": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "format": "int32",
+                      "pattern": "^-?(?:0|[1-9]\\d*)$",
+                      "type": [
+                        "integer",
+                        "string"
+                      ]
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "code",
+                    "traceId"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "errors": {
+                      "additionalProperties": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "type": [
+                        "null",
+                        "object"
+                      ]
+                    },
+                    "instance": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "format": "int32",
+                      "pattern": "^-?(?:0|[1-9]\\d*)$",
+                      "type": [
+                        "integer",
+                        "string"
+                      ]
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "code",
+                    "traceId"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Conflict"
           },
           "500": {
             "content": {
@@ -42345,6 +43953,900 @@
         ]
       }
     },
+    "/api/card-settlements/eligible-payments/paged": {
+      "get": {
+        "operationId": "CardSettlements_GetEligiblePage",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "Search",
+            "schema": {
+              "maxLength": 100,
+              "minLength": 0,
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "Page",
+            "schema": {
+              "format": "int32",
+              "maximum": 1000000,
+              "minimum": 1,
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "PageSize",
+            "schema": {
+              "format": "int32",
+              "maximum": 100,
+              "minimum": 1,
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResultOfEligibleCardPaymentDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResultOfEligibleCardPaymentDto"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResultOfEligibleCardPaymentDto"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "errors": {
+                      "additionalProperties": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "type": [
+                        "null",
+                        "object"
+                      ]
+                    },
+                    "instance": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "format": "int32",
+                      "pattern": "^-?(?:0|[1-9]\\d*)$",
+                      "type": [
+                        "integer",
+                        "string"
+                      ]
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "code",
+                    "traceId"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Solicitud inválida; los errores de validación se indican por campo."
+          },
+          "401": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "errors": {
+                      "additionalProperties": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "type": [
+                        "null",
+                        "object"
+                      ]
+                    },
+                    "instance": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "format": "int32",
+                      "pattern": "^-?(?:0|[1-9]\\d*)$",
+                      "type": [
+                        "integer",
+                        "string"
+                      ]
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "code",
+                    "traceId"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Se requiere una sesión válida."
+          },
+          "403": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "errors": {
+                      "additionalProperties": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "type": [
+                        "null",
+                        "object"
+                      ]
+                    },
+                    "instance": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "format": "int32",
+                      "pattern": "^-?(?:0|[1-9]\\d*)$",
+                      "type": [
+                        "integer",
+                        "string"
+                      ]
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "code",
+                    "traceId"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "El operador carece de permisos o debe cambiar la contraseña."
+          },
+          "500": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "errors": {
+                      "additionalProperties": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "type": [
+                        "null",
+                        "object"
+                      ]
+                    },
+                    "instance": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "format": "int32",
+                      "pattern": "^-?(?:0|[1-9]\\d*)$",
+                      "type": [
+                        "integer",
+                        "string"
+                      ]
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "code",
+                    "traceId"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error interno normalizado; incluye traceId para seguimiento."
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "CardSettlements: GetEligiblePage",
+        "tags": [
+          "CardSettlements"
+        ]
+      }
+    },
+    "/api/card-settlements/eligible-payments/summary": {
+      "get": {
+        "operationId": "CardSettlements_GetEligibleSummary",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EligibleCardSummaryDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EligibleCardSummaryDto"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/EligibleCardSummaryDto"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "errors": {
+                      "additionalProperties": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "type": [
+                        "null",
+                        "object"
+                      ]
+                    },
+                    "instance": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "format": "int32",
+                      "pattern": "^-?(?:0|[1-9]\\d*)$",
+                      "type": [
+                        "integer",
+                        "string"
+                      ]
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "code",
+                    "traceId"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Solicitud inválida; los errores de validación se indican por campo."
+          },
+          "401": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "errors": {
+                      "additionalProperties": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "type": [
+                        "null",
+                        "object"
+                      ]
+                    },
+                    "instance": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "format": "int32",
+                      "pattern": "^-?(?:0|[1-9]\\d*)$",
+                      "type": [
+                        "integer",
+                        "string"
+                      ]
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "code",
+                    "traceId"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Se requiere una sesión válida."
+          },
+          "403": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "errors": {
+                      "additionalProperties": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "type": [
+                        "null",
+                        "object"
+                      ]
+                    },
+                    "instance": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "format": "int32",
+                      "pattern": "^-?(?:0|[1-9]\\d*)$",
+                      "type": [
+                        "integer",
+                        "string"
+                      ]
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "code",
+                    "traceId"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "El operador carece de permisos o debe cambiar la contraseña."
+          },
+          "500": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "errors": {
+                      "additionalProperties": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "type": [
+                        "null",
+                        "object"
+                      ]
+                    },
+                    "instance": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "format": "int32",
+                      "pattern": "^-?(?:0|[1-9]\\d*)$",
+                      "type": [
+                        "integer",
+                        "string"
+                      ]
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "code",
+                    "traceId"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error interno normalizado; incluye traceId para seguimiento."
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "CardSettlements: GetEligibleSummary",
+        "tags": [
+          "CardSettlements"
+        ]
+      }
+    },
+    "/api/card-settlements/paged": {
+      "get": {
+        "operationId": "CardSettlements_GetPage",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "Search",
+            "schema": {
+              "maxLength": 100,
+              "minLength": 0,
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "Page",
+            "schema": {
+              "format": "int32",
+              "maximum": 1000000,
+              "minimum": 1,
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "PageSize",
+            "schema": {
+              "format": "int32",
+              "maximum": 100,
+              "minimum": 1,
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResultOfCardSettlementDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResultOfCardSettlementDto"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResultOfCardSettlementDto"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "errors": {
+                      "additionalProperties": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "type": [
+                        "null",
+                        "object"
+                      ]
+                    },
+                    "instance": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "format": "int32",
+                      "pattern": "^-?(?:0|[1-9]\\d*)$",
+                      "type": [
+                        "integer",
+                        "string"
+                      ]
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "code",
+                    "traceId"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Solicitud inválida; los errores de validación se indican por campo."
+          },
+          "401": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "errors": {
+                      "additionalProperties": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "type": [
+                        "null",
+                        "object"
+                      ]
+                    },
+                    "instance": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "format": "int32",
+                      "pattern": "^-?(?:0|[1-9]\\d*)$",
+                      "type": [
+                        "integer",
+                        "string"
+                      ]
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "code",
+                    "traceId"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Se requiere una sesión válida."
+          },
+          "403": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "errors": {
+                      "additionalProperties": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "type": [
+                        "null",
+                        "object"
+                      ]
+                    },
+                    "instance": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "format": "int32",
+                      "pattern": "^-?(?:0|[1-9]\\d*)$",
+                      "type": [
+                        "integer",
+                        "string"
+                      ]
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "code",
+                    "traceId"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "El operador carece de permisos o debe cambiar la contraseña."
+          },
+          "500": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "errors": {
+                      "additionalProperties": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "type": [
+                        "null",
+                        "object"
+                      ]
+                    },
+                    "instance": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "format": "int32",
+                      "pattern": "^-?(?:0|[1-9]\\d*)$",
+                      "type": [
+                        "integer",
+                        "string"
+                      ]
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "code",
+                    "traceId"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error interno normalizado; incluye traceId para seguimiento."
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "CardSettlements: GetPage",
+        "tags": [
+          "CardSettlements"
+        ]
+      }
+    },
     "/api/card-settlements/{id}": {
       "get": {
         "operationId": "CardSettlements_GetById",
@@ -42556,6 +45058,65 @@
               }
             },
             "description": "El operador carece de permisos o debe cambiar la contraseña."
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "errors": {
+                      "additionalProperties": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "type": [
+                        "null",
+                        "object"
+                      ]
+                    },
+                    "instance": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "format": "int32",
+                      "pattern": "^-?(?:0|[1-9]\\d*)$",
+                      "type": [
+                        "integer",
+                        "string"
+                      ]
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "code",
+                    "traceId"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not Found"
           },
           "500": {
             "content": {
@@ -42931,7 +45492,7 @@
           "required": true
         },
         "responses": {
-          "200": {
+          "201": {
             "content": {
               "application/json": {
                 "schema": {
@@ -42949,7 +45510,7 @@
                 }
               }
             },
-            "description": "OK"
+            "description": "Created"
           },
           "400": {
             "content": {
@@ -43199,49 +45760,67 @@
         ]
       }
     },
-    "/api/cash-registers/{id}/close": {
-      "post": {
-        "operationId": "CashRegisters_Close",
+    "/api/cash-registers/paged": {
+      "get": {
+        "operationId": "CashRegisters_GetPage",
         "parameters": [
           {
-            "in": "path",
-            "name": "id",
-            "required": true,
+            "in": "query",
+            "name": "Search",
             "schema": {
-              "format": "uuid",
+              "maxLength": 100,
+              "minLength": 0,
               "type": "string"
             }
           },
           {
-            "in": "header",
-            "name": "Idempotency-Key",
+            "in": "query",
+            "name": "Page",
             "schema": {
-              "type": "string"
+              "format": "int32",
+              "maximum": 1000000,
+              "minimum": 1,
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "PageSize",
+            "schema": {
+              "format": "int32",
+              "maximum": 100,
+              "minimum": 1,
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ]
             }
           }
         ],
-        "requestBody": {
-          "content": {
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/CloseCashRegisterRequest"
-              }
-            },
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CloseCashRegisterRequest"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CloseCashRegisterRequest"
-              }
-            }
-          },
-          "required": true
-        },
         "responses": {
           "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResultOfCashRegisterDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResultOfCashRegisterDto"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResultOfCashRegisterDto"
+                }
+              }
+            },
             "description": "OK"
           },
           "400": {
@@ -43420,6 +45999,776 @@
               }
             },
             "description": "El operador carece de permisos o debe cambiar la contraseña."
+          },
+          "500": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "errors": {
+                      "additionalProperties": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "type": [
+                        "null",
+                        "object"
+                      ]
+                    },
+                    "instance": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "format": "int32",
+                      "pattern": "^-?(?:0|[1-9]\\d*)$",
+                      "type": [
+                        "integer",
+                        "string"
+                      ]
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "code",
+                    "traceId"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error interno normalizado; incluye traceId para seguimiento."
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "CashRegisters: GetPage",
+        "tags": [
+          "CashRegisters"
+        ]
+      }
+    },
+    "/api/cash-registers/{id}": {
+      "get": {
+        "operationId": "CashRegisters_GetById",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CashRegisterDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CashRegisterDto"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/CashRegisterDto"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "errors": {
+                      "additionalProperties": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "type": [
+                        "null",
+                        "object"
+                      ]
+                    },
+                    "instance": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "format": "int32",
+                      "pattern": "^-?(?:0|[1-9]\\d*)$",
+                      "type": [
+                        "integer",
+                        "string"
+                      ]
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "code",
+                    "traceId"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Solicitud inválida; los errores de validación se indican por campo."
+          },
+          "401": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "errors": {
+                      "additionalProperties": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "type": [
+                        "null",
+                        "object"
+                      ]
+                    },
+                    "instance": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "format": "int32",
+                      "pattern": "^-?(?:0|[1-9]\\d*)$",
+                      "type": [
+                        "integer",
+                        "string"
+                      ]
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "code",
+                    "traceId"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Se requiere una sesión válida."
+          },
+          "403": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "errors": {
+                      "additionalProperties": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "type": [
+                        "null",
+                        "object"
+                      ]
+                    },
+                    "instance": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "format": "int32",
+                      "pattern": "^-?(?:0|[1-9]\\d*)$",
+                      "type": [
+                        "integer",
+                        "string"
+                      ]
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "code",
+                    "traceId"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "El operador carece de permisos o debe cambiar la contraseña."
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "errors": {
+                      "additionalProperties": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "type": [
+                        "null",
+                        "object"
+                      ]
+                    },
+                    "instance": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "format": "int32",
+                      "pattern": "^-?(?:0|[1-9]\\d*)$",
+                      "type": [
+                        "integer",
+                        "string"
+                      ]
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "code",
+                    "traceId"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "500": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "errors": {
+                      "additionalProperties": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "type": [
+                        "null",
+                        "object"
+                      ]
+                    },
+                    "instance": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "format": "int32",
+                      "pattern": "^-?(?:0|[1-9]\\d*)$",
+                      "type": [
+                        "integer",
+                        "string"
+                      ]
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "code",
+                    "traceId"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error interno normalizado; incluye traceId para seguimiento."
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "CashRegisters: GetById",
+        "tags": [
+          "CashRegisters"
+        ]
+      }
+    },
+    "/api/cash-registers/{id}/close": {
+      "post": {
+        "operationId": "CashRegisters_Close",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CloseCashRegisterRequest"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CloseCashRegisterRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CloseCashRegisterRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CashRegisterOperationDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CashRegisterOperationDto"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/CashRegisterOperationDto"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "errors": {
+                      "additionalProperties": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "type": [
+                        "null",
+                        "object"
+                      ]
+                    },
+                    "instance": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "format": "int32",
+                      "pattern": "^-?(?:0|[1-9]\\d*)$",
+                      "type": [
+                        "integer",
+                        "string"
+                      ]
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "code",
+                    "traceId"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Solicitud inválida; los errores de validación se indican por campo."
+          },
+          "401": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "errors": {
+                      "additionalProperties": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "type": [
+                        "null",
+                        "object"
+                      ]
+                    },
+                    "instance": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "format": "int32",
+                      "pattern": "^-?(?:0|[1-9]\\d*)$",
+                      "type": [
+                        "integer",
+                        "string"
+                      ]
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "code",
+                    "traceId"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Se requiere una sesión válida."
+          },
+          "403": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "errors": {
+                      "additionalProperties": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "type": [
+                        "null",
+                        "object"
+                      ]
+                    },
+                    "instance": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "format": "int32",
+                      "pattern": "^-?(?:0|[1-9]\\d*)$",
+                      "type": [
+                        "integer",
+                        "string"
+                      ]
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "code",
+                    "traceId"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "El operador carece de permisos o debe cambiar la contraseña."
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "errors": {
+                      "additionalProperties": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "type": [
+                        "null",
+                        "object"
+                      ]
+                    },
+                    "instance": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "format": "int32",
+                      "pattern": "^-?(?:0|[1-9]\\d*)$",
+                      "type": [
+                        "integer",
+                        "string"
+                      ]
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "code",
+                    "traceId"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "errors": {
+                      "additionalProperties": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "type": [
+                        "null",
+                        "object"
+                      ]
+                    },
+                    "instance": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "format": "int32",
+                      "pattern": "^-?(?:0|[1-9]\\d*)$",
+                      "type": [
+                        "integer",
+                        "string"
+                      ]
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "code",
+                    "traceId"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Conflict"
           },
           "500": {
             "content": {
@@ -43784,9 +47133,9 @@
         ]
       }
     },
-    "/api/cash-registers/{id}/open": {
-      "post": {
-        "operationId": "CashRegisters_Open",
+    "/api/cash-registers/{id}/movements/paged": {
+      "get": {
+        "operationId": "CashRegisters_GetMovementsPage",
         "parameters": [
           {
             "in": "path",
@@ -43798,35 +47147,70 @@
             }
           },
           {
-            "in": "header",
-            "name": "Idempotency-Key",
+            "in": "query",
+            "name": "MovementType",
             "schema": {
+              "pattern": "^(Apertura|Cierre|Ingreso|Egreso|Arqueo)$",
               "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "Search",
+            "schema": {
+              "maxLength": 100,
+              "minLength": 0,
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "Page",
+            "schema": {
+              "format": "int32",
+              "maximum": 1000000,
+              "minimum": 1,
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "PageSize",
+            "schema": {
+              "format": "int32",
+              "maximum": 100,
+              "minimum": 1,
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ]
             }
           }
         ],
-        "requestBody": {
-          "content": {
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/OpenCashRegisterRequest"
-              }
-            },
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/OpenCashRegisterRequest"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/OpenCashRegisterRequest"
-              }
-            }
-          },
-          "required": true
-        },
         "responses": {
           "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResultOfCashMovementDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResultOfCashMovementDto"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResultOfCashMovementDto"
+                }
+              }
+            },
             "description": "OK"
           },
           "400": {
@@ -44005,6 +47389,493 @@
               }
             },
             "description": "El operador carece de permisos o debe cambiar la contraseña."
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "errors": {
+                      "additionalProperties": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "type": [
+                        "null",
+                        "object"
+                      ]
+                    },
+                    "instance": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "format": "int32",
+                      "pattern": "^-?(?:0|[1-9]\\d*)$",
+                      "type": [
+                        "integer",
+                        "string"
+                      ]
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "code",
+                    "traceId"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "500": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "errors": {
+                      "additionalProperties": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "type": [
+                        "null",
+                        "object"
+                      ]
+                    },
+                    "instance": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "format": "int32",
+                      "pattern": "^-?(?:0|[1-9]\\d*)$",
+                      "type": [
+                        "integer",
+                        "string"
+                      ]
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "code",
+                    "traceId"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error interno normalizado; incluye traceId para seguimiento."
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "CashRegisters: GetMovementsPage",
+        "tags": [
+          "CashRegisters"
+        ]
+      }
+    },
+    "/api/cash-registers/{id}/open": {
+      "post": {
+        "operationId": "CashRegisters_Open",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpenCashRegisterRequest"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpenCashRegisterRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpenCashRegisterRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CashRegisterOperationDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CashRegisterOperationDto"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/CashRegisterOperationDto"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "errors": {
+                      "additionalProperties": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "type": [
+                        "null",
+                        "object"
+                      ]
+                    },
+                    "instance": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "format": "int32",
+                      "pattern": "^-?(?:0|[1-9]\\d*)$",
+                      "type": [
+                        "integer",
+                        "string"
+                      ]
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "code",
+                    "traceId"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Solicitud inválida; los errores de validación se indican por campo."
+          },
+          "401": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "errors": {
+                      "additionalProperties": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "type": [
+                        "null",
+                        "object"
+                      ]
+                    },
+                    "instance": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "format": "int32",
+                      "pattern": "^-?(?:0|[1-9]\\d*)$",
+                      "type": [
+                        "integer",
+                        "string"
+                      ]
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "code",
+                    "traceId"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Se requiere una sesión válida."
+          },
+          "403": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "errors": {
+                      "additionalProperties": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "type": [
+                        "null",
+                        "object"
+                      ]
+                    },
+                    "instance": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "format": "int32",
+                      "pattern": "^-?(?:0|[1-9]\\d*)$",
+                      "type": [
+                        "integer",
+                        "string"
+                      ]
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "code",
+                    "traceId"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "El operador carece de permisos o debe cambiar la contraseña."
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "errors": {
+                      "additionalProperties": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "type": [
+                        "null",
+                        "object"
+                      ]
+                    },
+                    "instance": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "format": "int32",
+                      "pattern": "^-?(?:0|[1-9]\\d*)$",
+                      "type": [
+                        "integer",
+                        "string"
+                      ]
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "code",
+                    "traceId"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "errors": {
+                      "additionalProperties": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "type": [
+                        "null",
+                        "object"
+                      ]
+                    },
+                    "instance": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "format": "int32",
+                      "pattern": "^-?(?:0|[1-9]\\d*)$",
+                      "type": [
+                        "integer",
+                        "string"
+                      ]
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "traceId": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "code",
+                    "traceId"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Conflict"
           },
           "500": {
             "content": {

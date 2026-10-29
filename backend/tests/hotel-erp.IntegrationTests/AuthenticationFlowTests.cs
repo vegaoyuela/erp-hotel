@@ -210,6 +210,35 @@ public partial class AuthenticationFlowTests
         await AssertEndpointStatusAsync(client, cashier.AccessToken, "/api/backup/logs", HttpStatusCode.Forbidden);
         await AssertEndpointStatusAsync(client, accountant.AccessToken, "/api/backup/logs", HttpStatusCode.Forbidden);
         await AssertEndpointStatusAsync(client, administrator.AccessToken, "/api/backup/logs", HttpStatusCode.OK);
+        foreach (var path in new[] { "/api/card-settlements/paged", "/api/card-settlements/eligible-payments/paged",
+            "/api/card-settlements/eligible-payments/summary", "/api/accounts/journal-entries/paged", "/api/accounts/journal-entries/summary" })
+        {
+            await AssertEndpointStatusAsync(client, reception.AccessToken, path, HttpStatusCode.Forbidden);
+            await AssertEndpointStatusAsync(client, cashier.AccessToken, path, HttpStatusCode.Forbidden);
+            await AssertEndpointStatusAsync(client, accountant.AccessToken, path, HttpStatusCode.OK);
+            await AssertEndpointStatusAsync(client, administrator.AccessToken, path, HttpStatusCode.OK);
+        }
+        await AssertEndpointStatusAsync(client, reception.AccessToken, "/api/backup/logs/paged", HttpStatusCode.Forbidden);
+        await AssertEndpointStatusAsync(client, cashier.AccessToken, "/api/backup/logs/paged", HttpStatusCode.Forbidden);
+        await AssertEndpointStatusAsync(client, accountant.AccessToken, "/api/backup/logs/paged", HttpStatusCode.Forbidden);
+        await AssertEndpointStatusAsync(client, administrator.AccessToken, "/api/backup/logs/paged", HttpStatusCode.OK);
+        Guid cashQueryId;
+        using (var scope = factory.Services.CreateScope())
+        {
+            var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            var register = new CashRegister { Name = "Matriz consultas QA" };
+            context.CashRegisters.Add(register);
+            await context.SaveChangesAsync();
+            cashQueryId = register.Id;
+        }
+        foreach (var path in new[] { "/api/cash-registers/paged", $"/api/cash-registers/{cashQueryId}", $"/api/cash-registers/{cashQueryId}/movements/paged" })
+        {
+            await AssertEndpointStatusAsync(client, reception.AccessToken, path, HttpStatusCode.OK);
+            await AssertEndpointStatusAsync(client, cashier.AccessToken, path, HttpStatusCode.OK);
+            await AssertEndpointStatusAsync(client, accountant.AccessToken, path, HttpStatusCode.Forbidden);
+            await AssertEndpointStatusAsync(client, administrator.AccessToken, path, HttpStatusCode.OK);
+        }
+
 
         await AssertEndpointStatusAsync(client, reception.AccessToken, "/api/audit-logs?limit=1", HttpStatusCode.Forbidden);
         await AssertEndpointStatusAsync(client, cashier.AccessToken, "/api/audit-logs?limit=1", HttpStatusCode.Forbidden);
@@ -572,6 +601,7 @@ public partial class AuthenticationFlowTests
         await AssertExplicitPersistenceConsumersAsync(client, factory.Services, currentSession.AccessToken!);
         await AssertApiContractAndPaginationAsync(client, factory.Services, currentSession.AccessToken!);
         await AssertOperationsPaginationAsync(client, factory.Services, currentSession.AccessToken!);
+        await AssertFinancePaginationAsync(client, factory.Services, currentSession.AccessToken!);
 
         using var retirementRequest = Authorized(HttpMethod.Post, "/api/settings/business/retire", currentSession.AccessToken!);
         retirementRequest.Content = JsonContent.Create(new

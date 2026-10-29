@@ -2,6 +2,8 @@ using AutoMapper;
 using hotel_erp.Api.Authorization;
 using hotel_erp.Api.Database.Entities;
 using hotel_erp.Api.Dtos.Accounting;
+using hotel_erp.Api.Dtos.Common;
+using hotel_erp.Api.Services;
 using hotel_erp.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,10 +19,12 @@ namespace hotel_erp.Api.Controllers
         private readonly IMapper _mapper;
 
         private readonly IUnitOfWork _unitOfWork;
+        private readonly HotelListQueryService _lists;
 
-        public AccountsController(IAccountingRepository repo, IMapper mapper, IUnitOfWork unitOfWork)
+        public AccountsController(IAccountingRepository repo, IMapper mapper, IUnitOfWork unitOfWork, HotelListQueryService lists)
         {
             _unitOfWork = unitOfWork;
+            _lists = lists;
             _repo = repo;
             _mapper = mapper;
         }
@@ -133,7 +137,17 @@ namespace hotel_erp.Api.Controllers
             return Ok(_mapper.Map<List<AccountingEntryDto>>(entries));
         }
 
+        [HttpGet("journal-entries/paged")]
+        public async Task<ActionResult<PagedResult<AccountingEntryListDto>>> GetJournalPage([FromQuery] SearchPageQuery query)
+            => Ok(await _lists.JournalEntriesAsync(query, HttpContext.RequestAborted));
+
+        [HttpGet("journal-entries/summary")]
+        public async Task<ActionResult<JournalSummaryDto>> GetJournalSummary()
+            => Ok(await _lists.JournalSummaryAsync(HttpContext.RequestAborted));
+
         [HttpGet("journal-entries/{id}")]
+        [ProducesResponseType(typeof(AccountingEntryDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<AccountingEntryDto>> GetJournalEntry(Guid id)
         {
             var entry = await _repo.GetEntryByIdAsync(id);
@@ -142,6 +156,7 @@ namespace hotel_erp.Api.Controllers
         }
 
         [HttpPost("journal-entries")]
+        [ProducesResponseType(typeof(AccountingEntryDto), StatusCodes.Status201Created)]
         public async Task<ActionResult<AccountingEntryDto>> CreateJournalEntry([FromBody] CreateAccountingEntryRequest request)
         {
             if (request.Items == null || request.Items.Count < 2)

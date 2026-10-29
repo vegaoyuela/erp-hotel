@@ -1,0 +1,194 @@
+{
+  "generated_at": "2026-10-29T17:54:21.873883+00:00",
+  "implementation_date_honduras": "2026-10-29",
+  "baseline_revision": "98ea74b2144167d00e6de83de5dd52e1470bf50e",
+  "scope": "P02-H2B: paged finance/backup queries, global aggregates, cross-page card selection and typed financial results",
+  "status": "passed",
+  "contains_secret_values": false,
+  "p02_04_complete": false,
+  "p02_05_complete": false,
+  "validation": {
+    "backend_warnings": 0,
+    "backend_errors": 0,
+    "unit_tests_passed": 109,
+    "postgresql_integration_tests_passed": 5,
+    "fiscal_dossier_tests_passed": 5,
+    "frontend_lint": "passed",
+    "frontend_build": "passed",
+    "frontend_npm_vulnerabilities": 0,
+    "contract_tools_npm_vulnerabilities": 0,
+    "live_openapi_matches_snapshot": true,
+    "generated_types_match_snapshot": true,
+    "ef_model_changes": false,
+    "dotnet_format_applied_to_changed_cs": true,
+    "anonymous_access_to_new_collections": "401",
+    "role_matrix": "cash: reception/cashier/admin allowed; settlements/journal: accountant/admin allowed; backup: admin allowed"
+  },
+  "implementation": {
+    "new_paged_collections": [
+      "cash registers",
+      "cash movements",
+      "card settlements",
+      "eligible card payments",
+      "journal entries",
+      "backup logs"
+    ],
+    "cash_detail_independent_of_pickers_and_movement_pages": true,
+    "journal_list_excludes_full_items": true,
+    "global_journal_and_eligible_totals": true,
+    "eligible_amounts_exclude_void_refunds_and_settlements": true,
+    "card_selection_survives_page_and_search_changes": true,
+    "manual_refresh_clears_selection": true,
+    "backup_logs_exclude_local_path_and_drive_id": true,
+    "legacy_backup_limit_validated_1_to_100": true,
+    "generated_frontend_aliases_added": 12
+  },
+  "browser": {
+    "status": "passed",
+    "synthetic_database": true,
+    "contains_secret_values": false,
+    "flows": {
+      "cash_balance_independent_of_both_pages_and_selection": true,
+      "journal_totals_independent_of_page_filter_and_detail_loaded": true,
+      "backup_history_beyond_twenty_and_combined_filters": true,
+      "card_selection_and_global_pending_survive_pages_and_search": true,
+      "cross_page_settlement_persisted_with_two_payments": true,
+      "backup_list_error_and_refresh_recovery": true,
+      "paged_list_requests_only": true
+    },
+    "mobile_document_overflow": {
+      "caja": false,
+      "asientos": false,
+      "respaldos": false,
+      "liquidaciones": false
+    },
+    "settlement_proof": {
+      "grossAmount": 170,
+      "bankDepositAmount": 163,
+      "commissionAmount": 5,
+      "withholdingAmount": 2,
+      "applications": 2,
+      "http_status": 201
+    },
+    "javascript_errors": 0,
+    "screenshots": 8
+  },
+  "mechanical_design_findings": [],
+  "metrics": {
+    "syntheticDatabase": true,
+    "lists": [
+      {
+        "path": "/api/cash-registers/paged?search=H2B-QA",
+        "matchedRows": 31,
+        "legacyRows": 35,
+        "pageRows": 10,
+        "legacyBytes": 5844,
+        "pageBytes": 1666
+      },
+      {
+        "path": "/api/cash-registers/01a188c7-623a-7b97-a022-0719becc6ad3/movements/paged?search=H2B-QA",
+        "matchedRows": 31,
+        "legacyRows": 31,
+        "pageRows": 10,
+        "legacyBytes": 13334,
+        "pageBytes": 4365
+      },
+      {
+        "path": "/api/card-settlements/paged?search=H2B-QA",
+        "matchedRows": 31,
+        "legacyRows": 33,
+        "pageRows": 10,
+        "legacyBytes": 21749,
+        "pageBytes": 6635
+      },
+      {
+        "path": "/api/card-settlements/eligible-payments/paged?search=H2B-QA",
+        "matchedRows": 31,
+        "legacyRows": 31,
+        "pageRows": 10,
+        "legacyBytes": 7382,
+        "pageBytes": 2448
+      },
+      {
+        "path": "/api/accounts/journal-entries/paged?search=H2B-QA",
+        "matchedRows": 31,
+        "legacyRows": 52,
+        "pageRows": 10,
+        "legacyBytes": 38356,
+        "pageBytes": 1935
+      },
+      {
+        "path": "/api/backup/logs/paged?search=H2B-QA",
+        "matchedRows": 31,
+        "legacyRows": 32,
+        "pageRows": 10,
+        "legacyBytes": 7834,
+        "pageBytes": 2465
+      }
+    ],
+    "partialPaymentAvailable": 70,
+    "cashBalance": 130,
+    "journalDebit": 5540.25,
+    "journalCredit": 5540.25
+  },
+  "preserved_qa_database": {
+    "database": "hotel_erp_qa",
+    "table_count": 42,
+    "total_rows": 345,
+    "migration_count": 11,
+    "temporary_databases_remaining": 0
+  },
+  "temporary_ui_resources_removed": true,
+  "remaining": [
+    "H2C: check-in/out, authorization and auxiliary cash selectors",
+    "Remaining manual frontend types and explicit success-response schemas",
+    "P02-06/07 security and secret rotation, P02-09 formal case matrix, P02-10 independent review",
+    "P03: existing browser-only monetary breakdown in folio detail must include discounts and shared rounding",
+    "G0/G1 official evidence and hotel/accountant decisions",
+    "Windows 11 Docker Desktop, PowerShell QA, physical printing and fiscal acceptance"
+  ],
+  "windows_printing_reminder": {
+    "status": "previous daily reminder retained",
+    "time": "10:00",
+    "timezone": "America/Tegucigalpa",
+    "automation_id": "pendientes-windows-11-e-impresi-n-del-hotel"
+  },
+  "sha256": {
+    "backend/src/hotel-erp.Api/Controllers/AccountingController.cs": "a4a77e7caf0738ebff71ea98425bdb88a26ab5baa42b87efe9435607a5647ae2",
+    "backend/src/hotel-erp.Api/Controllers/BackupController.cs": "8b767645958911e3b4546bb5a639740d9d0958b5a1e3ac31f5c04e940a296347",
+    "backend/src/hotel-erp.Api/Controllers/CardSettlementsController.cs": "dda7385d613d9597b12adb79659144d0589696faea1e2e38c30f94382afb811e",
+    "backend/src/hotel-erp.Api/Controllers/CashRegistersController.cs": "45277bd5305a82ede3b050e285897cd3e4341588831dd7bf4799346274bb4d03",
+    "backend/src/hotel-erp.Api/Dtos/FinanceListDtos.cs": "2bd0a551611e616238a42b0ee32b8591ae4d7ffe2b210e66cb70df1d1f313490",
+    "backend/src/hotel-erp.Api/Services/HotelListQueryService.Finance.cs": "00f1778dea30ca412a0823fc7374796ad79d96bf91b340267b37cd1bc60f8b78",
+    "backend/tests/hotel-erp.IntegrationTests/AuthenticationFlowTests.FinancePagination.cs": "f52aa4d30376730d239ddee538df483a02efa5e44cabe7d4daa51cd6cdfcd6d9",
+    "backend/tests/hotel-erp.IntegrationTests/AuthenticationFlowTests.cs": "b043fc0110b16b9e0396b450ba5e96e941d883d81f84bea12462aa57a9ef3b50",
+    "docs/plan de implementación/2026-09-27/06-lista-maestra.md": "440c8b310bdebbc3be69f6437206f9d6275387be261061c5d2d8d4fe74694da8",
+    "docs/plan de implementación/2026-09-27/08-registro-pendientes.md": "b56b3fee291c2a7dc706963531602ff76daff30f6343ad4fbb1abe86e72e6442",
+    "docs/plan de implementación/2026-09-27/README.md": "cb0fd2ec241087971127f0a0e116164a812382a62db206f96b0a913694dd1902",
+    "docs/plan de implementación/2026-09-27/contratos/openapi-v1.json": "09ab41486ced1790c2e10b111f813f7d4c6f4f0d4939aee032573d60a4f9d890",
+    "docs/plan de implementación/2026-09-27/evidencia/README.md": "30874208048dedfa307ee14a5c4ee41c271046f43179fe0e2a2333312fbe33af",
+    "docs/plan de implementación/2026-09-27/evidencia/p02h2b-base-qa.json": "076874156e9035d3c469766115de3cf81f05ead59c1b537e1b681893cd9ce834",
+    "docs/plan de implementación/2026-09-27/evidencia/p02h2b-impeccable.json": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+    "docs/plan de implementación/2026-09-27/evidencia/p02h2b-inventario-contratos.json": "df6a73b3de84a302da9c234749f406033f47bfebdcf8e7869c9c03df97ec5ac7",
+    "docs/plan de implementación/2026-09-27/evidencia/p02h2b-modelo-ef.log": "815c5cd494b61a9d8737ba7653cd05fb05926e7b40a924683fa4eef4ca87566c",
+    "docs/plan de implementación/2026-09-27/evidencia/p02h2b-paginacion.json": "3ac605db603f09e7ae78d3ccf438f679b5cde62e9c7b3479e9c2fa0da3a8eb51",
+    "docs/plan de implementación/2026-09-27/evidencia/p02h2b-qa.log": "438936ab026869e492be9e0af08442d1c162a4fe054ab90f98d4fc974f277cc3",
+    "docs/plan de implementación/2026-09-27/evidencia/ui-p02h2b/asientos-escritorio.png": "71c3e7d43348aa26c692d47e71cb0c21053971889f034fe3ab6f5291d5ef1c73",
+    "docs/plan de implementación/2026-09-27/evidencia/ui-p02h2b/asientos-movil.png": "888976828860548f9e8cfd9e2f559a0617c079af070c8b8fd32e21ebc095cc3f",
+    "docs/plan de implementación/2026-09-27/evidencia/ui-p02h2b/caja-escritorio.png": "752a7ad646866a2a60e03f95f92fb0b96a45508545642b7d749558f17dea946b",
+    "docs/plan de implementación/2026-09-27/evidencia/ui-p02h2b/caja-movil.png": "9ce9bcd49a0700d9474263aca9db312bb063cf4dd7ca56f7c7ff01349fd9b625",
+    "docs/plan de implementación/2026-09-27/evidencia/ui-p02h2b/liquidaciones-escritorio.png": "95fc0ed612b5e6f89439a7746f5beb76330a15545106764858feb2c2cea4d3a9",
+    "docs/plan de implementación/2026-09-27/evidencia/ui-p02h2b/liquidaciones-movil.png": "dd85c87993b7efe7324917d20d37d82fdfd468cad4938b3dc5f16f07d3dce462",
+    "docs/plan de implementación/2026-09-27/evidencia/ui-p02h2b/respaldos-escritorio.png": "68a235cae236ab2869e065d9e259c45a480f904f903ccd847c8454d36c8b4bc6",
+    "docs/plan de implementación/2026-09-27/evidencia/ui-p02h2b/respaldos-movil.png": "1189a00db6792a3f9c9bbe1d571050cc142382a8a827c79d56853b4eb6db80af",
+    "docs/plan de implementación/2026-09-27/evidencia/ui-p02h2b/resultado.json": "b298a28db0b94ed13c4e20dec471de749b2781ec0e2bee600eba06cceb962122",
+    "docs/plan de implementación/2026-09-27/p02-base-tecnica/README.md": "87c6c29ebd7c8203a26249124f1e649e98292d8d91648afc083d2dc7a18f6ea0",
+    "docs/plan de implementación/2026-09-27/p02-base-tecnica/p02-h2b-finanzas-respaldos.md": "ecb6d96b3174879025388b9a54993697e684f0a81ce2509c3419fac07de717c6",
+    "frontend/src/pages/accounting/JournalEntriesPage.tsx": "85545fa654e1f49c89aad0e8df3d06abb21d8ee56ca482aacb559d9079200b31",
+    "frontend/src/pages/backups/BackupsPage.tsx": "0a6353aa111bd6ddea7dec0971c294e5126d5ab4fc58ff4ad7af200a8de70b94",
+    "frontend/src/pages/cash/CardSettlementsPage.tsx": "303160955707737ed943f198080ba4a08110a39ac60b57ffd5cc1bf0d7493a56",
+    "frontend/src/pages/cash/CashRegistersPage.tsx": "9a21c623d08c7a88c50a1a0641601efd9efde21738301b1427fd4d0253120bc5",
+    "frontend/src/types/api.generated.ts": "2d34a4ed2b2357e0bf99e87ffb515e183efba368fcfa497590a60cfe09363975",
+    "frontend/src/types/index.ts": "63605eb38207ceb3b8876d0136e77c009815e0a359cf1955da64c81b15a454f4"
+  }
+}

@@ -68,3 +68,10 @@ Se paginaron reservas, folios, clientes, productos y movimientos; los indicadore
 H2B debe cubrir caja, liquidaciones, asientos, respaldos, selectores y contratos restantes. Se registra para P03 el recálculo de totales de detalle de folio en frontend, que debe reemplazarse por desglose backend y probar descuentos/redondeos. El [detalle H2A](p02-base-tecnica/p02-h2a-operacion-inventario.md) contiene rutas, límites y evidencia.
 
 **Windows e impresión aplazados por el usuario:** retomar QA PowerShell, instalación Docker Desktop/Windows 11 e impresión física y aceptación de factura. Recordatorio diario activo a las 10:00 de Honduras hasta completar ambas; ID `pendientes-windows-11-e-impresi-n-del-hotel`. No se cierran con las pruebas Linux ni con transporte simulado.
+
+
+### Avance P02-H2B — finanzas y respaldos (29 de octubre de 2026)
+
+Completadas las seis colecciones financieras/de respaldo previstas: cajas, movimientos, liquidaciones, cobros elegibles, asientos y logs. Los saldos y totales globales son independientes de la página y el navegador conservó dos cobros entre páginas para registrar un lote sintético real. Se migraron doce tipos y se comprobaron las políticas de los cuatro roles. El [detalle H2B](p02-base-tecnica/p02-h2b-finanzas-respaldos.md) contiene contrato, pruebas y ocho capturas.
+
+H2C debe revisar selectores de check-in/out, autorizaciones/cajas auxiliares, 29 lecturas de arrays y 53 respuestas 200/201 sin esquema; cada caso requiere clasificación. Persisten los contratos manuales restantes, seguridad, matriz formal e independencia de G2, además del cálculo de folio ya registrado en P03. Windows e impresión mantienen su aplazamiento y recordatorio diario.

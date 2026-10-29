@@ -53,6 +53,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/Accounts/journal-entries/paged": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Accounts: GetJournalPage */
+        get: operations["Accounts_GetJournalPage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/Accounts/journal-entries/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Accounts: GetJournalSummary */
+        get: operations["Accounts_GetJournalSummary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/Accounts/journal-entries/{id}": {
         parameters: {
             query?: never;
@@ -234,6 +268,23 @@ export interface paths {
         };
         /** Backup: GetLogs */
         get: operations["Backup_GetLogs"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/Backup/logs/paged": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Backup: GetLogsPage */
+        get: operations["Backup_GetLogsPage"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1483,6 +1534,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/card-settlements/eligible-payments/paged": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** CardSettlements: GetEligiblePage */
+        get: operations["CardSettlements_GetEligiblePage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/card-settlements/eligible-payments/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** CardSettlements: GetEligibleSummary */
+        get: operations["CardSettlements_GetEligibleSummary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/card-settlements/paged": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** CardSettlements: GetPage */
+        get: operations["CardSettlements_GetPage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/card-settlements/{id}": {
         parameters: {
             query?: never;
@@ -1518,6 +1620,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/cash-registers/paged": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** CashRegisters: GetPage */
+        get: operations["CashRegisters_GetPage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/cash-registers/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** CashRegisters: GetById */
+        get: operations["CashRegisters_GetById"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/cash-registers/{id}/close": {
         parameters: {
             query?: never;
@@ -1544,6 +1680,23 @@ export interface paths {
         };
         /** CashRegisters: GetMovements */
         get: operations["CashRegisters_GetMovements"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/cash-registers/{id}/movements/paged": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** CashRegisters: GetMovementsPage */
+        get: operations["CashRegisters_GetMovementsPage"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2185,6 +2338,20 @@ export interface components {
             /** Format: date */
             transactionDate?: string;
         };
+        AccountingEntryListDto: {
+            description?: string;
+            entryType?: string;
+            /** Format: uuid */
+            id?: string;
+            /** Format: int32 */
+            itemCount?: number | string;
+            /** Format: double */
+            totalCredit?: number | string;
+            /** Format: double */
+            totalDebit?: number | string;
+            /** Format: date */
+            transactionDate?: string;
+        };
         AddFolioItemRequest: {
             description: string;
             /** Format: double */
@@ -2249,6 +2416,24 @@ export interface components {
             message?: null | string;
             success?: boolean;
             user?: null | components["schemas"]["UserDto"];
+        };
+        BackupLogDto: {
+            /** Format: date-time */
+            completedAt?: null | string;
+            errorMessage?: null | string;
+            fileName?: string;
+            /** Format: uuid */
+            id?: string;
+            sha256Hash?: null | string;
+            /** Format: int64 */
+            sizeBytes?: number | string;
+            /** Format: date-time */
+            startedAt?: string;
+            status?: string;
+            /** Format: int32 */
+            uploadAttempts?: number | string;
+            /** Format: date-time */
+            uploadedAt?: null | string;
         };
         BalanceSheetDto: {
             /** Format: date-time */
@@ -2417,6 +2602,19 @@ export interface components {
             /** Format: date-time */
             lastMovementDate?: null | string;
             name?: string;
+        };
+        CashRegisterOperationDto: {
+            /** Format: double */
+            countedAmount?: null | number | string;
+            /** Format: double */
+            currentBalance?: number | string;
+            /** Format: double */
+            difference?: null | number | string;
+            /** Format: double */
+            expectedAmount?: null | number | string;
+            message?: string;
+            /** Format: uuid */
+            movementId?: string;
         };
         CategoryDto: {
             description?: null | string;
@@ -2915,6 +3113,12 @@ export interface components {
             /** Format: double */
             settledAmount?: number | string;
         };
+        EligibleCardSummaryDto: {
+            /** Format: double */
+            availableAmount: number | string;
+            /** Format: int32 */
+            totalPayments: number | string;
+        };
         EntryItemDto: {
             /** Format: uuid */
             accountId?: string;
@@ -3195,6 +3399,12 @@ export interface components {
             /** Format: double */
             unitPrice?: number | string;
         };
+        JournalSummaryDto: {
+            /** Format: double */
+            credit: number | string;
+            /** Format: double */
+            debit: number | string;
+        };
         LoginRequest: {
             password: string;
             username: string;
@@ -3202,6 +3412,17 @@ export interface components {
         OpenCashRegisterRequest: {
             /** Format: double */
             initialAmount: number | string;
+        };
+        PagedResultOfAccountingEntryListDto: {
+            items: components["schemas"]["AccountingEntryListDto"][];
+            /** Format: int32 */
+            page: number | string;
+            /** Format: int32 */
+            pageSize: number | string;
+            /** Format: int32 */
+            totalItems: number | string;
+            /** Format: int32 */
+            totalPages: number | string;
         };
         PagedResultOfAuditLogDto: {
             items: components["schemas"]["AuditLogDto"][];
@@ -3214,8 +3435,63 @@ export interface components {
             /** Format: int32 */
             totalPages: number | string;
         };
+        PagedResultOfBackupLogDto: {
+            items: components["schemas"]["BackupLogDto"][];
+            /** Format: int32 */
+            page: number | string;
+            /** Format: int32 */
+            pageSize: number | string;
+            /** Format: int32 */
+            totalItems: number | string;
+            /** Format: int32 */
+            totalPages: number | string;
+        };
+        PagedResultOfCardSettlementDto: {
+            items: components["schemas"]["CardSettlementDto"][];
+            /** Format: int32 */
+            page: number | string;
+            /** Format: int32 */
+            pageSize: number | string;
+            /** Format: int32 */
+            totalItems: number | string;
+            /** Format: int32 */
+            totalPages: number | string;
+        };
+        PagedResultOfCashMovementDto: {
+            items: components["schemas"]["CashMovementDto"][];
+            /** Format: int32 */
+            page: number | string;
+            /** Format: int32 */
+            pageSize: number | string;
+            /** Format: int32 */
+            totalItems: number | string;
+            /** Format: int32 */
+            totalPages: number | string;
+        };
+        PagedResultOfCashRegisterDto: {
+            items: components["schemas"]["CashRegisterDto"][];
+            /** Format: int32 */
+            page: number | string;
+            /** Format: int32 */
+            pageSize: number | string;
+            /** Format: int32 */
+            totalItems: number | string;
+            /** Format: int32 */
+            totalPages: number | string;
+        };
         PagedResultOfCustomerDto: {
             items: components["schemas"]["CustomerDto"][];
+            /** Format: int32 */
+            page: number | string;
+            /** Format: int32 */
+            pageSize: number | string;
+            /** Format: int32 */
+            totalItems: number | string;
+            /** Format: int32 */
+            totalPages: number | string;
+        };
+        PagedResultOfEligibleCardPaymentDto: {
+            items: components["schemas"]["EligibleCardPaymentDto"][];
             /** Format: int32 */
             page: number | string;
             /** Format: int32 */
@@ -4206,8 +4482,8 @@ export interface operations {
             };
         };
         responses: {
-            /** @description OK */
-            200: {
+            /** @description Created */
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -4215,6 +4491,222 @@ export interface operations {
                     "application/json": components["schemas"]["AccountingEntryDto"];
                     "text/json": components["schemas"]["AccountingEntryDto"];
                     "text/plain": components["schemas"]["AccountingEntryDto"];
+                };
+            };
+            /** @description Solicitud inválida; los errores de validación se indican por campo. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Se requiere una sesión válida. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description El operador carece de permisos o debe cambiar la contraseña. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Error interno normalizado; incluye traceId para seguimiento. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+        };
+    };
+    Accounts_GetJournalPage: {
+        parameters: {
+            query?: {
+                Search?: string;
+                Page?: number | string;
+                PageSize?: number | string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PagedResultOfAccountingEntryListDto"];
+                    "text/json": components["schemas"]["PagedResultOfAccountingEntryListDto"];
+                    "text/plain": components["schemas"]["PagedResultOfAccountingEntryListDto"];
+                };
+            };
+            /** @description Solicitud inválida; los errores de validación se indican por campo. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Se requiere una sesión válida. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description El operador carece de permisos o debe cambiar la contraseña. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Error interno normalizado; incluye traceId para seguimiento. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+        };
+    };
+    Accounts_GetJournalSummary: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JournalSummaryDto"];
+                    "text/json": components["schemas"]["JournalSummaryDto"];
+                    "text/plain": components["schemas"]["JournalSummaryDto"];
                 };
             };
             /** @description Solicitud inválida; los errores de validación se indican por campo. */
@@ -4369,6 +4861,27 @@ export interface operations {
             };
             /** @description El operador carece de permisos o debe cambiar la contraseña. */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Not Found */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -5527,7 +6040,122 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["BackupLogDto"][];
+                    "text/json": components["schemas"]["BackupLogDto"][];
+                    "text/plain": components["schemas"]["BackupLogDto"][];
+                };
+            };
+            /** @description Solicitud inválida; los errores de validación se indican por campo. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Se requiere una sesión válida. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description El operador carece de permisos o debe cambiar la contraseña. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Error interno normalizado; incluye traceId para seguimiento. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+        };
+    };
+    Backup_GetLogsPage: {
+        parameters: {
+            query?: {
+                Status?: string;
+                Search?: string;
+                Page?: number | string;
+                PageSize?: number | string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PagedResultOfBackupLogDto"];
+                    "text/json": components["schemas"]["PagedResultOfBackupLogDto"];
+                    "text/plain": components["schemas"]["PagedResultOfBackupLogDto"];
+                };
             };
             /** @description Solicitud inválida; los errores de validación se indican por campo. */
             400: {
@@ -17168,8 +17796,8 @@ export interface operations {
             };
         };
         responses: {
-            /** @description OK */
-            200: {
+            /** @description Created */
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -17177,6 +17805,154 @@ export interface operations {
                     "application/json": components["schemas"]["CardSettlementDto"];
                     "text/json": components["schemas"]["CardSettlementDto"];
                     "text/plain": components["schemas"]["CardSettlementDto"];
+                };
+            };
+            /** @description Solicitud inválida; los errores de validación se indican por campo. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Se requiere una sesión válida. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description El operador carece de permisos o debe cambiar la contraseña. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Error interno normalizado; incluye traceId para seguimiento. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+        };
+    };
+    CardSettlements_GetEligiblePayments: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EligibleCardPaymentDto"][];
+                    "text/json": components["schemas"]["EligibleCardPaymentDto"][];
+                    "text/plain": components["schemas"]["EligibleCardPaymentDto"][];
                 };
             };
             /** @description Solicitud inválida; los errores de validación se indican por campo. */
@@ -17265,7 +18041,117 @@ export interface operations {
             };
         };
     };
-    CardSettlements_GetEligiblePayments: {
+    CardSettlements_GetEligiblePage: {
+        parameters: {
+            query?: {
+                Search?: string;
+                Page?: number | string;
+                PageSize?: number | string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PagedResultOfEligibleCardPaymentDto"];
+                    "text/json": components["schemas"]["PagedResultOfEligibleCardPaymentDto"];
+                    "text/plain": components["schemas"]["PagedResultOfEligibleCardPaymentDto"];
+                };
+            };
+            /** @description Solicitud inválida; los errores de validación se indican por campo. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Se requiere una sesión válida. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description El operador carece de permisos o debe cambiar la contraseña. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Error interno normalizado; incluye traceId para seguimiento. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+        };
+    };
+    CardSettlements_GetEligibleSummary: {
         parameters: {
             query?: never;
             header?: never;
@@ -17280,9 +18166,119 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["EligibleCardPaymentDto"][];
-                    "text/json": components["schemas"]["EligibleCardPaymentDto"][];
-                    "text/plain": components["schemas"]["EligibleCardPaymentDto"][];
+                    "application/json": components["schemas"]["EligibleCardSummaryDto"];
+                    "text/json": components["schemas"]["EligibleCardSummaryDto"];
+                    "text/plain": components["schemas"]["EligibleCardSummaryDto"];
+                };
+            };
+            /** @description Solicitud inválida; los errores de validación se indican por campo. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Se requiere una sesión válida. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description El operador carece de permisos o debe cambiar la contraseña. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Error interno normalizado; incluye traceId para seguimiento. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+        };
+    };
+    CardSettlements_GetPage: {
+        parameters: {
+            query?: {
+                Search?: string;
+                Page?: number | string;
+                PageSize?: number | string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PagedResultOfCardSettlementDto"];
+                    "text/json": components["schemas"]["PagedResultOfCardSettlementDto"];
+                    "text/plain": components["schemas"]["PagedResultOfCardSettlementDto"];
                 };
             };
             /** @description Solicitud inválida; los errores de validación se indican por campo. */
@@ -17456,6 +18452,27 @@ export interface operations {
                     };
                 };
             };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
             /** @description Error interno normalizado; incluye traceId para seguimiento. */
             500: {
                 headers: {
@@ -17600,8 +18617,8 @@ export interface operations {
             };
         };
         responses: {
-            /** @description OK */
-            200: {
+            /** @description Created */
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -17697,31 +18714,29 @@ export interface operations {
             };
         };
     };
-    CashRegisters_Close: {
+    CashRegisters_GetPage: {
         parameters: {
-            query?: never;
-            header?: {
-                "Idempotency-Key"?: string;
+            query?: {
+                Search?: string;
+                Page?: number | string;
+                PageSize?: number | string;
             };
-            path: {
-                id: string;
-            };
+            header?: never;
+            path?: never;
             cookie?: never;
         };
-        requestBody: {
-            content: {
-                "application/*+json": components["schemas"]["CloseCashRegisterRequest"];
-                "application/json": components["schemas"]["CloseCashRegisterRequest"];
-                "text/json": components["schemas"]["CloseCashRegisterRequest"];
-            };
-        };
+        requestBody?: never;
         responses: {
             /** @description OK */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["PagedResultOfCashRegisterDto"];
+                    "text/json": components["schemas"]["PagedResultOfCashRegisterDto"];
+                    "text/plain": components["schemas"]["PagedResultOfCashRegisterDto"];
+                };
             };
             /** @description Solicitud inválida; los errores de validación se indican por campo. */
             400: {
@@ -17767,6 +18782,293 @@ export interface operations {
             };
             /** @description El operador carece de permisos o debe cambiar la contraseña. */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Error interno normalizado; incluye traceId para seguimiento. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+        };
+    };
+    CashRegisters_GetById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CashRegisterDto"];
+                    "text/json": components["schemas"]["CashRegisterDto"];
+                    "text/plain": components["schemas"]["CashRegisterDto"];
+                };
+            };
+            /** @description Solicitud inválida; los errores de validación se indican por campo. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Se requiere una sesión válida. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description El operador carece de permisos o debe cambiar la contraseña. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Error interno normalizado; incluye traceId para seguimiento. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+        };
+    };
+    CashRegisters_Close: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Idempotency-Key"?: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/*+json": components["schemas"]["CloseCashRegisterRequest"];
+                "application/json": components["schemas"]["CloseCashRegisterRequest"];
+                "text/json": components["schemas"]["CloseCashRegisterRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CashRegisterOperationDto"];
+                    "text/json": components["schemas"]["CashRegisterOperationDto"];
+                    "text/plain": components["schemas"]["CashRegisterOperationDto"];
+                };
+            };
+            /** @description Solicitud inválida; los errores de validación se indican por campo. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Se requiere una sesión válida. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description El operador carece de permisos o debe cambiar la contraseña. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Conflict */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -17917,31 +19219,32 @@ export interface operations {
             };
         };
     };
-    CashRegisters_Open: {
+    CashRegisters_GetMovementsPage: {
         parameters: {
-            query?: never;
-            header?: {
-                "Idempotency-Key"?: string;
+            query?: {
+                MovementType?: string;
+                Search?: string;
+                Page?: number | string;
+                PageSize?: number | string;
             };
+            header?: never;
             path: {
                 id: string;
             };
             cookie?: never;
         };
-        requestBody: {
-            content: {
-                "application/*+json": components["schemas"]["OpenCashRegisterRequest"];
-                "application/json": components["schemas"]["OpenCashRegisterRequest"];
-                "text/json": components["schemas"]["OpenCashRegisterRequest"];
-            };
-        };
+        requestBody?: never;
         responses: {
             /** @description OK */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["PagedResultOfCashMovementDto"];
+                    "text/json": components["schemas"]["PagedResultOfCashMovementDto"];
+                    "text/plain": components["schemas"]["PagedResultOfCashMovementDto"];
+                };
             };
             /** @description Solicitud inválida; los errores de validación se indican por campo. */
             400: {
@@ -17987,6 +19290,185 @@ export interface operations {
             };
             /** @description El operador carece de permisos o debe cambiar la contraseña. */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Error interno normalizado; incluye traceId para seguimiento. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+        };
+    };
+    CashRegisters_Open: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Idempotency-Key"?: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/*+json": components["schemas"]["OpenCashRegisterRequest"];
+                "application/json": components["schemas"]["OpenCashRegisterRequest"];
+                "text/json": components["schemas"]["OpenCashRegisterRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CashRegisterOperationDto"];
+                    "text/json": components["schemas"]["CashRegisterOperationDto"];
+                    "text/plain": components["schemas"]["CashRegisterOperationDto"];
+                };
+            };
+            /** @description Solicitud inválida; los errores de validación se indican por campo. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Se requiere una sesión válida. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description El operador carece de permisos o debe cambiar la contraseña. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Conflict */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };
