@@ -12,7 +12,7 @@ namespace hotel_erp.Api.Controllers
 {
     [ApiController]
     [Route("api/document-authorizations")]
-    [Authorize]
+    [Authorize(Policy = HotelAccessPolicies.ReadFiscalOptions)]
     public class DocumentAuthorizationsController : ControllerBase
     {
         private readonly IDocumentAuthorizationRepository _repo;

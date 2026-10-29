@@ -11,7 +11,7 @@ namespace hotel_erp.Api.Controllers
 {
     [ApiController]
     [Route("api/tax-configurations")]
-    [Authorize]
+    [Authorize(Policy = HotelAccessPolicies.ReadTaxRates)]
     public class TaxConfigurationsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;

@@ -39,12 +39,12 @@ Pendientes externos: [registro único de bloqueos](08-registro-pendientes.md). E
 - [x] P02-01 Extraer casos de uso críticos de controladores. Finanzas, documentos fiscales, reservas, check-in/out, folios, caja, compras, inventario y respaldo delegan su mutación a servicios.
 - [x] P02-02 Unificar unidad de trabajo y retirar guardados parciales. **Completada el 28 de octubre:** 56 guardados implícitos retirados, consumidores migrados a `IUnitOfWork`, rollback y persistencia explícita verificados sobre PostgreSQL.
 - [x] P02-03 Inyectar reloj, cálculo, correlativo, auditoría, impresión y respaldo. **Completada en código el 28 de octubre:** contratos registrados y consumidores migrados; sustitución de cálculo/auditoría con rollback y transporte de impresión simulado verificados. La prueba física permanece en Windows.
-- [ ] P02-04 Completar OpenAPI, `ProblemDetails`, paginación, fechas y enums. **Parcial (P02-H2C, 29 de octubre):** catorce colecciones y selectores principales paginados; cero éxitos 200/201 sin esquema, ocho descargas binarias y 19 arrays restantes clasificados. Quedan paginación de usuarios/roles y validar límites de catálogos/reportes con volumen oficial.
+- [ ] P02-04 Completar OpenAPI, `ProblemDetails`, paginación, fechas y enums. **Parcial (P02-I, 29 de octubre):** contrato y selectores cubiertos; usuarios/opciones de roles paginados. Quedan límites/volumen de catálogos/reportes y clientes de rutas completas heredadas; 17 lecturas de arrays en páginas clasificadas.
 - [x] P02-05 Generar/validar tipos frontend desde el contrato. **Completada en código y QA (P02-H2C):** tipos compartidos derivados de OpenAPI, snapshot/tipos comparados con la API real; revisión independiente en P02-10.
-- [ ] P02-06 Completar permisos y motivos/aprobaciones sensibles.
+- [ ] P02-06 Completar permisos y motivos/aprobaciones sensibles. **Parcial (P02-I):** lecturas/UI por permisos, `adjust_invoices`, dashboard filtrado y protección de cuentas/roles superiores probados. Quedan aprobaciones segregadas y administración de seguridad bajo concurrencia/atomicidad/auditoría de cambios exitosos.
 - [ ] P02-07 Rotar secretos y separar migrador/aplicación/respaldo/bootstrap.
 - [x] P02-08 Crear verificador/exportador de cadena de auditoría.
-- [ ] P02-09 Ejecutar API01–API05, DAT01–DAT03 y SEC01–SEC11. **Parcial:** regresión base aprobada; falta matriz formal completa.
+- [ ] P02-09 Ejecutar API01–API05, DAT01–DAT03 y SEC01–SEC11. **Parcial (P02-I):** matriz formal con pruebas ejecutadas y brechas registrada; completar cada escenario/entorno antes de aceptación.
 - [ ] P02-10 Registrar revisión técnica independiente.
 - [ ] **G2** Aprobar base técnica y seguridad.
 

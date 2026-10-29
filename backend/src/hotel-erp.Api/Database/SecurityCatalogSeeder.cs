@@ -20,6 +20,7 @@ public static class SecurityCatalogSeeder
 
     private static readonly string[] AccountantPermissionNames =
     [
+        PermissionNames.AdjustInvoices,
         PermissionNames.ManageTaxes,
         PermissionNames.ManageAccounting,
         PermissionNames.ViewReports,
@@ -39,6 +40,7 @@ public static class SecurityCatalogSeeder
             [PermissionNames.ExportData] = "Exportar datos operativos y personales",
             [PermissionNames.ManageAccounting] = "Gestionar contabilidad",
             [PermissionNames.ViewReports] = "Consultar reportes",
+            [PermissionNames.AdjustInvoices] = "Emitir notas de crédito y débito",
             [PermissionNames.CreateInvoices] = "Crear documentos fiscales",
             [PermissionNames.ManageReservations] = "Gestionar reservaciones",
             [PermissionNames.ManageCash] = "Gestionar caja",

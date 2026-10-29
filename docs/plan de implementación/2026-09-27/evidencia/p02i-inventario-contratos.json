@@ -1,0 +1,131 @@
+{
+  "date_honduras": "2026-10-29",
+  "baseline_commit": "703ce23",
+  "contains_secret_values": false,
+  "new_permission": "adjust_invoices",
+  "default_system_roles_for_adjustments": [
+    "administrator",
+    "accountant"
+  ],
+  "new_paged_routes": [
+    "/api/Users/paged",
+    "/api/Users/role-options/paged"
+  ],
+  "successful_200_201_without_schema": [],
+  "binary_responses": 8,
+  "openapi_operations": 185,
+  "shared_manual_interfaces_remaining": [],
+  "remaining_frontend_array_reads": [
+    {
+      "file": "frontend/src/pages/accounting/ChartOfAccountsPage.tsx",
+      "line": 134,
+      "expression": "const { data } = await api.get<AccountingAccount[]>('/accounts')",
+      "classification": "accounting_catalog_or_report"
+    },
+    {
+      "file": "frontend/src/pages/accounting/JournalEntriesPage.tsx",
+      "line": 127,
+      "expression": "(await api.get<AccountingAccount[]>('/accounts/flat', { signal })).data })",
+      "classification": "accounting_catalog_or_report"
+    },
+    {
+      "file": "frontend/src/pages/accounting/TrialBalancePage.tsx",
+      "line": 18,
+      "expression": "const { data } = await api.get<TrialBalanceItem[]>('/accounts/trial-balance')",
+      "classification": "accounting_catalog_or_report"
+    },
+    {
+      "file": "frontend/src/pages/admin/AuditLogsPage.tsx",
+      "line": 43,
+      "expression": "(await api.get<string[]>('/audit-logs/actions', { signal })).data })",
+      "classification": "physical_or_reference_catalog"
+    },
+    {
+      "file": "frontend/src/pages/discounts/DiscountsPage.tsx",
+      "line": 32,
+      "expression": "const { data } = await api.get<Discount[]>('/discounts')",
+      "classification": "physical_or_reference_catalog"
+    },
+    {
+      "file": "frontend/src/pages/inventory/InventoryPage.tsx",
+      "line": 65,
+      "expression": "(await api.get<Category[]>('/inventory/categories', { signal })).data })",
+      "classification": "physical_or_reference_catalog"
+    },
+    {
+      "file": "frontend/src/pages/invoices/InvoicesPage.tsx",
+      "line": 179,
+      "expression": "const { data } = await api.get<Payment[]>('/payments', { params: { invoiceId } })",
+      "classification": "invoice_scoped_financial_auxiliary"
+    },
+    {
+      "file": "frontend/src/pages/invoices/InvoicesPage.tsx",
+      "line": 286,
+      "expression": "const invoiceResponse = await api.get<Invoice[]>('/invoices/search', { params: { originalInvoiceId: selectedInvoice.id } })",
+      "classification": "invoice_scoped_financial_auxiliary"
+    },
+    {
+      "file": "frontend/src/pages/reservations/CheckInPage.tsx",
+      "line": 112,
+      "expression": "api.get<Room[]>('/rooms/available', { params: { checkIn: checkIn.checkInDate, checkOut: checkIn.checkOutDate } }).then(({ data }) => setAvailableRooms(data))",
+      "classification": "physical_or_reference_catalog"
+    },
+    {
+      "file": "frontend/src/pages/reservations/CheckInPage.tsx",
+      "line": 117,
+      "expression": "api.get<Discount[]>('/discounts').then(({ data }) => {",
+      "classification": "physical_or_reference_catalog"
+    },
+    {
+      "file": "frontend/src/pages/reservations/CheckOutPage.tsx",
+      "line": 104,
+      "expression": "void api.get<Discount[]>('/discounts', { signal: controller.signal }).then(({ data }) => {",
+      "classification": "physical_or_reference_catalog"
+    },
+    {
+      "file": "frontend/src/pages/rooms/FloorMapPage.tsx",
+      "line": 30,
+      "expression": "const r = await api.get<Room[]>('/rooms')",
+      "classification": "physical_or_reference_catalog"
+    },
+    {
+      "file": "frontend/src/pages/rooms/RoomTypesPage.tsx",
+      "line": 32,
+      "expression": "const { data } = await api.get<RoomType[]>('/room-types')",
+      "classification": "physical_or_reference_catalog"
+    },
+    {
+      "file": "frontend/src/pages/rooms/RoomsPage.tsx",
+      "line": 34,
+      "expression": "api.get<Room[]>('/rooms'),",
+      "classification": "physical_or_reference_catalog"
+    },
+    {
+      "file": "frontend/src/pages/rooms/RoomsPage.tsx",
+      "line": 35,
+      "expression": "api.get<RoomType[]>('/room-types'),",
+      "classification": "physical_or_reference_catalog"
+    },
+    {
+      "file": "frontend/src/pages/settings/SettingsPage.tsx",
+      "line": 144,
+      "expression": "void api.get<string[]>('/print/printers')",
+      "classification": "physical_or_reference_catalog"
+    },
+    {
+      "file": "frontend/src/pages/settings/SettingsPage.tsx",
+      "line": 502,
+      "expression": "<Button size=\"sm\" variant=\"outline\" onClick={() => api.get<string[]>('/print/printers').then(({ data }) => setPrinters(data)).catch(() => {})}>Recargar</Button>",
+      "classification": "physical_or_reference_catalog"
+    }
+  ],
+  "read_checks": 72,
+  "rejected_privileged_account_changes": 6,
+  "known_limits": [
+    "Security administration concurrency, last administrator, atomic successful changes and audit",
+    "Segregated approvals and hotel-approved thresholds",
+    "Catalog/report capacity and legacy complete route consumers",
+    "Formal API/DAT/SEC scenario gaps",
+    "Windows QA and physical printing; existing reminder retained"
+  ]
+}

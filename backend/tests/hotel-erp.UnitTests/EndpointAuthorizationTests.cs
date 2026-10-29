@@ -10,6 +10,32 @@ namespace hotel_erp.UnitTests;
 
 public class EndpointAuthorizationTests
 {
+    [Fact]
+    public void EverySensitiveRead_RequiresNamedPolicy()
+    {
+        var sessionOnly = new[] { "AuthController.GetCurrentUser", "DashboardController.GetSummary" };
+        var missing = typeof(AuthController).Assembly.GetTypes()
+            .Where(type => !type.IsAbstract && typeof(ControllerBase).IsAssignableFrom(type))
+            .SelectMany(type => type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly)
+                .Where(method => method.GetCustomAttributes<HttpMethodAttribute>().Any(attribute => attribute.HttpMethods.Contains("GET")))
+                .Select(method => new { Type = type, Method = method }))
+            .Where(action => !action.Method.IsDefined(typeof(AllowAnonymousAttribute)))
+            .Where(action => !sessionOnly.Contains($"{action.Type.Name}.{action.Method.Name}"))
+            .Where(action => !action.Type.GetCustomAttributes<AuthorizeAttribute>()
+                .Concat(action.Method.GetCustomAttributes<AuthorizeAttribute>()).Any(attribute => !string.IsNullOrWhiteSpace(attribute.Policy)))
+            .Select(action => $"{action.Type.Name}.{action.Method.Name}").ToArray();
+        Assert.Empty(missing);
+    }
+
+    [Theory]
+    [InlineData("CreateCreditNote")]
+    [InlineData("CreateDebitNote")]
+    public void FiscalAdjustment_RequiresDedicatedPermission(string action)
+    {
+        Assert.Contains(typeof(InvoicesController).GetMethod(action)!.GetCustomAttributes<AuthorizeAttribute>(),
+            attribute => attribute.Policy == PermissionNames.AdjustInvoices);
+    }
+
     [Theory]
     [InlineData(typeof(RolesController), PermissionNames.ManageRoles)]
     [InlineData(typeof(UsersController), PermissionNames.ManageUsers)]
@@ -133,8 +159,7 @@ public class EndpointAuthorizationTests
         var sessionScopedActions = new HashSet<string>(StringComparer.Ordinal)
         {
             $"{nameof(AuthController)}.{nameof(AuthController.Logout)}",
-            $"{nameof(AuthController)}.{nameof(AuthController.ChangePassword)}",
-            $"{nameof(PrintController)}.{nameof(PrintController.PrintInvoice)}"
+            $"{nameof(AuthController)}.{nameof(AuthController.ChangePassword)}"
         };
 
         var actionsWithoutPermission = typeof(AuthController).Assembly

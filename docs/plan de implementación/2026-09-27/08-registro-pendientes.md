@@ -83,3 +83,11 @@ Se completaron los selectores principales de check-in/out, autorizaciones y caja
 P02-04 permanece parcial: las 19 lecturas de arrays restantes están [clasificadas](evidencia/p02h2c-inventario-contratos.json); usuarios/roles requieren paginación administrativa y los catálogos/reportes requieren validar volumen/límites. Los auxiliares de una factura deben conservar su completitud hasta disponer de agregados equivalentes. El siguiente bloque cubre P02-06 (permisos, motivos y aprobaciones), esas tareas residuales y la matriz API/DAT/SEC de P02-09. P02-07/P02-10 siguen pendientes en su alcance documentado.
 
 No cambia el defecto P03 de desglose de folio, G0/G1, decisiones reales del gerente/contador ni aprobación productiva/fiscal. Windows 11, Docker Desktop, QA PowerShell e impresión física siguen aplazados con el recordatorio diario existente a las 10:00 de Honduras.
+
+### Avance P02-I — permisos y administración (29 de octubre de 2026)
+
+Comprobadas lecturas sensibles y navegación por permisos; el dashboard minimiza información por sección. `adjust_invoices` separa notas de la emisión ordinaria y se asigna a Admin/Contador. La gestión delegada rechaza seis formas de alterar cuentas/roles superiores o conceder Recepción por la ruta heredada. Usuarios y opciones de roles ya se paginan, sin exigir `manage_roles` para el selector del gestor de usuarios. El [detalle](p02-base-tecnica/p02-i-accesos-seguridad.md) incluye QA, doce capturas y anexo de uso.
+
+Se registró la [matriz formal API/DAT/SEC](p02-base-tecnica/p02-i-matriz-api-dat-sec.md), con brechas por caso; P02-09 no queda cerrada. El siguiente bloque debe proteger cambios de seguridad bajo concurrencia (incluido último administrador), unificar atomicidad/auditoría de sus mutaciones exitosas y avanzar las aprobaciones sensibles; los umbrales por monto/medio/origen requieren decisiones del hotel. P02-04 conserva catálogos/reportes, límites de volumen y clientes heredados. P02-07/P02-10, P03-folio y G0/G1 siguen abiertos.
+
+Windows 11, Docker Desktop, QA PowerShell e impresión física permanecen aplazados con el recordatorio diario existente a las 10:00 de Honduras.

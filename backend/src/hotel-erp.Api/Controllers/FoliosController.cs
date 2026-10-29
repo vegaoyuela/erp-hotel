@@ -11,7 +11,7 @@ namespace hotel_erp.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize]
+[Authorize(Policy = HotelAccessPolicies.ReadFolios)]
 public class FoliosController(
     IFolioRepository repository,
     FolioApplicationService folioService,

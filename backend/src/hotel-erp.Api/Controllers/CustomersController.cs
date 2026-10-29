@@ -12,7 +12,7 @@ namespace hotel_erp.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
+    [Authorize(Policy = HotelAccessPolicies.ReadGuests)]
     public class CustomersController : ControllerBase
     {
         private readonly ICustomerRepository _repo;

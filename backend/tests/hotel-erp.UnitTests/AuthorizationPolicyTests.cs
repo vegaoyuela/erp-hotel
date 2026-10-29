@@ -64,3 +64,21 @@ public class AuthorizationPolicyTests
         return new ClaimsPrincipal(new ClaimsIdentity(claims, "test"));
     }
 }
+
+public class ReadAccessPolicyTests
+{
+    public static IEnumerable<object[]> Cases => HotelAccessPolicies.AnyOf.SelectMany(pair =>
+        pair.Value.Select(permission => new object[] { pair.Key, permission }));
+
+    [Theory]
+    [MemberData(nameof(Cases))]
+    public async Task ReadPolicy_AllowsEachExplicitPermission_AndRejectsMissingOrBootstrap(string policy, string permission)
+    {
+        var services = new ServiceCollection().AddLogging().AddHotelAuthorization().BuildServiceProvider();
+        var authorization = services.GetRequiredService<IAuthorizationService>();
+        ClaimsPrincipal Principal(params Claim[] claims) => new(new ClaimsIdentity(claims, "test"));
+        Assert.True((await authorization.AuthorizeAsync(Principal(new Claim(SecurityClaimTypes.Permission, permission)), null, policy)).Succeeded);
+        Assert.False((await authorization.AuthorizeAsync(Principal(new Claim(ClaimTypes.Role, "Admin")), null, policy)).Succeeded);
+        Assert.False((await authorization.AuthorizeAsync(Principal(new Claim(SecurityClaimTypes.Permission, permission), new Claim(SecurityClaimTypes.MustChangePassword, "True")), null, policy)).Succeeded);
+    }
+}

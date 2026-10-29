@@ -115,3 +115,5 @@ export type CheckInResult = Wire<components['schemas']['CheckInResult']>
 
 export type PrintPreview = Wire<components['schemas']['PrintPreviewDto']>
 export type AuditIntegrity = Wire<components['schemas']['AuditIntegrityResult']>
+
+export type RoleOption = Wire<components['schemas']['RoleOptionDto']>

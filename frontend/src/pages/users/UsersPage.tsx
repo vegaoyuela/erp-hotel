@@ -1,7 +1,11 @@
-import { useState, useEffect, useCallback } from 'react'
+import { PagedSelect } from '@/components/ui/PagedSelect'
+import { PagedRolePicker } from '@/components/ui/PagedRolePicker'
+import { Pagination } from '@/components/ui/Pagination'
+import { useDebouncedValue, usePagedList } from '@/hooks/usePagedList'
+import { useState } from 'react'
 import api from '@/lib/axios'
 import { getApiErrorMessage } from '@/lib/errors'
-import type { User, Role, CreateUserRequest, UpdateUserRequest } from '@/types'
+import type { User, RoleOption, CreateUserRequest, UpdateUserRequest } from '@/types'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
@@ -18,7 +22,6 @@ import {
   EyeOff,
   RefreshCw,
   Loader2,
-  CheckCircle2,
 } from 'lucide-react'
 
 const roleBadgeColors: Record<string, string> = {
@@ -32,9 +35,8 @@ const isStrongPassword = (value: string) =>
   value.length >= 12 && /[A-Z]/.test(value) && /[a-z]/.test(value) && /\d/.test(value)
 
 export default function UsersPage() {
-  const [users, setUsers] = useState<User[]>([])
-  const [roles, setRoles] = useState<Role[]>([])
-  const [loading, setLoading] = useState(true)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pageSize, setPageSize] = useState(15)
   const [searchTerm, setSearchTerm] = useState('')
   const [roleFilter, setRoleFilter] = useState('')
 
@@ -46,7 +48,7 @@ export default function UsersPage() {
     email: '',
     firstName: '',
     lastName: '',
-    roles: ['Recepcion'],
+    roles: [],
   })
   const [showPassword, setShowPassword] = useState(false)
 
@@ -67,32 +69,19 @@ export default function UsersPage() {
   const [alertInfo, setAlertInfo] = useState<{ variant: 'error' | 'success' | 'info'; message: string } | null>(null)
   const [actionLoading, setActionLoading] = useState(false)
 
-  const loadData = useCallback(async () => {
-    setLoading(true)
-    try {
-      const [usersRes, rolesRes] = await Promise.all([
-        api.get<User[]>('/users'),
-        api.get<Role[]>('/roles'),
-      ])
-      setUsers(usersRes.data)
-      setRoles(rolesRes.data)
-    } catch {
-      setAlertInfo({ variant: 'error', message: 'Error al consultar la lista de usuarios y roles.' })
-    } finally {
-      setLoading(false)
-    }
-  }, [])
-
-  useEffect(() => {
-    const timer = window.setTimeout(() => void loadData(), 0)
-    return () => window.clearTimeout(timer)
-  }, [loadData])
+  const debouncedSearch = useDebouncedValue(searchTerm)
+  const { items: users, loading, error: listError, load: loadData, page, totalPages, totalItems } = usePagedList<User>(
+    '/users/paged', { page: currentPage, pageSize, search: debouncedSearch || undefined, roleId: roleFilter || undefined })
 
   // Handle Create User
   const handleCreateSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!createForm.username || !createForm.password || !createForm.email || !createForm.firstName || !createForm.lastName) {
       setAlertInfo({ variant: 'error', message: 'Todos los campos obligatorios deben ser completados.' })
+      return
+    }
+    if (!createForm.roles?.length) {
+      setAlertInfo({ variant: 'error', message: 'Seleccione al menos un rol autorizado para el nuevo usuario.' })
       return
     }
     if (!isStrongPassword(createForm.password)) {
@@ -111,7 +100,7 @@ export default function UsersPage() {
         email: '',
         firstName: '',
         lastName: '',
-        roles: ['Recepcion'],
+        roles: [],
       })
       loadData()
     } catch (error: unknown) {
@@ -185,31 +174,6 @@ export default function UsersPage() {
     }
   }
 
-  const toggleRoleSelection = (roleName: string, isCreate: boolean) => {
-    if (isCreate) {
-      const current = createForm.roles || []
-      const updated = current.includes(roleName)
-        ? current.filter((r) => r !== roleName)
-        : [...current, roleName]
-      setCreateForm({ ...createForm, roles: updated })
-    } else {
-      const current = editForm.roles || []
-      const updated = current.includes(roleName)
-        ? current.filter((r) => r !== roleName)
-        : [...current, roleName]
-      setEditForm({ ...editForm, roles: updated })
-    }
-  }
-
-  const filteredUsers = users.filter((u) => {
-    const matchesSearch =
-      u.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      u.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      `${u.firstName} ${u.lastName}`.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesRole = roleFilter ? u.roles.includes(roleFilter) : true
-    return matchesSearch && matchesRole
-  })
-
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -250,31 +214,22 @@ export default function UsersPage() {
           <Input
             placeholder="Buscar por nombre, usuario o email..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            maxLength={100} aria-label="Buscar usuarios" onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1) }}
             className="pl-8 text-sm"
           />
         </div>
-        <div className="w-56">
-          <select
-            value={roleFilter}
-            onChange={(e) => setRoleFilter(e.target.value)}
-            className="w-full border border-input rounded-md px-3 py-2 text-sm bg-background"
-          >
-            <option value="">Todos los roles</option>
-            {roles.map((r) => (
-              <option key={r.id} value={r.name}>
-                Rol: {r.name}
-              </option>
-            ))}
-          </select>
+        <div className="w-full sm:w-64">
+          <PagedSelect<RoleOption> label="Filtrar por rol" path="/users/role-options/paged" value={roleFilter}
+            onChange={id => { setRoleFilter(id); setCurrentPage(1) }} getLabel={role => role.name} />
         </div>
       </div>
 
+      {listError && <InlineAlert variant="error" message="No se pudieron cargar los usuarios. Pulse Actualizar para reintentar." />}
       {/* Users Table */}
       <div className="border border-border rounded-xl bg-card overflow-hidden shadow-xs">
         <div className="p-4 border-b border-border/80 bg-muted/20 flex items-center justify-between">
           <h3 className="font-semibold text-sm text-foreground">Usuarios Registrados</h3>
-          <span className="text-xs text-muted-foreground">{filteredUsers.length} usuario(s)</span>
+          <span className="text-xs text-muted-foreground">{totalItems} usuario(s)</span>
         </div>
 
         {loading ? (
@@ -296,7 +251,7 @@ export default function UsersPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/60">
-                {filteredUsers.map((u) => (
+                {users.map((u) => (
                   <tr key={u.id} className="hover:bg-accent/30 transition-colors">
                     <td className="p-3.5">
                       <div className="flex items-center gap-2">
@@ -378,7 +333,7 @@ export default function UsersPage() {
                     </td>
                   </tr>
                 ))}
-                {filteredUsers.length === 0 && (
+                {users.length === 0 && (
                   <tr>
                     <td colSpan={6} className="p-8 text-center text-muted-foreground">
                       No se encontraron usuarios con los criterios de búsqueda.
@@ -391,6 +346,9 @@ export default function UsersPage() {
         )}
       </div>
 
+      <Pagination currentPage={page} totalPages={totalPages} totalItems={totalItems} pageSize={pageSize} disabled={loading}
+        onPageChange={setCurrentPage} onPageSizeChange={size => { setPageSize(size); setCurrentPage(1) }} />
+
       {/* CREATE USER MODAL */}
       {showCreateModal && (
         <div
@@ -398,7 +356,7 @@ export default function UsersPage() {
           onClick={() => setShowCreateModal(false)}
         >
           <div
-            className="bg-card border border-border rounded-xl p-6 w-full max-w-lg shadow-2xl space-y-4 animate-in zoom-in-95"
+            className="bg-card border border-border rounded-xl p-6 w-full max-w-lg max-h-[calc(100dvh-2rem)] overflow-y-auto shadow-2xl space-y-4 animate-in zoom-in-95"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center gap-2 border-b border-border pb-3">
@@ -490,26 +448,7 @@ export default function UsersPage() {
                 <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1.5">
                   Roles y Permisos del Sistema
                 </label>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 p-3 bg-muted/20 border border-border rounded-lg">
-                  {roles.map((role) => {
-                    const isSelected = createForm.roles?.includes(role.name)
-                    return (
-                      <button
-                        type="button"
-                        key={role.id}
-                        onClick={() => toggleRoleSelection(role.name, true)}
-                        className={`p-2 rounded-md text-xs font-semibold text-left transition-all border flex items-center justify-between cursor-pointer ${
-                          isSelected
-                            ? 'bg-[#C69C4B]/15 border-[#C69C4B] text-foreground'
-                            : 'bg-card border-border text-muted-foreground hover:text-foreground'
-                        }`}
-                      >
-                        <span>{role.name}</span>
-                        {isSelected && <CheckCircle2 size={13} className="text-[#C69C4B]" />}
-                      </button>
-                    )
-                  })}
-                </div>
+                <PagedRolePicker value={createForm.roles ?? []} onChange={roles => setCreateForm({ ...createForm, roles })} />
               </div>
 
               <div className="flex justify-end gap-2.5 pt-3 border-t border-border">
@@ -533,7 +472,7 @@ export default function UsersPage() {
           onClick={() => setEditingUser(null)}
         >
           <div
-            className="bg-card border border-border rounded-xl p-6 w-full max-w-lg shadow-2xl space-y-4 animate-in zoom-in-95"
+            className="bg-card border border-border rounded-xl p-6 w-full max-w-lg max-h-[calc(100dvh-2rem)] overflow-y-auto shadow-2xl space-y-4 animate-in zoom-in-95"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center gap-2 border-b border-border pb-3">
@@ -597,26 +536,7 @@ export default function UsersPage() {
                 <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-1.5">
                   Roles Asignados
                 </label>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 p-3 bg-muted/20 border border-border rounded-lg">
-                  {roles.map((role) => {
-                    const isSelected = editForm.roles?.includes(role.name)
-                    return (
-                      <button
-                        type="button"
-                        key={role.id}
-                        onClick={() => toggleRoleSelection(role.name, false)}
-                        className={`p-2 rounded-md text-xs font-semibold text-left transition-all border flex items-center justify-between cursor-pointer ${
-                          isSelected
-                            ? 'bg-[#C69C4B]/15 border-[#C69C4B] text-foreground'
-                            : 'bg-card border-border text-muted-foreground hover:text-foreground'
-                        }`}
-                      >
-                        <span>{role.name}</span>
-                        {isSelected && <CheckCircle2 size={13} className="text-[#C69C4B]" />}
-                      </button>
-                    )
-                  })}
-                </div>
+                <PagedRolePicker value={editForm.roles ?? []} onChange={roles => setEditForm({ ...editForm, roles })} />
               </div>
 
               <div className="flex justify-end gap-2.5 pt-3 border-t border-border">

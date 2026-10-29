@@ -1,3 +1,4 @@
+import { access } from '@/lib/access'
 import { useState, useCallback } from 'react'
 import { PagedSelect } from '@/components/ui/PagedSelect'
 import { usePagedList } from '@/hooks/usePagedList'
@@ -90,7 +91,8 @@ const isDefinitiveAdjustmentFailure = (error: unknown) =>
 
 export default function InvoicesPage() {
   const canManageCash = useAuthStore((state) => state.hasPermission('manage_cash'))
-  const canCreateInvoices = useAuthStore((state) => state.hasPermission('create_invoices'))
+  const canAdjustInvoices = useAuthStore((state) => state.hasPermission('adjust_invoices'))
+  const canReadPayments = useAuthStore((state) => state.hasPermission(access.payments))
   const [searchParams] = useSearchParams()
   const [dni, setDni] = useState('')
   const [startDate, setStartDate] = useState('')
@@ -168,7 +170,7 @@ export default function InvoicesPage() {
   }
 
   const loadPayments = useCallback(async (invoiceId: string) => {
-    if (!canManageCash) {
+    if (!canReadPayments) {
       setPayments([])
       return
     }
@@ -182,7 +184,7 @@ export default function InvoicesPage() {
     } finally {
       setPaymentsLoading(false)
     }
-  }, [canManageCash])
+  }, [canReadPayments])
 
   const viewPrint = async (inv: Invoice) => {
     setSelectedInvoiceId(inv.id)
@@ -735,7 +737,7 @@ export default function InvoicesPage() {
                         <WalletCards size={12} /> Registrar abono
                       </Button>
                     )}
-                  {canCreateInvoices && selectedInvoice.status !== 'Anulada' && selectedInvoice.documentType === 'Factura' && (
+                  {canAdjustInvoices && selectedInvoice.status !== 'Anulada' && selectedInvoice.documentType === 'Factura' && (
                     <>
                       <Button
                         size="sm"
@@ -821,7 +823,7 @@ export default function InvoicesPage() {
                 </pre>
               </div>
 
-              {canManageCash && (
+              {canReadPayments && (
                 <div className="rounded-lg border border-border overflow-hidden">
                   <div className="px-3 py-2 bg-muted/30 border-b border-border flex items-center justify-between">
                     <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Auxiliar de pagos</span>
@@ -870,7 +872,7 @@ export default function InvoicesPage() {
                                 ))}
                               </div>
                             )}
-                            {selectedInvoice.creditedAmount > 0 && payment.amount - payment.refundedAmount > 0 && (
+                            {canManageCash && selectedInvoice.creditedAmount > 0 && payment.amount - payment.refundedAmount > 0 && (
                               <Button
                                 type="button"
                                 size="sm"

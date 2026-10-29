@@ -1,0 +1,25 @@
+{
+  "status": "passed",
+  "synthetic_database": true,
+  "contains_secret_values": false,
+  "flows": {
+    "users_sql_search_and_second_page": true,
+    "role_selection_persists_across_pages_without_submitting": true,
+    "admin_label_never_grants_permissions_or_exposes_previous_session": true,
+    "command_palette_and_direct_url_match_permissions": true,
+    "custom_reception_role_operates_without_fiscal_adjustment": true,
+    "accountant_can_adjust_and_read_payments_without_collecting": true,
+    "delegated_user_management_and_role_limits_and_retry": true
+  },
+  "mobile_document_overflow": {
+    "usuarios-paginados": false,
+    "selector-roles": false,
+    "alias-admin-sin-acceso": false,
+    "recepcion-personalizada": false,
+    "contador-factura": false,
+    "administrador-delegado": false
+  },
+  "javascript_errors": 0,
+  "business_mutations": 0,
+  "screenshots": 12
+}

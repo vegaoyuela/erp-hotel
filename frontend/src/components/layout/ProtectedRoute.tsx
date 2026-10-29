@@ -6,13 +6,12 @@ import type { ReactNode } from 'react'
 
 interface Props {
   children: ReactNode
-  allowedRoles?: string[]
-  requiredPermission?: string | string[]
+  requiredPermission?: string | readonly string[]
   allowPasswordChange?: boolean
 }
 
-export default function ProtectedRoute({ children, allowedRoles, requiredPermission, allowPasswordChange = false }: Props) {
-  const { isAuthenticated, user, hasRole, hasPermission } = useAuthStore()
+export default function ProtectedRoute({ children, requiredPermission, allowPasswordChange = false }: Props) {
+  const { isAuthenticated, user, hasPermission } = useAuthStore()
   const location = useLocation()
 
   if (!isAuthenticated) {
@@ -25,25 +24,6 @@ export default function ProtectedRoute({ children, allowedRoles, requiredPermiss
 
   if (!user?.mustChangePassword && allowPasswordChange) {
     return <Navigate to="/dashboard" replace />
-  }
-
-  if (allowedRoles && allowedRoles.length > 0 && !hasRole(allowedRoles)) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-6 space-y-4">
-        <div className="p-4 rounded-full bg-destructive/10 text-destructive">
-          <ShieldAlert className="w-12 h-12 text-[#C69C4B]" />
-        </div>
-        <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground">Acceso Restringido</h2>
-          <p className="text-sm text-muted-foreground max-w-md">
-            Su usuario no dispone de los permisos ni el rol necesario ({allowedRoles.join(', ')}) para acceder a este módulo.
-          </p>
-        </div>
-        <Button onClick={() => window.location.href = '/dashboard'} variant="outline" className="gap-2">
-          <ArrowLeft size={16} /> Volver al Dashboard
-        </Button>
-      </div>
-    )
   }
 
   if (requiredPermission && !hasPermission(requiredPermission)) {

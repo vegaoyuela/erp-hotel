@@ -153,6 +153,7 @@ namespace hotel_erp.Api.Controllers
         }
 
         [HttpGet("invoice/{id}/preview")]
+        [Authorize(Policy = HotelAccessPolicies.ReadInvoices)]
         [ProducesResponseType(typeof(PrintPreviewDto), StatusCodes.Status200OK)]
         public async Task<ActionResult> GetPreview(Guid id)
         {
@@ -175,6 +176,7 @@ namespace hotel_erp.Api.Controllers
         }
 
         [HttpPost("invoice/{id}")]
+        [Authorize(Policy = HotelAccessPolicies.ReadInvoices)]
         [ProducesResponseType(typeof(PrintedInvoiceDto), StatusCodes.Status200OK)]
         public async Task<ActionResult> PrintInvoice(Guid id)
         {

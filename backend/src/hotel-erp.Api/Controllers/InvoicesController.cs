@@ -11,7 +11,7 @@ namespace hotel_erp.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize]
+[Authorize(Policy = HotelAccessPolicies.ReadInvoices)]
 public class InvoicesController(
     IInvoiceRepository repository,
     InvoiceApplicationService invoiceService,
@@ -111,7 +111,7 @@ public class InvoicesController(
     }
 
     [HttpPost("{id}/credit-note")]
-    [Authorize(Policy = PermissionNames.CreateInvoices)]
+    [Authorize(Policy = PermissionNames.AdjustInvoices)]
     [ProducesResponseType(typeof(InvoiceDto), StatusCodes.Status201Created)]
     public async Task<ActionResult<InvoiceDto>> CreateCreditNote(
         Guid id,
@@ -132,7 +132,7 @@ public class InvoicesController(
     }
 
     [HttpPost("{id}/debit-note")]
-    [Authorize(Policy = PermissionNames.CreateInvoices)]
+    [Authorize(Policy = PermissionNames.AdjustInvoices)]
     [ProducesResponseType(typeof(InvoiceDto), StatusCodes.Status201Created)]
     public async Task<ActionResult<InvoiceDto>> CreateDebitNote(
         Guid id,

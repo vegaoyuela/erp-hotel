@@ -14,7 +14,7 @@ namespace hotel_erp.Api.Controllers
 {
     [ApiController]
     [Route("api/settings")]
-    [Authorize]
+    [Authorize(Policy = HotelAccessPolicies.ReadSettings)]
     public class SettingsController : ControllerBase
     {
         private readonly IBusinessSettingsRepository _repo;

@@ -1,0 +1,18 @@
+  hotel-erp.Api -> /home/vm/Projects/erp-hotel/backend/src/hotel-erp.Api/bin/Debug/net10.0/hotel-erp.Api.dll
+  hotel-erp.IntegrationTests -> /home/vm/Projects/erp-hotel/backend/tests/hotel-erp.IntegrationTests/bin/Debug/net10.0/hotel-erp.IntegrationTests.dll
+Test run for /home/vm/Projects/erp-hotel/backend/tests/hotel-erp.IntegrationTests/bin/Debug/net10.0/hotel-erp.IntegrationTests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+[xUnit.net 00:00:25.21]     hotel_erp.IntegrationTests.AuthenticationFlowTests.SystemRoleMatrix_EnforcesSensitiveEndpointPolicies [FAIL]
+  Failed hotel_erp.IntegrationTests.AuthenticationFlowTests.SystemRoleMatrix_EnforcesSensitiveEndpointPolicies [24 s]
+  Error Message:
+   Assert.Equal() Failure: Values differ
+Expected: 31
+Actual:   0
+  Stack Trace:
+     at hotel_erp.IntegrationTests.AuthenticationFlowTests.AssertReadAccessMatrixAsync(HttpClient client, IServiceProvider services, AuthResponse admin, AuthResponse reception, AuthResponse cashier, AuthResponse accountant) in /home/vm/Projects/erp-hotel/backend/tests/hotel-erp.IntegrationTests/AuthenticationFlowTests.ReadAccess.cs:line 148
+   at hotel_erp.IntegrationTests.AuthenticationFlowTests.SystemRoleMatrix_EnforcesSensitiveEndpointPolicies() in /home/vm/Projects/erp-hotel/backend/tests/hotel-erp.IntegrationTests/AuthenticationFlowTests.cs:line 276
+   at hotel_erp.IntegrationTests.AuthenticationFlowTests.SystemRoleMatrix_EnforcesSensitiveEndpointPolicies() in /home/vm/Projects/erp-hotel/backend/tests/hotel-erp.IntegrationTests/AuthenticationFlowTests.cs:line 276
+   at hotel_erp.IntegrationTests.AuthenticationFlowTests.SystemRoleMatrix_EnforcesSensitiveEndpointPolicies() in /home/vm/Projects/erp-hotel/backend/tests/hotel-erp.IntegrationTests/AuthenticationFlowTests.cs:line 276
+--- End of stack trace from previous location ---
+
+Failed!  - Failed:     1, Passed:     0, Skipped:     0, Total:     1, Duration: 24 s - hotel-erp.IntegrationTests.dll (net10.0)

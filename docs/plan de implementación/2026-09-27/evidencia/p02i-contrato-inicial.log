@@ -1,0 +1,69 @@
+[QA] 11 archivos de repositorio: sin persistencia ni transacciones implícitas
+[QA] Restaurando backend
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+[QA] Compilando backend
+  hotel-erp.Api -> /home/vm/Projects/erp-hotel/backend/src/hotel-erp.Api/bin/Debug/net10.0/hotel-erp.Api.dll
+  hotel-erp.UnitTests -> /home/vm/Projects/erp-hotel/backend/tests/hotel-erp.UnitTests/bin/Debug/net10.0/hotel-erp.UnitTests.dll
+  hotel-erp.IntegrationTests -> /home/vm/Projects/erp-hotel/backend/tests/hotel-erp.IntegrationTests/bin/Debug/net10.0/hotel-erp.IntegrationTests.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:21.91
+[QA] Ejecutando pruebas unitarias
+  hotel-erp.Api -> /home/vm/Projects/erp-hotel/backend/src/hotel-erp.Api/bin/Debug/net10.0/hotel-erp.Api.dll
+  hotel-erp.UnitTests -> /home/vm/Projects/erp-hotel/backend/tests/hotel-erp.UnitTests/bin/Debug/net10.0/hotel-erp.UnitTests.dll
+Test run for /home/vm/Projects/erp-hotel/backend/tests/hotel-erp.UnitTests/bin/Debug/net10.0/hotel-erp.UnitTests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+
+Passed!  - Failed:     0, Passed:   136, Skipped:     0, Total:   136, Duration: 160 ms - hotel-erp.UnitTests.dll (net10.0)
+[QA] Ejecutando integración PostgreSQL
+  hotel-erp.Api -> /home/vm/Projects/erp-hotel/backend/src/hotel-erp.Api/bin/Debug/net10.0/hotel-erp.Api.dll
+  hotel-erp.IntegrationTests -> /home/vm/Projects/erp-hotel/backend/tests/hotel-erp.IntegrationTests/bin/Debug/net10.0/hotel-erp.IntegrationTests.dll
+Test run for /home/vm/Projects/erp-hotel/backend/tests/hotel-erp.IntegrationTests/bin/Debug/net10.0/hotel-erp.IntegrationTests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+
+Passed!  - Failed:     0, Passed:     5, Skipped:     0, Total:     5, Duration: 1 m 28 s - hotel-erp.IntegrationTests.dll (net10.0)
+[QA] Validando expediente fiscal N01-N06
+✔ acepta un expediente sintético completo para QA (4.79519ms)
+✔ rechaza el expediente sintético cuando se exige fuente oficial (0.697032ms)
+✔ rechaza decisiones ausentes o duplicadas (0.605118ms)
+✔ el resultado no copia valores del expediente (1.508714ms)
+✔ rechaza fechas de calendario inexistentes (0.560563ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 109.919333
+[QA] Instalando frontend desde package-lock.json
+
+added 211 packages, and audited 212 packages in 5s
+
+57 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+[QA] Auditando dependencias frontend
+found 0 vulnerabilities
+[QA] Instalando y auditando herramientas del contrato
+
+added 33 packages, and audited 34 packages in 2s
+
+6 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+found 0 vulnerabilities
+file:///home/vm/Projects/erp-hotel/scripts/api-contract/generate.mjs:16
+  if (schema !== await readFile(schemaFile, 'utf8')) throw new Error('El OpenAPI real difiere del snapshot: regenere y revise el contrato.')
+                                                           ^
+
+Error: El OpenAPI real difiere del snapshot: regenere y revise el contrato.
+    at file:///home/vm/Projects/erp-hotel/scripts/api-contract/generate.mjs:16:60
+
+Node.js v26.7.0

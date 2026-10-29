@@ -112,8 +112,7 @@ namespace hotel_erp.Api.Services
 
             await _userRepository.AddAsync(user);
 
-            var defaultRole = await _context.Roles.FirstOrDefaultAsync(r => r.Name == "Recepcion");
-            defaultRole ??= await _context.Roles.FirstOrDefaultAsync(r => r.SystemKey == SystemRoleKeys.Reception);
+            var defaultRole = await _context.Roles.FirstOrDefaultAsync(r => r.SystemKey == SystemRoleKeys.Reception);
             if (defaultRole != null)
             {
                 await _context.UserRoles.AddAsync(new UserRole { UserId = user.Id, RoleId = defaultRole.Id });

@@ -19,8 +19,8 @@ interface AuthState {
   setAuth: (user: User, accessToken: string) => void
   finishInitialization: () => void
   logout: () => void
-  hasPermission: (permission: string | string[]) => boolean
-  hasRole: (role: string | string[]) => boolean
+  hasPermission: (permission: string | readonly string[]) => boolean
+  hasRole: (role: string | readonly string[]) => boolean
 }
 
 function normalizeRole(role: string): string {
@@ -52,22 +52,17 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   hasPermission: (permission) => {
     const { user } = get()
     if (!user) return false
-    const userRoles = (user.roles || []).map(normalizeRole)
-    if (userRoles.includes('admin')) return true
     if (!user.permissions) return false
-    if (Array.isArray(permission)) {
-      return permission.some((item) => user.permissions.includes(item))
-    }
-    return user.permissions.includes(permission)
+    const requested = typeof permission === 'string' ? [permission] : permission
+    return requested.some(item => user.permissions.includes(item))
   },
 
   hasRole: (role) => {
     const { user } = get()
     if (!user || !user.roles) return false
     const userRoles = user.roles.map(normalizeRole)
-    if (userRoles.includes('admin')) return true
 
-    const checkList = Array.isArray(role) ? role : [role]
+    const checkList = typeof role === 'string' ? [role] : role
     return checkList.map(normalizeRole).some((item) => userRoles.includes(item))
   },
 }))

@@ -23,6 +23,7 @@ namespace hotel_erp.Api.Controllers
         private readonly IJwtService _jwtService;
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IAuditService _audit;
 
         public RolesController(
             IRoleRepository roleRepository,
@@ -30,13 +31,14 @@ namespace hotel_erp.Api.Controllers
             ApplicationDbContext context,
             IJwtService jwtService,
             IMapper mapper,
-            IUnitOfWork unitOfWork)
+            IUnitOfWork unitOfWork, IAuditService audit)
         {
             _roleRepository = roleRepository;
             _permissionRepository = permissionRepository;
             _context = context;
             _jwtService = jwtService;
             _mapper = mapper;
+            _audit = audit;
             _unitOfWork = unitOfWork;
         }
 
@@ -90,6 +92,14 @@ namespace hotel_erp.Api.Controllers
             await using var transaction = await _context.Database.BeginTransactionAsync(HttpContext.RequestAborted);
             var role = await _roleRepository.GetByIdAsync(id);
             if (role == null) return NotFound();
+            if (await ResolveAssignablePermissionsAsync(role.RolePermissions
+                    .Where(link => !link.Permission.IsDeleted).Select(link => link.Permission.Name)) is null)
+            {
+                await _audit.LogAsync(Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!),
+                    "SecurityChangeDenied", nameof(Role), id, new { Operation = ControllerContext.ActionDescriptor.ActionName });
+                await transaction.CommitAsync(HttpContext.RequestAborted);
+                return Forbid();
+            }
 
             if (request.Name != null)
             {
@@ -133,6 +143,14 @@ namespace hotel_erp.Api.Controllers
             await using var transaction = await _context.Database.BeginTransactionAsync(HttpContext.RequestAborted);
             var role = await _roleRepository.GetByIdAsync(id);
             if (role == null) return NotFound();
+            if (await ResolveAssignablePermissionsAsync(role.RolePermissions
+                    .Where(link => !link.Permission.IsDeleted).Select(link => link.Permission.Name)) is null)
+            {
+                await _audit.LogAsync(Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!),
+                    "SecurityChangeDenied", nameof(Role), id, new { Operation = ControllerContext.ActionDescriptor.ActionName });
+                await transaction.CommitAsync(HttpContext.RequestAborted);
+                return Forbid();
+            }
             if (role.SystemKey is not null)
                 return BadRequest("Los roles del sistema no se pueden eliminar");
 

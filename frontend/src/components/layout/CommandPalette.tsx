@@ -1,3 +1,4 @@
+import { routePermissions } from '@/lib/access'
 import { useState, useEffect } from 'react'
 import type { LucideIcon } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
@@ -29,33 +30,32 @@ interface NavigationItem {
   subtitle: string
   path: string
   icon: LucideIcon
-  roles?: string[]
 }
 
 const navActions: NavigationItem[] = [
   { title: 'Dashboard Operativo', subtitle: 'Panel de control en tiempo real', path: '/dashboard', icon: LayoutDashboard },
-  { title: 'Mapa Interactivo', subtitle: 'Estado visual de habitaciones por piso', path: '/rooms/map', icon: Map, roles: ['Admin', 'Recepcion'] },
-  { title: 'Check-In Express', subtitle: 'Registro y asignación de habitaciones', path: '/checkin', icon: UserCheck, roles: ['Admin', 'Recepcion'] },
-  { title: 'Check-Out & Folios', subtitle: 'Liquidación, cobro y facturación', path: '/checkout', icon: UserMinus, roles: ['Admin', 'Recepcion'] },
-  { title: 'Reservaciones', subtitle: 'Agenda y calendario hotelero', path: '/reservations', icon: CalendarDays, roles: ['Admin', 'Recepcion'] },
-  { title: 'Habitaciones', subtitle: 'Catálogo y tarifas', path: '/rooms', icon: BedDouble, roles: ['Admin', 'Recepcion'] },
-  { title: 'Facturación SAR', subtitle: 'Comprobantes fiscales, notas de crédito/débito', path: '/invoices', icon: Receipt, roles: ['Admin', 'Recepcion', 'Caja', 'Contador'] },
-  { title: 'Huéspedes', subtitle: 'Directorio y documentos DNI', path: '/guests', icon: Users, roles: ['Admin', 'Recepcion', 'Contador'] },
-  { title: 'Clientes & Empresas', subtitle: 'Directorio fiscal con RTN', path: '/customers', icon: Building2, roles: ['Admin', 'Recepcion', 'Contador'] },
-  { title: 'Caja & Turnos', subtitle: 'Aperturas y arqueos de caja', path: '/cash', icon: DollarSign, roles: ['Admin', 'Recepcion', 'Caja'] },
-  { title: 'Liquidaciones de tarjeta', subtitle: 'Depósitos, comisiones y retenciones del adquirente', path: '/card-settlements', icon: CreditCard, roles: ['Admin', 'Contador'] },
-  { title: 'Inventario', subtitle: 'Productos y stock hotelero', path: '/inventory', icon: Boxes, roles: ['Admin'] },
-  { title: 'Reportes SAR & P&L', subtitle: 'Libros fiscales y Estado de Resultados', path: '/reports', icon: BarChart3, roles: ['Admin', 'Contador'] },
-  { title: 'Libro Diario & Asientos', subtitle: 'Partida doble y ajustes contables', path: '/accounting/journal-entries', icon: ScrollText, roles: ['Admin', 'Contador'] },
-  { title: 'Usuarios & Roles', subtitle: 'Gestión de accesos y colaboradores', path: '/users', icon: UserCog, roles: ['Admin'] },
-  { title: 'Auditoría & Trazabilidad', subtitle: 'Firmas SHA-256 e integridad', path: '/audit-logs', icon: ShieldCheck, roles: ['Admin', 'Contador'] },
-  { title: 'Configuración del Hotel', subtitle: 'Datos comerciales y membrete SAR', path: '/settings', icon: SlidersHorizontal, roles: ['Admin'] },
+  { title: 'Mapa Interactivo', subtitle: 'Estado visual de habitaciones por piso', path: '/rooms/map', icon: Map },
+  { title: 'Check-In Express', subtitle: 'Registro y asignación de habitaciones', path: '/checkin', icon: UserCheck },
+  { title: 'Check-Out & Folios', subtitle: 'Liquidación, cobro y facturación', path: '/checkout', icon: UserMinus },
+  { title: 'Reservaciones', subtitle: 'Agenda y calendario hotelero', path: '/reservations', icon: CalendarDays },
+  { title: 'Habitaciones', subtitle: 'Catálogo y tarifas', path: '/rooms', icon: BedDouble },
+  { title: 'Facturación SAR', subtitle: 'Comprobantes fiscales, notas de crédito/débito', path: '/invoices', icon: Receipt },
+  { title: 'Huéspedes', subtitle: 'Directorio y documentos DNI', path: '/guests', icon: Users },
+  { title: 'Clientes & Empresas', subtitle: 'Directorio fiscal con RTN', path: '/customers', icon: Building2 },
+  { title: 'Caja & Turnos', subtitle: 'Aperturas y arqueos de caja', path: '/cash', icon: DollarSign },
+  { title: 'Liquidaciones de tarjeta', subtitle: 'Depósitos, comisiones y retenciones del adquirente', path: '/card-settlements', icon: CreditCard },
+  { title: 'Inventario', subtitle: 'Productos y stock hotelero', path: '/inventory', icon: Boxes },
+  { title: 'Reportes SAR & P&L', subtitle: 'Libros fiscales y Estado de Resultados', path: '/reports', icon: BarChart3 },
+  { title: 'Libro Diario & Asientos', subtitle: 'Partida doble y ajustes contables', path: '/accounting/journal-entries', icon: ScrollText },
+  { title: 'Usuarios & Roles', subtitle: 'Gestión de accesos y colaboradores', path: '/users', icon: UserCog },
+  { title: 'Auditoría & Trazabilidad', subtitle: 'Firmas SHA-256 e integridad', path: '/audit-logs', icon: ShieldCheck },
+  { title: 'Configuración del Hotel', subtitle: 'Datos comerciales y membrete SAR', path: '/settings', icon: SlidersHorizontal },
 ]
 
 export function CommandPalette({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const [query, setQuery] = useState('')
   const navigate = useNavigate()
-  const hasRole = useAuthStore((s) => s.hasRole)
+  const hasPermission = useAuthStore((s) => s.hasPermission)
 
   // Keyboard shortcut listener
   useEffect(() => {
@@ -84,7 +84,8 @@ export function CommandPalette({ isOpen, onClose }: { isOpen: boolean; onClose: 
   if (!isOpen) return null
 
   const filtered = navActions.filter((item) => {
-    if (item.roles && !hasRole(item.roles)) return false
+    const required = routePermissions[item.path]
+    if (!required || (required.length > 0 && !hasPermission(required))) return false
     const q = query.toLowerCase()
     return (
       item.title.toLowerCase().includes(q) ||

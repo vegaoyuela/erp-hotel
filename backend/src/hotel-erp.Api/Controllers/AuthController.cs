@@ -17,15 +17,17 @@ namespace hotel_erp.Api.Controllers
         private readonly IAuthService _authService;
         private readonly IAuditService _auditService;
         private readonly AuthenticationSessionCookies _sessionCookies;
+        private readonly IRoleRepository _roles;
 
         public AuthController(
             IAuthService authService,
             IAuditService auditService,
-            AuthenticationSessionCookies sessionCookies)
+            AuthenticationSessionCookies sessionCookies, IRoleRepository roles)
         {
             _authService = authService;
             _auditService = auditService;
             _sessionCookies = sessionCookies;
+            _roles = roles;
         }
 
         [HttpPost("login")]
@@ -53,6 +55,15 @@ namespace hotel_erp.Api.Controllers
         [HttpPost("register")]
         public async Task<ActionResult<AuthResponse>> Register([FromBody] RegisterRequest request)
         {
+            var defaultRole = (await _roles.GetAllAsync()).SingleOrDefault(role => role.SystemKey == SystemRoleKeys.Reception);
+            if (defaultRole is null) return Conflict("El rol de recepción no está disponible");
+            if (defaultRole.RolePermissions.Any(link => !link.Permission.IsDeleted
+                    && !User.HasClaim(SecurityClaimTypes.Permission, link.Permission.Name)))
+            {
+                await _auditService.LogAsync(Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!),
+                    "SecurityChangeDenied", "User", null, new { Operation = "RegisterReception" });
+                return Forbid();
+            }
             var result = await _authService.RegisterAsync(request);
             if (!result.Success)
                 return BadRequest(result);

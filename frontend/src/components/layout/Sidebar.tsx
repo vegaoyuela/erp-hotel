@@ -1,3 +1,4 @@
+import { routePermissions } from '@/lib/access'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { cn } from '@/lib/utils'
 import { useUIStore } from '@/store/uiStore'
@@ -38,7 +39,6 @@ interface NavItem {
   to: string
   icon: React.ComponentType<{ size?: number; className?: string }>
   label: string
-  roles: string[]
 }
 
 interface NavSection {
@@ -50,55 +50,55 @@ const navSections: NavSection[] = [
   {
     title: 'Operaciones',
     items: [
-      { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard', roles: ['Admin', 'Recepcion', 'Caja', 'Contador'] },
-      { to: '/rooms/map', icon: Map, label: 'Mapa Interactivo', roles: ['Admin', 'Recepcion'] },
-      { to: '/checkin', icon: UserCheck, label: 'Check-In', roles: ['Admin', 'Recepcion'] },
-      { to: '/checkout', icon: UserMinus, label: 'Check-Out', roles: ['Admin', 'Recepcion'] },
-      { to: '/reservations', icon: CalendarDays, label: 'Reservaciones', roles: ['Admin', 'Recepcion'] },
+      { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+      { to: '/rooms/map', icon: Map, label: 'Mapa Interactivo' },
+      { to: '/checkin', icon: UserCheck, label: 'Check-In' },
+      { to: '/checkout', icon: UserMinus, label: 'Check-Out' },
+      { to: '/reservations', icon: CalendarDays, label: 'Reservaciones' },
     ],
   },
   {
     title: 'Habitaciones',
     items: [
-      { to: '/rooms', icon: BedDouble, label: 'Habitaciones', roles: ['Admin', 'Recepcion'] },
-      { to: '/rooms/types', icon: Tags, label: 'Tipos de Hab.', roles: ['Admin', 'Recepcion'] },
+      { to: '/rooms', icon: BedDouble, label: 'Habitaciones' },
+      { to: '/rooms/types', icon: Tags, label: 'Tipos de Hab.' },
     ],
   },
   {
     title: 'Facturación & Clientes',
     items: [
-      { to: '/invoices', icon: Receipt, label: 'Facturación SAR', roles: ['Admin', 'Recepcion', 'Caja', 'Contador'] },
-      { to: '/authorizations', icon: ShieldCheck, label: 'Autorizaciones CAI', roles: ['Admin', 'Contador'] },
-      { to: '/customers', icon: Building2, label: 'Clientes / Empresas', roles: ['Admin', 'Recepcion', 'Contador'] },
-      { to: '/guests', icon: Users, label: 'Huéspedes', roles: ['Admin', 'Recepcion', 'Contador'] },
-      { to: '/folios', icon: ClipboardList, label: 'Folios / Consumos', roles: ['Admin', 'Recepcion', 'Caja', 'Contador'] },
+      { to: '/invoices', icon: Receipt, label: 'Facturación SAR' },
+      { to: '/authorizations', icon: ShieldCheck, label: 'Autorizaciones CAI' },
+      { to: '/customers', icon: Building2, label: 'Clientes / Empresas' },
+      { to: '/guests', icon: Users, label: 'Huéspedes' },
+      { to: '/folios', icon: ClipboardList, label: 'Folios / Consumos' },
     ],
   },
   {
     title: 'Caja e Inventario',
     items: [
-      { to: '/cash', icon: DollarSign, label: 'Caja', roles: ['Admin', 'Recepcion', 'Caja'] },
-      { to: '/card-settlements', icon: CreditCard, label: 'Liquidaciones Tarjeta', roles: ['Admin', 'Contador'] },
-      { to: '/inventory', icon: Boxes, label: 'Inventario', roles: ['Admin'] },
+      { to: '/cash', icon: DollarSign, label: 'Caja' },
+      { to: '/card-settlements', icon: CreditCard, label: 'Liquidaciones Tarjeta' },
+      { to: '/inventory', icon: Boxes, label: 'Inventario' },
     ],
   },
   {
     title: 'Contabilidad & Reportes',
     items: [
-      { to: '/reports', icon: BarChart3, label: 'Reportes SAR', roles: ['Admin', 'Contador'] },
-      { to: '/accounting/chart-of-accounts', icon: BookOpen, label: 'Catálogo Cuentas', roles: ['Admin', 'Contador'] },
-      { to: '/accounting/journal-entries', icon: ScrollText, label: 'Asientos Contables', roles: ['Admin', 'Contador'] },
-      { to: '/accounting/trial-balance', icon: Scale, label: 'Balance Comprob.', roles: ['Admin', 'Contador'] },
+      { to: '/reports', icon: BarChart3, label: 'Reportes SAR' },
+      { to: '/accounting/chart-of-accounts', icon: BookOpen, label: 'Catálogo Cuentas' },
+      { to: '/accounting/journal-entries', icon: ScrollText, label: 'Asientos Contables' },
+      { to: '/accounting/trial-balance', icon: Scale, label: 'Balance Comprob.' },
     ],
   },
   {
     title: 'Administración',
     items: [
-      { to: '/users', icon: UserCog, label: 'Usuarios & Roles', roles: ['Admin'] },
-      { to: '/audit-logs', icon: ShieldCheck, label: 'Auditoría & Logs', roles: ['Admin', 'Contador'] },
-      { to: '/discounts', icon: Percent, label: 'Descuentos', roles: ['Admin'] },
-      { to: '/backups', icon: HardDriveDownload, label: 'Respaldos BD', roles: ['Admin'] },
-      { to: '/settings', icon: SlidersHorizontal, label: 'Configuración', roles: ['Admin'] },
+      { to: '/users', icon: UserCog, label: 'Usuarios & Roles' },
+      { to: '/audit-logs', icon: ShieldCheck, label: 'Auditoría & Logs' },
+      { to: '/discounts', icon: Percent, label: 'Descuentos' },
+      { to: '/backups', icon: HardDriveDownload, label: 'Respaldos BD' },
+      { to: '/settings', icon: SlidersHorizontal, label: 'Configuración' },
     ],
   },
 ]
@@ -110,7 +110,7 @@ interface SidebarProps {
 
 export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
   const { sidebarOpen, toggleSidebar } = useUIStore()
-  const { user, hasRole, logout } = useAuthStore()
+  const { user, hasPermission, logout } = useAuthStore()
   const navigate = useNavigate()
   const expanded = sidebarOpen || mobileOpen
 
@@ -185,10 +185,9 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
       {/* Navigation Sections */}
       <nav className="flex-1 overflow-y-auto py-2 px-2 space-y-3 custom-scrollbar">
         {navSections.map((section, idx) => {
-          // Filter items based on user roles
-          const visibleItems = section.items.filter((item) => {
-            if (!item.roles || item.roles.length === 0) return true
-            return hasRole(item.roles)
+          const visibleItems = section.items.filter(item => {
+            const required = routePermissions[item.to]
+            return required !== undefined && (required.length === 0 || hasPermission(required))
           })
 
           if (visibleItems.length === 0) return null

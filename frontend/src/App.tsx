@@ -1,10 +1,11 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import React, { Suspense, useEffect, type ReactNode } from 'react'
+import React, { Suspense, useEffect, useMemo, type ReactNode } from 'react'
 import AppLayout from '@/components/layout/AppLayout'
 import ProtectedRoute from '@/components/layout/ProtectedRoute'
 import { refreshBrowserSession } from '@/lib/sessionRefresh'
 import { useAuthStore } from '@/store/authStore'
+import { access } from '@/lib/access'
 import type { AuthResponse } from '@/types'
 
 // Lazy loaded pages
@@ -36,8 +37,6 @@ const ReportsPage = React.lazy(() => import('@/pages/reports/ReportsPage'))
 const UsersPage = React.lazy(() => import('@/pages/users/UsersPage'))
 const AuditLogsPage = React.lazy(() => import('@/pages/admin/AuditLogsPage'))
 const NotFoundPage = React.lazy(() => import('@/pages/common/NotFoundPage'))
-
-const queryClient = new QueryClient()
 
 const PageLoader = () => (
   <div className="flex h-full items-center justify-center p-8">
@@ -88,6 +87,10 @@ function SessionBootstrap({ children }: { children: ReactNode }) {
 }
 
 function App() {
+  const sessionKey = useAuthStore(state => state.user
+    ? `${state.user.id}:${[...state.user.permissions].sort().join(',')}` : 'anonymous')
+  const queryClient = useMemo(() => new QueryClient(), [sessionKey])
+  useEffect(() => () => queryClient.clear(), [queryClient])
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
@@ -119,12 +122,12 @@ function App() {
               <Route path="/reservations" element={<ProtectedRoute requiredPermission="manage_reservations"><ReservationsPage /></ProtectedRoute>} />
               <Route path="/checkin" element={<ProtectedRoute requiredPermission="manage_reservations"><CheckInPage /></ProtectedRoute>} />
               <Route path="/checkout" element={<ProtectedRoute requiredPermission="manage_reservations"><CheckOutPage /></ProtectedRoute>} />
-              <Route path="/guests" element={<ProtectedRoute allowedRoles={['Admin', 'Recepcion', 'Contador']}><GuestsPage /></ProtectedRoute>} />
+              <Route path="/guests" element={<ProtectedRoute requiredPermission={access.guests}><GuestsPage /></ProtectedRoute>} />
               
               {/* Facturación & Clientes */}
-              <Route path="/folios" element={<ProtectedRoute allowedRoles={['Admin', 'Recepcion', 'Caja', 'Contador']}><FoliosPage /></ProtectedRoute>} />
-              <Route path="/customers" element={<ProtectedRoute allowedRoles={['Admin', 'Recepcion', 'Contador']}><CustomersPage /></ProtectedRoute>} />
-              <Route path="/invoices" element={<ProtectedRoute allowedRoles={['Admin', 'Recepcion', 'Caja', 'Contador']}><InvoicesPage /></ProtectedRoute>} />
+              <Route path="/folios" element={<ProtectedRoute requiredPermission={access.folios}><FoliosPage /></ProtectedRoute>} />
+              <Route path="/customers" element={<ProtectedRoute requiredPermission={access.guests}><CustomersPage /></ProtectedRoute>} />
+              <Route path="/invoices" element={<ProtectedRoute requiredPermission={access.invoices}><InvoicesPage /></ProtectedRoute>} />
               <Route path="/invoices/:id/edit" element={<ProtectedRoute requiredPermission="create_invoices"><InvoiceEditPage /></ProtectedRoute>} />
               <Route path="/authorizations" element={<ProtectedRoute requiredPermission="manage_taxes"><AuthorizationsPage /></ProtectedRoute>} />
               <Route path="/cai" element={<Navigate to="/authorizations" replace />} />

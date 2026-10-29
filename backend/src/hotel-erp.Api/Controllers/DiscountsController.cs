@@ -11,7 +11,7 @@ namespace hotel_erp.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
+    [Authorize(Policy = HotelAccessPolicies.ReadDiscounts)]
     public class DiscountsController : ControllerBase
     {
         private readonly IDiscountRepository _repo;

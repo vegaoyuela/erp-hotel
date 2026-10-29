@@ -1,0 +1,372 @@
+{
+  "syntheticDatabase": true,
+  "readChecks": [
+    {
+      "role": "administrator",
+      "path": "/api/guests/paged",
+      "status": 200
+    },
+    {
+      "role": "reception",
+      "path": "/api/guests/paged",
+      "status": 200
+    },
+    {
+      "role": "cashier",
+      "path": "/api/guests/paged",
+      "status": 403
+    },
+    {
+      "role": "accountant",
+      "path": "/api/guests/paged",
+      "status": 200
+    },
+    {
+      "role": "administrator",
+      "path": "/api/guests",
+      "status": 200
+    },
+    {
+      "role": "reception",
+      "path": "/api/guests",
+      "status": 200
+    },
+    {
+      "role": "cashier",
+      "path": "/api/guests",
+      "status": 403
+    },
+    {
+      "role": "accountant",
+      "path": "/api/guests",
+      "status": 200
+    },
+    {
+      "role": "administrator",
+      "path": "/api/customers/paged",
+      "status": 200
+    },
+    {
+      "role": "reception",
+      "path": "/api/customers/paged",
+      "status": 200
+    },
+    {
+      "role": "cashier",
+      "path": "/api/customers/paged",
+      "status": 403
+    },
+    {
+      "role": "accountant",
+      "path": "/api/customers/paged",
+      "status": 200
+    },
+    {
+      "role": "administrator",
+      "path": "/api/reservations/paged",
+      "status": 200
+    },
+    {
+      "role": "reception",
+      "path": "/api/reservations/paged",
+      "status": 200
+    },
+    {
+      "role": "cashier",
+      "path": "/api/reservations/paged",
+      "status": 403
+    },
+    {
+      "role": "accountant",
+      "path": "/api/reservations/paged",
+      "status": 403
+    },
+    {
+      "role": "administrator",
+      "path": "/api/reservations",
+      "status": 200
+    },
+    {
+      "role": "reception",
+      "path": "/api/reservations",
+      "status": 200
+    },
+    {
+      "role": "cashier",
+      "path": "/api/reservations",
+      "status": 403
+    },
+    {
+      "role": "accountant",
+      "path": "/api/reservations",
+      "status": 403
+    },
+    {
+      "role": "administrator",
+      "path": "/api/rooms",
+      "status": 200
+    },
+    {
+      "role": "reception",
+      "path": "/api/rooms",
+      "status": 200
+    },
+    {
+      "role": "cashier",
+      "path": "/api/rooms",
+      "status": 403
+    },
+    {
+      "role": "accountant",
+      "path": "/api/rooms",
+      "status": 403
+    },
+    {
+      "role": "administrator",
+      "path": "/api/room-types",
+      "status": 200
+    },
+    {
+      "role": "reception",
+      "path": "/api/room-types",
+      "status": 200
+    },
+    {
+      "role": "cashier",
+      "path": "/api/room-types",
+      "status": 403
+    },
+    {
+      "role": "accountant",
+      "path": "/api/room-types",
+      "status": 403
+    },
+    {
+      "role": "administrator",
+      "path": "/api/folios/paged",
+      "status": 200
+    },
+    {
+      "role": "reception",
+      "path": "/api/folios/paged",
+      "status": 200
+    },
+    {
+      "role": "cashier",
+      "path": "/api/folios/paged",
+      "status": 200
+    },
+    {
+      "role": "accountant",
+      "path": "/api/folios/paged",
+      "status": 200
+    },
+    {
+      "role": "administrator",
+      "path": "/api/invoices/paged",
+      "status": 200
+    },
+    {
+      "role": "reception",
+      "path": "/api/invoices/paged",
+      "status": 200
+    },
+    {
+      "role": "cashier",
+      "path": "/api/invoices/paged",
+      "status": 200
+    },
+    {
+      "role": "accountant",
+      "path": "/api/invoices/paged",
+      "status": 200
+    },
+    {
+      "role": "administrator",
+      "path": "/api/invoices/search",
+      "status": 200
+    },
+    {
+      "role": "reception",
+      "path": "/api/invoices/search",
+      "status": 200
+    },
+    {
+      "role": "cashier",
+      "path": "/api/invoices/search",
+      "status": 200
+    },
+    {
+      "role": "accountant",
+      "path": "/api/invoices/search",
+      "status": 200
+    },
+    {
+      "role": "administrator",
+      "path": "/api/document-authorizations/options/paged",
+      "status": 200
+    },
+    {
+      "role": "reception",
+      "path": "/api/document-authorizations/options/paged",
+      "status": 200
+    },
+    {
+      "role": "cashier",
+      "path": "/api/document-authorizations/options/paged",
+      "status": 403
+    },
+    {
+      "role": "accountant",
+      "path": "/api/document-authorizations/options/paged",
+      "status": 200
+    },
+    {
+      "role": "administrator",
+      "path": "/api/cai",
+      "status": 200
+    },
+    {
+      "role": "reception",
+      "path": "/api/cai",
+      "status": 200
+    },
+    {
+      "role": "cashier",
+      "path": "/api/cai",
+      "status": 403
+    },
+    {
+      "role": "accountant",
+      "path": "/api/cai",
+      "status": 200
+    },
+    {
+      "role": "administrator",
+      "path": "/api/discounts",
+      "status": 200
+    },
+    {
+      "role": "reception",
+      "path": "/api/discounts",
+      "status": 200
+    },
+    {
+      "role": "cashier",
+      "path": "/api/discounts",
+      "status": 403
+    },
+    {
+      "role": "accountant",
+      "path": "/api/discounts",
+      "status": 403
+    },
+    {
+      "role": "administrator",
+      "path": "/api/tax-configurations",
+      "status": 200
+    },
+    {
+      "role": "reception",
+      "path": "/api/tax-configurations",
+      "status": 200
+    },
+    {
+      "role": "cashier",
+      "path": "/api/tax-configurations",
+      "status": 403
+    },
+    {
+      "role": "accountant",
+      "path": "/api/tax-configurations",
+      "status": 200
+    },
+    {
+      "role": "administrator",
+      "path": "/api/settings/business",
+      "status": 200
+    },
+    {
+      "role": "reception",
+      "path": "/api/settings/business",
+      "status": 403
+    },
+    {
+      "role": "cashier",
+      "path": "/api/settings/business",
+      "status": 403
+    },
+    {
+      "role": "accountant",
+      "path": "/api/settings/business",
+      "status": 200
+    },
+    {
+      "role": "administrator",
+      "path": "/api/payments",
+      "status": 200
+    },
+    {
+      "role": "reception",
+      "path": "/api/payments",
+      "status": 200
+    },
+    {
+      "role": "cashier",
+      "path": "/api/payments",
+      "status": 200
+    },
+    {
+      "role": "accountant",
+      "path": "/api/payments",
+      "status": 200
+    },
+    {
+      "role": "administrator",
+      "action": "credit-note",
+      "status": 400
+    },
+    {
+      "role": "administrator",
+      "action": "debit-note",
+      "status": 400
+    },
+    {
+      "role": "reception",
+      "action": "credit-note",
+      "status": 403
+    },
+    {
+      "role": "reception",
+      "action": "debit-note",
+      "status": 403
+    },
+    {
+      "role": "cashier",
+      "action": "credit-note",
+      "status": 403
+    },
+    {
+      "role": "cashier",
+      "action": "debit-note",
+      "status": 403
+    },
+    {
+      "role": "accountant",
+      "action": "credit-note",
+      "status": 400
+    },
+    {
+      "role": "accountant",
+      "action": "debit-note",
+      "status": 400
+    }
+  ],
+  "pagedUsers": 31,
+  "pagedRoleOptions": 31,
+  "rejectedPrivilegedAccountChanges": 6,
+  "roleLabelsGrantAccess": false,
+  "dashboardMinimization": true,
+  "deniedRequestsAudited": true,
+  "auditContainsRequestSecrets": false
+}

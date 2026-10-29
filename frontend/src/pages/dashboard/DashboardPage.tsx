@@ -1,3 +1,4 @@
+import { access } from '@/lib/access'
 import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '@/lib/axios'
@@ -60,6 +61,8 @@ export default function DashboardPage() {
   const isAdmin = hasRole('Admin')
   const canManageReservations = hasPermission('manage_reservations')
   const canManageCash = hasPermission('manage_cash')
+  const canReadInvoices = hasPermission(access.invoices)
+  const canReadAlerts = hasPermission(['create_invoices', 'adjust_invoices', 'manage_taxes', 'manage_inventory'])
 
   const totalRooms = (summary?.occupiedRooms ?? 0) + (summary?.freeRooms ?? 0)
   const occupancyPercent = totalRooms > 0 ? Math.round(((summary?.occupiedRooms ?? 0) / totalRooms) * 100) : 0
@@ -165,8 +168,13 @@ export default function DashboardPage() {
         )}
       </div>
 
+      {!canManageReservations && !canReadInvoices && !canManageCash && !canReadAlerts && (
+        <p className="text-sm text-muted-foreground">Use el menú para acceder a los módulos habilitados para su usuario.</p>
+      )}
+
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        {canManageReservations && <>
         <div className="rounded-xl border border-border bg-card p-5 shadow-xs flex items-center justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
@@ -224,7 +232,8 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div className="rounded-xl border border-border bg-card p-5 shadow-xs flex items-center justify-between">
+        </>}
+        {canReadInvoices && <div className="rounded-xl border border-border bg-card p-5 shadow-xs flex items-center justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Ventas Facturadas Hoy
@@ -239,12 +248,12 @@ export default function DashboardPage() {
           <div className="p-3 rounded-xl bg-teal-500/10 text-teal-600 dark:text-teal-400">
             <Receipt size={24} />
           </div>
-        </div>
+        </div>}
       </div>
 
       {/* Main Grid: Activity & Alertas */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-        <section className="xl:col-span-2 rounded-xl border border-border bg-card p-5 space-y-4 shadow-xs">
+        {(canManageReservations || canReadInvoices) && <section className="xl:col-span-2 rounded-xl border border-border bg-card p-5 space-y-4 shadow-xs">
           <div className="flex items-center justify-between border-b border-border/80 pb-3">
             <div className="flex items-center gap-2">
               <Hotel size={18} className="text-[#C69C4B]" />
@@ -254,7 +263,7 @@ export default function DashboardPage() {
 
           <div className="grid gap-4 lg:grid-cols-2">
             {/* Upcoming Reservations */}
-            <div className="rounded-xl border border-border p-4 bg-muted/10 flex flex-col">
+            {canManageReservations && <div className="rounded-xl border border-border p-4 bg-muted/10 flex flex-col">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-semibold text-xs text-foreground uppercase tracking-wider flex items-center gap-1.5">
                   <CalendarCheck size={14} className="text-[#C69C4B]" />
@@ -293,10 +302,10 @@ export default function DashboardPage() {
                   </p>
                 )}
               </div>
-            </div>
+            </div>}
 
             {/* Recent Invoices */}
-            <div className="rounded-xl border border-border p-4 bg-muted/10 flex flex-col">
+            {canReadInvoices && <div className="rounded-xl border border-border p-4 bg-muted/10 flex flex-col">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-semibold text-xs text-foreground uppercase tracking-wider flex items-center gap-1.5">
                   <Receipt size={14} className="text-[#C69C4B]" />
@@ -343,13 +352,13 @@ export default function DashboardPage() {
                   </p>
                 )}
               </div>
-            </div>
+            </div>}
           </div>
-        </section>
+        </section>}
 
         {/* Sidebar Panel: Cash & SAR Alerts */}
         <aside className="space-y-4">
-          <section className="rounded-xl border border-border bg-card p-5 space-y-3 shadow-xs">
+          {canManageCash && <section className="rounded-xl border border-border bg-card p-5 space-y-3 shadow-xs">
             <h2 className="font-bold text-sm text-foreground flex items-center gap-2 border-b border-border/80 pb-2.5">
               <DollarSign size={16} className="text-[#C69C4B]" />
               Estado de Caja de Turno
@@ -383,9 +392,9 @@ export default function DashboardPage() {
                 )}
               </div>
             )}
-          </section>
+          </section>}
 
-          <section className="rounded-xl border border-border bg-card p-5 space-y-3 shadow-xs">
+          {canReadAlerts && <section className="rounded-xl border border-border bg-card p-5 space-y-3 shadow-xs">
             <h2 className="font-bold text-sm text-foreground flex items-center gap-2 border-b border-border/80 pb-2.5">
               <AlertTriangle size={16} className="text-amber-500" />
               Alertas Fiscales & Operativas
@@ -409,7 +418,7 @@ export default function DashboardPage() {
                 </p>
               )}
             </div>
-          </section>
+          </section>}
         </aside>
       </div>
     </div>

@@ -173,6 +173,7 @@ public partial class AuthenticationFlowTests
         Assert.Equal(
             new[]
             {
+                PermissionNames.AdjustInvoices,
                 PermissionNames.ExportData,
                 PermissionNames.ManageAccounting,
                 PermissionNames.ManageTaxes,
@@ -272,6 +273,7 @@ public partial class AuthenticationFlowTests
         await AssertJsonEndpointStatusAsync(client, cashier.AccessToken, "/api/discounts", HttpStatusCode.Forbidden);
         await AssertJsonEndpointStatusAsync(client, accountant.AccessToken, "/api/discounts", HttpStatusCode.Forbidden);
         await AssertJsonEndpointStatusAsync(client, administrator.AccessToken, "/api/discounts", HttpStatusCode.BadRequest);
+        await AssertReadAccessMatrixAsync(client, factory.Services, administrator, reception, cashier, accountant);
     }
 
     [PostgreSqlFact]

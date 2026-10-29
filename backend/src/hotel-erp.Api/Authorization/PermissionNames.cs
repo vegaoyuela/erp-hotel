@@ -13,6 +13,7 @@ public static class PermissionNames
     public const string ExportData = "export_data";
     public const string ManageAccounting = "manage_accounting";
     public const string ViewReports = "view_reports";
+    public const string AdjustInvoices = "adjust_invoices";
     public const string CreateInvoices = "create_invoices";
     public const string ManageReservations = "manage_reservations";
     public const string ManageCash = "manage_cash";
@@ -30,6 +31,7 @@ public static class PermissionNames
         ManageAccounting,
         ViewReports,
         CreateInvoices,
+        AdjustInvoices,
         ManageReservations,
         ManageCash,
         ManageInventory
@@ -55,6 +57,7 @@ public static class AuthorizationServiceCollectionExtensions
 {
     public static IServiceCollection AddHotelAuthorization(this IServiceCollection services)
     {
+        services.AddSingleton<IAuthorizationMiddlewareResultHandler, AuditedAuthorizationResultHandler>();
         services.AddAuthorization(options =>
         {
             foreach (var permission in PermissionNames.All)
@@ -67,6 +70,15 @@ public static class AuthorizationServiceCollectionExtensions
                             context.User.FindFirst(SecurityClaimTypes.MustChangePassword)?.Value,
                             bool.TrueString,
                             StringComparison.OrdinalIgnoreCase)));
+            }
+            foreach (var (name, permissions) in HotelAccessPolicies.AnyOf)
+            {
+                options.AddPolicy(name, policy => policy
+                    .RequireAuthenticatedUser()
+                    .RequireClaim(SecurityClaimTypes.Permission, permissions)
+                    .RequireAssertion(context =>
+                        !string.Equals(context.User.FindFirst(SecurityClaimTypes.MustChangePassword)?.Value,
+                            bool.TrueString, StringComparison.OrdinalIgnoreCase)));
             }
         });
 

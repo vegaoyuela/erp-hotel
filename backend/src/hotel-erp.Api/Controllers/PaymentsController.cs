@@ -31,7 +31,7 @@ namespace hotel_erp.Api.Controllers
         }
 
         [HttpGet]
-        [Authorize(Policy = PermissionNames.ManageCash)]
+        [Authorize(Policy = HotelAccessPolicies.ReadPayments)]
         public async Task<ActionResult<IEnumerable<PaymentDto>>> GetAll([FromQuery] Guid? invoiceId)
         {
             var query = DetailedPayments().OrderByDescending(payment => payment.PaymentDate).AsQueryable();
@@ -41,7 +41,7 @@ namespace hotel_erp.Api.Controllers
         }
 
         [HttpGet("{id}")]
-        [Authorize(Policy = PermissionNames.ManageCash)]
+        [Authorize(Policy = HotelAccessPolicies.ReadPayments)]
         public async Task<ActionResult<PaymentDto>> GetById(Guid id)
         {
             var payment = await DetailedPayments().AsSplitQuery().SingleOrDefaultAsync(candidate => candidate.Id == id);

@@ -1361,6 +1361,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/Users/paged": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Users: GetPage */
+        get: operations["Users_GetPage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/Users/role-options/paged": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Users: GetRoleOptions */
+        get: operations["Users_GetRoleOptions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/Users/{id}": {
         parameters: {
             query?: never;
@@ -3642,6 +3676,28 @@ export interface components {
             /** Format: int32 */
             totalPages: number | string;
         };
+        PagedResultOfRoleOptionDto: {
+            items: components["schemas"]["RoleOptionDto"][];
+            /** Format: int32 */
+            page: number | string;
+            /** Format: int32 */
+            pageSize: number | string;
+            /** Format: int32 */
+            totalItems: number | string;
+            /** Format: int32 */
+            totalPages: number | string;
+        };
+        PagedResultOfUserDto: {
+            items: components["schemas"]["UserDto"][];
+            /** Format: int32 */
+            page: number | string;
+            /** Format: int32 */
+            pageSize: number | string;
+            /** Format: int32 */
+            totalItems: number | string;
+            /** Format: int32 */
+            totalPages: number | string;
+        };
         PaymentApplicationDto: {
             /** Format: double */
             amount?: number | string;
@@ -3867,6 +3923,11 @@ export interface components {
             isSystem?: boolean;
             name?: string;
             permissions?: string[];
+        };
+        RoleOptionDto: {
+            /** Format: uuid */
+            id?: string;
+            name?: string;
         };
         RoomDto: {
             /** Format: int32 */
@@ -16698,6 +16759,228 @@ export interface operations {
                     "application/json": components["schemas"]["UserDto"];
                     "text/json": components["schemas"]["UserDto"];
                     "text/plain": components["schemas"]["UserDto"];
+                };
+            };
+            /** @description Solicitud inválida; los errores de validación se indican por campo. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Se requiere una sesión válida. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description El operador carece de permisos o debe cambiar la contraseña. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Error interno normalizado; incluye traceId para seguimiento. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+        };
+    };
+    Users_GetPage: {
+        parameters: {
+            query?: {
+                RoleId?: string;
+                Search?: string;
+                Page?: number | string;
+                PageSize?: number | string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PagedResultOfUserDto"];
+                    "text/json": components["schemas"]["PagedResultOfUserDto"];
+                    "text/plain": components["schemas"]["PagedResultOfUserDto"];
+                };
+            };
+            /** @description Solicitud inválida; los errores de validación se indican por campo. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Se requiere una sesión válida. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description El operador carece de permisos o debe cambiar la contraseña. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Error interno normalizado; incluye traceId para seguimiento. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+        };
+    };
+    Users_GetRoleOptions: {
+        parameters: {
+            query?: {
+                AssignableOnly?: boolean;
+                Search?: string;
+                Page?: number | string;
+                PageSize?: number | string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PagedResultOfRoleOptionDto"];
+                    "text/json": components["schemas"]["PagedResultOfRoleOptionDto"];
+                    "text/plain": components["schemas"]["PagedResultOfRoleOptionDto"];
                 };
             };
             /** @description Solicitud inválida; los errores de validación se indican por campo. */

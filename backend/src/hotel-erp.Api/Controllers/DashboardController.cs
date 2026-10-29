@@ -1,3 +1,4 @@
+using hotel_erp.Api.Authorization;
 using hotel_erp.Api.Database;
 using hotel_erp.Api.Database.Entities;
 using hotel_erp.Api.Dtos.Dashboard;
@@ -6,149 +7,90 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace hotel_erp.Api.Controllers
+namespace hotel_erp.Api.Controllers;
+
+[ApiController]
+[Route("api/dashboard")]
+[Authorize]
+public class DashboardController(ApplicationDbContext context, IHotelClock clock) : ControllerBase
 {
-    [ApiController]
-    [Route("api/dashboard")]
-    [Authorize]
-    public class DashboardController : ControllerBase
+    // Every authenticated operator has a home page; each section requires its own permission.
+    [HttpGet("summary")]
+    public async Task<ActionResult<DashboardSummaryDto>> GetSummary()
     {
-        private readonly ApplicationDbContext _context;
-        private readonly IHotelClock _clock;
-
-        public DashboardController(ApplicationDbContext context, IHotelClock clock)
+        bool Has(string permission) => User.HasClaim(SecurityClaimTypes.Permission, permission);
+        bool Can(string policy) => HotelAccessPolicies.AnyOf[policy].Any(Has);
+        var token = HttpContext.RequestAborted;
+        var today = clock.Today;
+        var summary = new DashboardSummaryDto();
+        if (Has(PermissionNames.ManageReservations))
         {
-            _context = context;
-            _clock = clock;
+            summary.OccupiedRooms = await context.Rooms.CountAsync(row => row.Status == RoomStatus.Ocupada, token);
+            summary.FreeRooms = await context.Rooms.CountAsync(row => row.Status == RoomStatus.Libre, token);
+            summary.PendingCheckIns = await context.Reservations.CountAsync(row => row.CheckInDate == today && row.Status == ReservationStatus.Confirmada, token);
+            summary.PendingCheckOuts = await context.Reservations.CountAsync(row => row.CheckOutDate == today && row.Status == ReservationStatus.CheckIn, token);
+            summary.UpcomingReservations = await context.Reservations.AsNoTracking()
+                .Where(row => row.Status == ReservationStatus.Confirmada || row.Status == ReservationStatus.Pendiente)
+                .OrderBy(row => row.CheckInDate).ThenBy(row => row.Id).Take(5)
+                .Select(row => new DashboardReservationDto
+                {
+                    GuestName = row.Guest.FirstName + " " + row.Guest.LastName,
+                    RoomNumber = row.Room.RoomNumber,
+                    Status = row.Status.ToString(),
+                    CheckInDate = row.CheckInDate,
+                    CheckOutDate = row.CheckOutDate
+                }).ToListAsync(token);
+            summary.Stats.AddRange([
+                new() { Title = "Habitaciones ocupadas", Value = summary.OccupiedRooms.ToString(), Trend = "Operativo" },
+                new() { Title = "Habitaciones libres", Value = summary.FreeRooms.ToString(), Trend = "Operativo" },
+                new() { Title = "Reservas hoy", Value = summary.PendingCheckIns.ToString(), Trend = "Por confirmar" }
+            ]);
         }
-
-        [HttpGet("summary")]
-        public async Task<ActionResult<DashboardSummaryDto>> GetSummary()
+        if (Can(HotelAccessPolicies.ReadInvoices))
         {
-            var today = _clock.Today;
-            var todayStart = _clock.HondurasNow.Date;
-            var todayEnd = todayStart.AddDays(1);
-
-            var occupiedStatuses = new[] { RoomStatus.Ocupada };
-            var occupiedRooms = await _context.Rooms.CountAsync(r => occupiedStatuses.Contains(r.Status));
-            var freeRooms = await _context.Rooms.CountAsync(r => r.Status == RoomStatus.Libre);
-
-            var pendingCheckIns = await _context.Reservations.CountAsync(r => r.CheckInDate == today && r.Status == ReservationStatus.Confirmada);
-            var pendingCheckOuts = await _context.Reservations.CountAsync(r => r.CheckOutDate == today && r.Status == ReservationStatus.CheckIn);
-
-            var invoiceQuery = _context.Invoices.AsNoTracking().Include(i => i.Guest).Include(i => i.Customer);
-            var recentInvoices = await invoiceQuery
-                .OrderByDescending(i => i.InvoiceDate)
-                .Take(5)
-                .Select(i => new DashboardInvoiceDto
+            summary.RecentInvoices = await context.Invoices.AsNoTracking().OrderByDescending(row => row.InvoiceDate)
+                .ThenBy(row => row.Id).Take(5).Select(row => new DashboardInvoiceDto
                 {
-                    CorrelativeNumber = i.CorrelativeNumber,
-                    CustomerName = i.CustomerName,
-                    TotalAmount = i.TotalAmount,
-                    Status = i.Status.ToString(),
-                    InvoiceDate = i.InvoiceDate
-                })
-                .ToListAsync();
-
-            var upcomingReservations = await _context.Reservations
-                .AsNoTracking()
-                .Include(r => r.Guest)
-                .Include(r => r.Room)
-                .Where(r => r.Status == ReservationStatus.Confirmada || r.Status == ReservationStatus.Pendiente)
-                .OrderBy(r => r.CheckInDate)
-                .Take(5)
-                .Select(r => new DashboardReservationDto
-                {
-                    GuestName = r.Guest.FirstName + " " + r.Guest.LastName,
-                    RoomNumber = r.Room.RoomNumber,
-                    Status = r.Status.ToString(),
-                    CheckInDate = r.CheckInDate,
-                    CheckOutDate = r.CheckOutDate
-                })
-                .ToListAsync();
-
-            var totalInvoicesToday = await _context.Invoices.CountAsync(i => i.InvoiceDate >= todayStart && i.InvoiceDate < todayEnd);
-            var revenueToday = await _context.Invoices
-                .Where(i => i.InvoiceDate >= todayStart && i.InvoiceDate < todayEnd)
-                .SumAsync(i => (decimal?)i.TotalAmount) ?? 0;
-
-            var expiringCAIs = await _context.CAIs
-                .AsNoTracking()
-                .Where(c => c.Status == CAIStatus.Activo && c.DueDate <= today.AddDays(30))
-                .OrderBy(c => c.DueDate)
-                .ToListAsync();
-
-            var activeDocAuth = await _context.DocumentAuthorizations
-                .AsNoTracking()
-                .Where(d => d.Status == CAIStatus.Activo)
-                .OrderBy(d => d.DueDate)
-                .ToListAsync();
-
-            var cashRegister = await _context.CashRegisters.AsNoTracking().FirstOrDefaultAsync(cr => cr.IsActive);
-            decimal? cashBalance = null;
-            string? cashName = null;
-            if (cashRegister != null)
-            {
-                cashBalance = await _context.CashMovements
-                    .Where(cm => cm.CashRegisterId == cashRegister.Id)
-                    .OrderByDescending(cm => cm.CreatedAt)
-                    .ThenByDescending(cm => cm.Id)
-                    .Select(cm => (decimal?)cm.BalanceAfter)
-                    .FirstOrDefaultAsync() ?? 0;
-                cashName = cashRegister.Name;
-            }
-
-            var alerts = new List<DashboardAlertDto>();
-            if (expiringCAIs.Count > 0)
-            {
-                alerts.Add(new DashboardAlertDto
-                {
-                    Title = "CAI por vencer",
-                    Description = $"{expiringCAIs.Count} CAI(s) vencen pronto. El más cercano vence el {expiringCAIs[0].DueDate:dd/MM/yyyy}.",
-                    Severity = "warning"
-                });
-            }
-            if (activeDocAuth.Any(d => d.DueDate <= _clock.Today.AddDays(30)))
-            {
-                alerts.Add(new DashboardAlertDto
-                {
-                    Title = "Autorización fiscal próxima a vencer",
-                    Description = $"{activeDocAuth.Count(d => d.DueDate <= _clock.Today.AddDays(30))} autorización(es) requieren revisión.",
-                    Severity = "warning"
-                });
-            }
-            if (await _context.Products.AnyAsync(p => p.IsActive && p.CurrentStock <= p.MinStockLevel))
-            {
-                alerts.Add(new DashboardAlertDto
-                {
-                    Title = "Stock bajo",
-                    Description = "Hay productos por debajo del stock mínimo.",
-                    Severity = "danger"
-                });
-            }
-
-            var summary = new DashboardSummaryDto
-            {
-                OccupiedRooms = occupiedRooms,
-                FreeRooms = freeRooms,
-                PendingCheckIns = pendingCheckIns,
-                PendingCheckOuts = pendingCheckOuts,
-                Cash = cashRegister == null
-                    ? null
-                    : new DashboardCashDto { RegisterName = cashName!, Balance = cashBalance ?? 0 },
-                Stats = new List<DashboardStatDto>
-                {
-                    new() { Title = "Habitaciones ocupadas", Value = occupiedRooms.ToString(), Trend = "Operativo" },
-                    new() { Title = "Habitaciones libres", Value = freeRooms.ToString(), Trend = "Operativo" },
-                    new() { Title = "Reservas hoy", Value = pendingCheckIns.ToString(), Trend = "Por confirmar" },
-                    new() { Title = "Ingresos del día", Value = $"L {revenueToday:N2}", Trend = $"{totalInvoicesToday} factura(s)" },
-                },
-                Alerts = alerts,
-                RecentInvoices = recentInvoices,
-                UpcomingReservations = upcomingReservations
-            };
-
-            return Ok(summary);
+                    CorrelativeNumber = row.CorrelativeNumber,
+                    CustomerName = row.CustomerName,
+                    TotalAmount = row.TotalAmount,
+                    Status = row.Status.ToString(),
+                    InvoiceDate = row.InvoiceDate
+                }).ToListAsync(token);
+            var start = clock.HondurasNow.Date;
+            var end = start.AddDays(1);
+            var invoices = context.Invoices.Where(row => row.InvoiceDate >= start && row.InvoiceDate < end);
+            var count = await invoices.CountAsync(token);
+            var amount = await invoices.SumAsync(row => (decimal?)row.TotalAmount, token) ?? 0m;
+            summary.Stats.Add(new() { Title = "Ingresos del día", Value = $"L {amount:N2}", Trend = $"{count} factura(s)" });
         }
+        if (Can(HotelAccessPolicies.ReadFiscalOptions))
+        {
+            var soon = today.AddDays(30);
+            var expiring = await context.CAIs.CountAsync(row => row.Status == CAIStatus.Activo && row.DueDate <= soon, token)
+                + await context.DocumentAuthorizations.CountAsync(row => row.Status == CAIStatus.Activo && row.DueDate <= soon, token);
+            if (expiring > 0) summary.Alerts.Add(new()
+            {
+                Title = "Autorizaciones fiscales por revisar",
+                Description = $"{expiring} autorización(es) vencidas o próximas a vencer requieren revisión.",
+                Severity = "warning"
+            });
+        }
+        if (Has(PermissionNames.ManageCash))
+        {
+            var register = await context.CashRegisters.AsNoTracking().Where(row => row.IsActive)
+                .OrderBy(row => row.Name).ThenBy(row => row.Id).FirstOrDefaultAsync(token);
+            if (register is not null)
+            {
+                var balance = await context.CashMovements.Where(row => row.CashRegisterId == register.Id)
+                    .OrderByDescending(row => row.CreatedAt).ThenByDescending(row => row.Id)
+                    .Select(row => (decimal?)row.BalanceAfter).FirstOrDefaultAsync(token) ?? 0m;
+                summary.Cash = new() { RegisterName = register.Name, Balance = balance };
+            }
+        }
+        if (Has(PermissionNames.ManageInventory)
+            && await context.Products.AnyAsync(row => row.IsActive && row.CurrentStock <= row.MinStockLevel, token))
+            summary.Alerts.Add(new() { Title = "Stock bajo", Description = "Hay productos por debajo del stock mínimo.", Severity = "danger" });
+        return Ok(summary);
     }
 }

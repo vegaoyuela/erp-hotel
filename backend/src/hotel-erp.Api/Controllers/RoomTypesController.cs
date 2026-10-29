@@ -9,7 +9,7 @@ namespace hotel_erp.Api.Controllers
 {
     [ApiController]
     [Route("api/room-types")]
-    [Authorize]
+    [Authorize(Policy = PermissionNames.ManageReservations)]
     public class RoomTypesController : ControllerBase
     {
         private readonly IRoomTypeRepository _repo;

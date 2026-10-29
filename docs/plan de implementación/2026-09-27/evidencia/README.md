@@ -238,3 +238,23 @@ Selección paginada para operación/fiscal/caja, contrato completo de éxitos y 
 | [p02h2c-qa-resumen.json](p02h2c-qa-resumen.json) | Resumen y hashes de fuentes, contrato, pruebas y evidencia. |
 
 El [detalle H2C](../p02-base-tecnica/p02-h2c-selectores-contratos.md) conserva el anexo de navegación y límites. Continúan seguridad, matriz formal, revisión independiente, Windows e impresión; las pruebas no equivalen a aprobación SAR.
+
+### P02-I — permisos y administración (29 de octubre de 2026)
+
+Acceso por permisos en API/UI, notas fiscales separadas, cuentas superiores protegidas, usuarios/opciones de roles paginados y matriz formal de pruebas.
+
+| Archivo | Resultado |
+|---|---|
+| [p02i-qa.log](p02i-qa.log) | QA final: 136 unitarias, 5 integraciones PostgreSQL, 5 validaciones del expediente, npm audit, contrato real, lint y build. |
+| [p02i-qa-inicial.log](p02i-qa-inicial.log) | Ensayo inicial: ID de fixture capturado antes de generarse; corregido. |
+| [p02i-selector-inicial.log](p02i-selector-inicial.log) | Ensayo inicial: proyección de rol no traducible a SQL; corregida. |
+| [p02i-contrato-inicial.log](p02i-contrato-inicial.log) | Backend aprobado; comparación detectó URL temporal UI en snapshot. Se regeneró desde integración antes de QA final. |
+| [p02i-modelo-ef.log](p02i-modelo-ef.log) | No requiere migración adicional. |
+| [p02i-base-qa.json](p02i-base-qa.json) | Base QA original preservada y bases temporales retiradas. |
+| [p02i-accesos.json](p02i-accesos.json) | 72 comprobaciones de lectura/notas, seis cambios superiores rechazados, dashboard minimizado y páginas de 31 usuarios/roles. |
+| [p02i-inventario-contratos.json](p02i-inventario-contratos.json) | Rutas nuevas, contrato y 17 arrays de páginas restantes clasificados. |
+| [p02i-impeccable.json](p02i-impeccable.json) | Detector sobre ocho archivos UI: cero hallazgos. |
+| [ui-p02i/resultado.json](ui-p02i/resultado.json) | Siete recorridos, doce capturas, cero errores JavaScript y cero mutaciones de negocio desde navegador. |
+| [p02i-qa-resumen.json](p02i-qa-resumen.json) | Resumen y hashes del bloque. |
+
+El [detalle](../p02-base-tecnica/p02-i-accesos-seguridad.md) y la [matriz formal](../p02-base-tecnica/p02-i-matriz-api-dat-sec.md) distinguen cobertura ejecutada, aprobaciones y pendientes. Windows e impresión mantienen el recordatorio existente.
