@@ -1,210 +1,59 @@
-using hotel_erp.Api.Dtos.Auth;
 using AutoMapper;
-using hotel_erp.Api.Dtos.Common;
+using hotel_erp.Api.Authorization;
+using hotel_erp.Api.Dtos.Auth;
+using hotel_erp.Api.Services;
 using hotel_erp.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
-using hotel_erp.Api.Authorization;
-using hotel_erp.Api.Database;
-using hotel_erp.Api.Database.Entities;
 
-namespace hotel_erp.Api.Controllers
+namespace hotel_erp.Api.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+[Authorize(Policy = PermissionNames.ManageRoles)]
+public class RolesController(IRoleRepository repository, IPermissionRepository permissions, IMapper mapper,
+    SecurityAdministrationService security) : ControllerBase
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    [Authorize(Policy = PermissionNames.ManageRoles)]
-    public class RolesController : ControllerBase
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<RoleDto>>> GetAll()
+        => Ok(mapper.Map<IEnumerable<RoleDto>>(await repository.GetAllAsync()));
+
+    [HttpGet("{id}")]
+    public async Task<ActionResult<RoleDto>> GetById(Guid id)
     {
-        private readonly IRoleRepository _roleRepository;
-        private readonly IPermissionRepository _permissionRepository;
-        private readonly ApplicationDbContext _context;
-        private readonly IJwtService _jwtService;
-        private readonly IMapper _mapper;
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IAuditService _audit;
-
-        public RolesController(
-            IRoleRepository roleRepository,
-            IPermissionRepository permissionRepository,
-            ApplicationDbContext context,
-            IJwtService jwtService,
-            IMapper mapper,
-            IUnitOfWork unitOfWork, IAuditService audit)
-        {
-            _roleRepository = roleRepository;
-            _permissionRepository = permissionRepository;
-            _context = context;
-            _jwtService = jwtService;
-            _mapper = mapper;
-            _audit = audit;
-            _unitOfWork = unitOfWork;
-        }
-
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<RoleDto>>> GetAll()
-        {
-            var roles = await _roleRepository.GetAllAsync();
-            return Ok(_mapper.Map<IEnumerable<RoleDto>>(roles));
-        }
-
-        [HttpGet("{id}")]
-        public async Task<ActionResult<RoleDto>> GetById(Guid id)
-        {
-            var role = await _roleRepository.GetByIdAsync(id);
-            if (role == null) return NotFound();
-            return Ok(_mapper.Map<RoleDto>(role));
-        }
-
-        [HttpPost]
-        [ProducesResponseType(typeof(RoleDto), StatusCodes.Status201Created)]
-        public async Task<ActionResult<RoleDto>> Create([FromBody] CreateRoleRequest request)
-        {
-            var existing = await _roleRepository.GetByNameAsync(request.Name);
-            if (existing != null) return BadRequest("El rol ya existe");
-
-            var selectedPermissions = await ResolveAssignablePermissionsAsync(request.Permissions);
-            if (selectedPermissions is null)
-                return BadRequest("Uno o más permisos solicitados no existen o exceden los permisos del operador");
-
-            var role = new Role
-            {
-                Name = request.Name.Trim(),
-                NormalizedName = SecurityCatalogSeeder.NormalizeRoleName(request.Name),
-                Description = request.Description
-            };
-            await _roleRepository.AddAsync(role);
-
-            if (selectedPermissions.Count > 0)
-            {
-                await _roleRepository.AssignPermissionsAsync(role.Id, selectedPermissions.Select(permission => permission.Id));
-            }
-
-            await _unitOfWork.SaveChangesAsync(HttpContext.RequestAborted);
-            return CreatedAtAction(nameof(GetById), new { id = role.Id }, _mapper.Map<RoleDto>(role));
-        }
-
-        [HttpPut("{id}")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public async Task<ActionResult> Update(Guid id, [FromBody] UpdateRoleRequest request)
-        {
-            await using var transaction = await _context.Database.BeginTransactionAsync(HttpContext.RequestAborted);
-            var role = await _roleRepository.GetByIdAsync(id);
-            if (role == null) return NotFound();
-            if (await ResolveAssignablePermissionsAsync(role.RolePermissions
-                    .Where(link => !link.Permission.IsDeleted).Select(link => link.Permission.Name)) is null)
-            {
-                await _audit.LogAsync(Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!),
-                    "SecurityChangeDenied", nameof(Role), id, new { Operation = ControllerContext.ActionDescriptor.ActionName });
-                await transaction.CommitAsync(HttpContext.RequestAborted);
-                return Forbid();
-            }
-
-            if (request.Name != null)
-            {
-                var normalizedName = SecurityCatalogSeeder.NormalizeRoleName(request.Name);
-                if (role.SystemKey is not null && normalizedName != role.NormalizedName)
-                    return BadRequest("Los roles del sistema no se pueden renombrar");
-
-                var duplicate = await _context.Roles.AnyAsync(candidate =>
-                    candidate.Id != id && !candidate.IsDeleted && candidate.NormalizedName == normalizedName);
-                if (duplicate)
-                    return BadRequest("El rol ya existe");
-
-                role.Name = request.Name.Trim();
-                role.NormalizedName = normalizedName;
-            }
-
-            List<Permission>? selectedPermissions = null;
-            if (request.Permissions is not null)
-            {
-                selectedPermissions = await ResolveAssignablePermissionsAsync(request.Permissions);
-                if (selectedPermissions is null)
-                    return BadRequest("Uno o más permisos solicitados no existen o exceden los permisos del operador");
-            }
-
-            if (request.Description != null) role.Description = request.Description;
-            await _roleRepository.UpdateAsync(role);
-
-            if (selectedPermissions is not null)
-                await _roleRepository.AssignPermissionsAsync(role.Id, selectedPermissions.Select(permission => permission.Id));
-
-            await InvalidateRoleSessionsAsync(role.Id);
-            await transaction.CommitAsync(HttpContext.RequestAborted);
-
-            return NoContent();
-        }
-
-        [HttpDelete("{id}")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public async Task<ActionResult> Delete(Guid id)
-        {
-            await using var transaction = await _context.Database.BeginTransactionAsync(HttpContext.RequestAborted);
-            var role = await _roleRepository.GetByIdAsync(id);
-            if (role == null) return NotFound();
-            if (await ResolveAssignablePermissionsAsync(role.RolePermissions
-                    .Where(link => !link.Permission.IsDeleted).Select(link => link.Permission.Name)) is null)
-            {
-                await _audit.LogAsync(Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!),
-                    "SecurityChangeDenied", nameof(Role), id, new { Operation = ControllerContext.ActionDescriptor.ActionName });
-                await transaction.CommitAsync(HttpContext.RequestAborted);
-                return Forbid();
-            }
-            if (role.SystemKey is not null)
-                return BadRequest("Los roles del sistema no se pueden eliminar");
-
-            await _roleRepository.DeleteAsync(id);
-            await InvalidateRoleSessionsAsync(id);
-            await transaction.CommitAsync(HttpContext.RequestAborted);
-            return NoContent();
-        }
-
-        [HttpGet("permissions")]
-        public async Task<ActionResult<IEnumerable<PermissionDto>>> GetPermissions()
-        {
-            var permissions = await _permissionRepository.GetAllAsync();
-            return Ok(_mapper.Map<IEnumerable<PermissionDto>>(permissions));
-        }
-
-        private async Task<List<Permission>?> ResolveAssignablePermissionsAsync(IEnumerable<string>? permissionNames)
-        {
-            var requested = (permissionNames ?? [])
-                .Select(name => name.Trim())
-                .Where(name => name.Length > 0)
-                .Distinct(StringComparer.Ordinal)
-                .ToList();
-            if (requested.Count == 0)
-                return [];
-
-            var available = (await _permissionRepository.GetAllAsync())
-                .Where(permission => !permission.IsDeleted && requested.Contains(permission.Name, StringComparer.Ordinal))
-                .ToList();
-            if (available.Count != requested.Count)
-                return null;
-
-            var actorPermissions = User.FindAll(SecurityClaimTypes.Permission)
-                .Select(claim => claim.Value)
-                .ToHashSet(StringComparer.Ordinal);
-            return available.All(permission => actorPermissions.Contains(permission.Name)) ? available : null;
-        }
-
-        private async Task InvalidateRoleSessionsAsync(Guid roleId)
-        {
-            var users = await _context.UserRoles
-                .Where(userRole => userRole.RoleId == roleId)
-                .Select(userRole => userRole.User)
-                .Distinct()
-                .ToListAsync();
-
-            foreach (var user in users)
-                user.SecurityVersion++;
-
-            await _unitOfWork.SaveChangesAsync(HttpContext.RequestAborted);
-            foreach (var user in users)
-                await _jwtService.RevokeAllRefreshTokensAsync(user.Id);
-        }
+        var role = await repository.GetByIdAsync(id);
+        return role is null ? NotFound() : Ok(mapper.Map<RoleDto>(role));
     }
+
+    [HttpPost]
+    [ProducesResponseType(typeof(RoleDto), StatusCodes.Status201Created)]
+    public async Task<ActionResult<RoleDto>> Create([FromBody] CreateRoleRequest request)
+    {
+        var result = await security.CreateRoleAsync(SecurityActor.From(User), request, HttpContext.RequestAborted);
+        return result.Succeeded ? CreatedAtAction(nameof(GetById), new { id = result.Value!.Id }, result.Value) : Failure(result);
+    }
+
+    [HttpPut("{id}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public async Task<ActionResult> Update(Guid id, [FromBody] UpdateRoleRequest request)
+    {
+        var result = await security.UpdateRoleAsync(SecurityActor.From(User), id, request, HttpContext.RequestAborted);
+        return result.Succeeded ? NoContent() : Failure(result);
+    }
+
+    [HttpDelete("{id}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<ActionResult> Delete(Guid id)
+    {
+        var result = await security.DeleteRoleAsync(SecurityActor.From(User), id, HttpContext.RequestAborted);
+        return result.Succeeded ? NoContent() : Failure(result);
+    }
+
+    [HttpGet("permissions")]
+    public async Task<ActionResult<IEnumerable<PermissionDto>>> GetPermissions()
+        => Ok(mapper.Map<IEnumerable<PermissionDto>>(await permissions.GetAllAsync()));
+
+    private ObjectResult Failure<T>(ApplicationMutationResult<T> result) where T : class
+        => StatusCode(result.FailureStatus!.Value, result.FailureDetail);
 }
-
-

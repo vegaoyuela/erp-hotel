@@ -2,7 +2,7 @@
 
 **Inicio:** 27 de septiembre de 2026
 
-**Estado:** en ejecución; entregas P02-A a P02-I aprobadas por pruebas automáticas. Última ejecución: 29 de octubre de 2026.
+**Estado:** en ejecución; entregas P02-A a P02-J aprobadas por pruebas automáticas. Última ejecución: 29 de octubre de 2026.
 
 Este registro divide P02 en entregas comprobables. No se declara G2 mientras queden controladores con lógica de negocio, repositorios que confirman cambios por su cuenta o contratos sin prueba.
 
@@ -33,7 +33,7 @@ La versión anterior calculaba el hash con ticks de 100 ns antes de guardar un `
 | P02-03 | Completada en código | Contratos inyectables de reloj, cálculo, correlativo, auditoría, impresión y respaldo; sustitución/rollback y transporte simulado probados. Prueba física pendiente en Windows. |
 | P02-04 | Parcial (P02-I) | Usuarios y opciones de roles paginados; quedan límites/volumen de catálogos/reportes y revisión de clientes de rutas completas heredadas. |
 | P02-05 | Completada en código y QA | Tipos compartidos derivados de OpenAPI; comparación automática contra API real, snapshot y tipos generados. Revisión independiente en P02-10. |
-| P02-06 | Parcial (P02-I) | Lecturas y navegación por permisos, ajuste fiscal separado y protección de cuentas/roles superiores probados; faltan aprobaciones segregadas y administración bajo concurrencia. |
+| P02-06 | Parcial (P02-J) | Administración y sesiones coordinadas; último administrador, atomicidad, revocación y auditoría probados. Restan aprobaciones segregadas y motivos/aprobaciones sensibles. |
 | P02-07 | Parcial previo | Existen roles PostgreSQL y migración separada; la rotación de secretos se ejecutará durante instalación Windows. |
 | P02-08 | Completada | Verificador, exportador, UI, compatibilidad histórica y pruebas. |
 | P02-09 | Parcial (P02-I) | Matriz formal API/DAT/SEC registrada con cobertura y brechas; faltan los escenarios y entornos indicados en ella. |
@@ -97,7 +97,7 @@ Se paginaron cajas, movimientos de caja, liquidaciones, cobros elegibles, asient
 
 ## Criterio para la siguiente entrega
 
-P02-H2C queda documentada en la entrega siguiente. P02-I registra las políticas, paginación administrativa y matriz formal. El siguiente bloque debe cubrir administración de seguridad bajo concurrencia, auditoría/atomicidad de cambios exitosos y aprobaciones sensibles; conserva los límites restantes de P02-04 y las brechas formales de P02-09. G2 sigue abierta hasta cubrir los pendientes de la tabla y obtener la revisión independiente.
+P02-H2C queda documentada en la entrega siguiente. P02-I registra las políticas, paginación administrativa y matriz formal. P02-J cubre administración de seguridad bajo concurrencia y auditoría/atomicidad. El siguiente bloque debe cerrar brechas formales API/DAT/SEC ejecutables y avanzar aprobaciones sensibles cuando existan decisiones del hotel; conserva los límites restantes de P02-04. G2 sigue abierta hasta cubrir los pendientes de la tabla y obtener la revisión independiente.
 
 La evidencia de QA y compatibilidad se conserva en el [expediente general](../evidencia/README.md#p02--base-técnica-primera-entrega).
 
@@ -108,3 +108,7 @@ Se paginaron los selectores de check-in/out, autorizaciones y cajas auxiliares. 
 ## Entrega P02-I — permisos y administración (29 de octubre de 2026)
 
 Las lecturas sensibles y la navegación usan permisos efectivos; el nombre del rol no concede privilegios. El dashboard filtra sus secciones, las notas requieren `adjust_invoices` y la gestión delegada rechaza cambios sobre cuentas/roles superiores. Usuarios y opciones de roles se consultan por páginas; el selector solo ofrece roles concedibles. Pasan 136 unitarias, 5 integraciones, 5 validaciones del expediente y siete recorridos con doce capturas. El [detalle P02-I](p02-i-accesos-seguridad.md) y la [matriz formal](p02-i-matriz-api-dat-sec.md) documentan cambios y brechas. P02-04/P02-06/P02-09 y G2 siguen parciales/abiertas en su alcance restante.
+
+## Entrega P02-J — administración atómica (29 de octubre de 2026)
+
+Usuarios, roles y registro heredado delegan sus mutaciones a un servicio con transacción exterior. Los bloqueos de catálogo/usuario coordinan cambios administrativos y sesiones; el actor se revalida después de esperar. Se protege el último administrador y los permisos de Admin. Nueve clases de mutación tienen auditoría; 39 fallos restauran el estado completo y ocho carreras comprueban consistencia y revocación. La suite suma 138 unitarias, 8 integraciones y 5 validaciones del expediente. El [detalle P02-J](p02-j-administracion-atomica.md) contiene evidencia, cambios HTTP y pendientes. P02-06 y G2 siguen abiertas por el alcance restante.

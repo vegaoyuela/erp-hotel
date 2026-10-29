@@ -1,3 +1,4 @@
+using hotel_erp.Api.Services;
 using hotel_erp.Api.Authorization;
 using hotel_erp.Api.Database.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -53,6 +54,7 @@ public static class SecurityCatalogSeeder
         ILogger logger,
         CancellationToken cancellationToken = default)
     {
+        await using var transaction = await SecurityMutationLocks.BeginAdministrationAsync(context, cancellationToken);
         var permissionsByName = await context.Permissions
             .ToDictionaryAsync(permission => permission.Name, StringComparer.Ordinal, cancellationToken);
 
@@ -177,6 +179,7 @@ public static class SecurityCatalogSeeder
         }
 
         await context.SaveChangesAsync(cancellationToken);
+        await transaction.CommitAsync(cancellationToken);
     }
 
     public static string NormalizeRoleName(string name) => name.Trim().ToUpperInvariant();

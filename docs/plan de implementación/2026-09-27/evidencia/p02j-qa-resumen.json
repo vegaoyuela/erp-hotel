@@ -1,0 +1,160 @@
+{
+  "date_honduras": "2026-10-29",
+  "block": "P02-J",
+  "baseline_commit": "2281700",
+  "status": "passed",
+  "contains_secret_values": false,
+  "qa": {
+    "backend_build": "passed_without_warnings",
+    "unit_tests": 138,
+    "postgres_integration_tests": 8,
+    "profile_dossier_tests": 5,
+    "frontend_lint": "passed",
+    "frontend_production_build": "passed",
+    "frontend_audit_vulnerabilities": 0,
+    "contract_tools_audit_vulnerabilities": 0,
+    "live_openapi_snapshot_types": "synchronized",
+    "ef_model_pending_changes": false
+  },
+  "security": {
+    "audited_mutation_kinds": 9,
+    "administrator_safeguards": 6,
+    "concurrent_races": 8,
+    "postgres_lock_waits_observed": 6,
+    "rollback_scenarios": 39,
+    "rollback_checkpoints": [
+      "after-persistence",
+      "after-revocation",
+      "after-audit"
+    ],
+    "rollback_tables": [
+      "Users",
+      "Roles",
+      "Permissions",
+      "UserRoles",
+      "RolePermissions",
+      "RefreshTokens",
+      "AuditLogs",
+      "CorrelativeLocks"
+    ],
+    "jwt_calls_without_transaction_rejected": 3,
+    "legacy_registration_permissions_preserved": true,
+    "session_writes_leave_role_catalog_unchanged": true,
+    "credentials_excluded_from_audit": true
+  },
+  "contract": {
+    "date_honduras": "2026-10-29",
+    "baseline_commit": "2281700",
+    "contains_secret_values": false,
+    "operations": 185,
+    "successful_200_201_without_schema": [],
+    "binary_responses": 8,
+    "changed_operations": [
+      {
+        "method": "PUT",
+        "path": "/api/Roles/{id}",
+        "responses_added": [
+          "409"
+        ],
+        "responses_removed": []
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/Users/{id}",
+        "responses_added": [
+          "409"
+        ],
+        "responses_removed": []
+      },
+      {
+        "method": "PUT",
+        "path": "/api/Users/{id}",
+        "responses_added": [
+          "409"
+        ],
+        "responses_removed": []
+      }
+    ],
+    "request_and_success_response_shapes": "verified_unchanged",
+    "operations_missing_expected_success": 0,
+    "legacy_rejection_only_operations": 2,
+    "new_database_migration_required": false,
+    "frontend_ui_source_changes": false
+  },
+  "database": {
+    "database": "hotel_erp_qa",
+    "table_count": 42,
+    "total_rows": 345,
+    "migration_count": 11,
+    "temporary_databases_remaining": 0
+  },
+  "scope": {
+    "frontend_ui_changed": false,
+    "ui_qa": "No UI edits; frontend build/lint and generated contract checked.",
+    "no_new_migration": true,
+    "prior_complete_qa_passed_before_graph_write_cleanup": true,
+    "new_tests": "Three PostgreSQL facts added to the existing five; all eight executed.",
+    "coordinated_write_scope": "User, role, registration and authentication session mutations"
+  },
+  "completion": {
+    "P02_06": "partial_other_mutation_races_segregated_approvals_and_sensitive_reasons",
+    "P02_09": "formal_matrix_updated_with_open_scenarios",
+    "G2": "open"
+  },
+  "remaining": [
+    "Revocation while hotel/financial operations wait on resource locks",
+    "Segregated approvals by amount, method and origin; hotel-defined thresholds",
+    "Remaining formal API/DAT/SEC scenarios",
+    "P02-04 catalog/report limits and legacy clients",
+    "P02-07 account separation and Windows secret rotation",
+    "P02-10 independent review",
+    "P03 folio monetary breakdown",
+    "G0/G1 official data and hotel decisions",
+    "Windows 11 Docker Desktop, PowerShell QA and physical invoice printing"
+  ],
+  "windows_reminder": "Existing daily 10:00 America/Tegucigalpa reminder retained; no duplicate created.",
+  "sha256": {
+    "backend/src/hotel-erp.Api/Controllers/AuthController.cs": "475f19af91e083ca5302d191324c2b0ec8fcd29af46c29272cf595e6131d9238",
+    "backend/src/hotel-erp.Api/Controllers/RolesController.cs": "83f19a5e774538241ddf938fb92ed1c5dac4e54cf8a33eca7bbf89491a3203f6",
+    "backend/src/hotel-erp.Api/Controllers/UsersController.cs": "6937454539489dc5fa9e42840bf9f5e50c503e55ad2bbe1ce59d729b91cd41b2",
+    "backend/src/hotel-erp.Api/Database/SecurityCatalogSeeder.cs": "d5c55445688212660b45d02ba71a03680e153574645c8214acd5862bce1f8577",
+    "backend/src/hotel-erp.Api/Program.cs": "95898408043e520aa3c5351023b7ec37c24e14fcdf358075ef56c46cfe759fad",
+    "backend/src/hotel-erp.Api/Services/ApplicationFailureInjection.cs": "c51f4c6c96d66913f4496bc29b0247c64ef937be5a502a5b1a7a8aeed1bed8a2",
+    "backend/src/hotel-erp.Api/Services/AuthService.cs": "13e119782ba41b0fc8d08564298870d8e784f0331922d9166a1f8af7961e06fb",
+    "backend/src/hotel-erp.Api/Services/AuthenticationOperationExceptions.cs": "41fcb1faef78618ded4fee245f22a41fe681186e2060f42b20299c154c90a41e",
+    "backend/src/hotel-erp.Api/Services/Interfaces/IAuthService.cs": "08c787c4fd40c1d0822102efc402059574d48c21f0e631a2e1283d018510f072",
+    "backend/src/hotel-erp.Api/Services/SecurityAdministrationService.Roles.cs": "0f60370a7474f02c4e630d859628ce6626834af63029b8a5c16a3eca1ab34c02",
+    "backend/src/hotel-erp.Api/Services/SecurityAdministrationService.Users.cs": "bfc3eb50995596c52c419685cf4f14b5d28b0201ff0382cc450461363f3d6b47",
+    "backend/src/hotel-erp.Api/Services/SecurityAdministrationService.cs": "654ee7d090aea17618a81c06385c15c579145afe709adc5cff9efa6c9370ea43",
+    "backend/src/hotel-erp.Api/Services/SecurityMutationLocks.cs": "6da89765edb3e2aca964ef71e71164386d227529b2397afdce0ac0eafce64e24",
+    "backend/tests/hotel-erp.IntegrationTests/AuthenticationFlowTests.SecurityConcurrency.cs": "cb3fdcf84639979b6ae11e279d0ec567ba670a16bf8e5ab212ac9fc37674a58f",
+    "backend/tests/hotel-erp.IntegrationTests/AuthenticationFlowTests.SecurityOperations.cs": "fbf8d92626f7c3688a37292360774d20709bd8bb8ee1516cfb6010a8e54c3e5c",
+    "backend/tests/hotel-erp.IntegrationTests/AuthenticationFlowTests.SecurityRollback.cs": "eb61b9666edded2192e0e62263335e0823d33a38e690af58cdd87500814e0b67",
+    "backend/tests/hotel-erp.IntegrationTests/AuthenticationFlowTests.SecuritySupport.cs": "98adfa97741bdbee1cb03233efcdda85220c0d5ee91a82615b413019aca272c7",
+    "backend/tests/hotel-erp.IntegrationTests/AuthenticationFlowTests.SelectorContracts.cs": "a982169825c580a890761a55c90363906e9edc46e6099cb6c84be0448c9fe27f",
+    "backend/tests/hotel-erp.IntegrationTests/AuthenticationFlowTests.cs": "f8aa65e9425384011b8b6745ef396e322bc11b8b60f019b1e7e361a584059ecd",
+    "backend/tests/hotel-erp.UnitTests/ApplicationServiceArchitectureTests.cs": "eafd19fb28dc90f8b925a9fe004bc5d80821346ab372164845b80bc618c2a8ce",
+    "docs/plan de implementación/2026-09-27/06-lista-maestra.md": "c5458c6ed6d826ace046dc08a176e65b4863c578f4a6b0ac4d3729efd2a499cf",
+    "docs/plan de implementación/2026-09-27/08-registro-pendientes.md": "4415075ced8adeab3a5f8d238fd8095bd5bbdc6043ac8f81dd0f5807942e6acf",
+    "docs/plan de implementación/2026-09-27/README.md": "69d5714e45832a0c79627dc7141d690dc985c69b6c3e65429b2b84865f47ebfa",
+    "docs/plan de implementación/2026-09-27/contratos/openapi-v1.json": "02cf05d853957782cdb9ebb33f591b79b8140c8c507ec4a6b786ad6e889f4e00",
+    "docs/plan de implementación/2026-09-27/evidencia/README.md": "bfcd1f0930e4acc8c0591e8b98830be46fa26fef8a6133dbdfea303859b5eba7",
+    "docs/plan de implementación/2026-09-27/evidencia/p02j-base-qa.json": "076874156e9035d3c469766115de3cf81f05ead59c1b537e1b681893cd9ce834",
+    "docs/plan de implementación/2026-09-27/evidencia/p02j-concurrencia.json": "9d8e64f5abc8eb5f1fbf40c32ce0e3bf4548de722a23409cddc974b7886afbdf",
+    "docs/plan de implementación/2026-09-27/evidencia/p02j-contrato-validacion.log": "e745bd661fbdd2503da4a1d3224a05fbdab91394428d11536573f3f1b1d787ee",
+    "docs/plan de implementación/2026-09-27/evidencia/p02j-contratos.json": "c7a7d6d512ae354fc2147c3f871b918a4aa40f88d03dbc4fc44aea9418d2284a",
+    "docs/plan de implementación/2026-09-27/evidencia/p02j-integracion.log": "2e44fbd1b8b3438ff085e21f56aea0a9a418db282cc8af176d33d0c5ef6fe70e",
+    "docs/plan de implementación/2026-09-27/evidencia/p02j-modelo-ef.log": "815c5cd494b61a9d8737ba7653cd05fb05926e7b40a924683fa4eef4ca87566c",
+    "docs/plan de implementación/2026-09-27/evidencia/p02j-operaciones.json": "0b528493d885ac22681d6b20f7454a071b7495540497e0c0b885b533fd989177",
+    "docs/plan de implementación/2026-09-27/evidencia/p02j-qa-antes-compatibilidad.log": "5f5c8138c8d3ac9ecb5cfed8d62d8dd618a1e7a20389d2b36c4b327dd9b0fb1d",
+    "docs/plan de implementación/2026-09-27/evidencia/p02j-qa-antes-contrato.log": "e4139c3cae5088583ded911d0dda9ea01710313fa94575b744769a8dfbab1f0d",
+    "docs/plan de implementación/2026-09-27/evidencia/p02j-qa-previa.log": "48fd6780b4b99c32e4e186679151fbbbc84e7acdddd047ae322e8ddb146be067",
+    "docs/plan de implementación/2026-09-27/evidencia/p02j-qa.log": "6b2525180fcbdfe02cba305a404e174ed889eac7619bd91c4dd45e2738fd3b94",
+    "docs/plan de implementación/2026-09-27/evidencia/p02j-rollback.json": "e6679d7c6005cc6fde8d6895d24928a23abe9ef9fd235422accded5e482d672e",
+    "docs/plan de implementación/2026-09-27/evidencia/p02j-selectiva.log": "44d173cf1f1469d5f8a7e00aac45d325f9256b85f92ec15ceb170eab0a5a23f7",
+    "docs/plan de implementación/2026-09-27/p02-base-tecnica/README.md": "9f3af55e1e66e7cd70fbb1c30cdc994a62c5f50b37b59aff0236d04696b5c7a9",
+    "docs/plan de implementación/2026-09-27/p02-base-tecnica/p02-i-matriz-api-dat-sec.md": "c802cd32f41dbb99dbbb1f0106a89a7d058ee91d65b83f66dbb56a6c04deade2",
+    "docs/plan de implementación/2026-09-27/p02-base-tecnica/p02-j-administracion-atomica.md": "4e3e2cfc12702f9061e15ec160ead4c3ba6f03c8ee6088e6f8ce43abfc91e98b",
+    "frontend/src/types/api.generated.ts": "68fef98deb4a59421c518887b868a5c3ca6ff760f2f8da6afa2dc2551d6562d9"
+  }
+}

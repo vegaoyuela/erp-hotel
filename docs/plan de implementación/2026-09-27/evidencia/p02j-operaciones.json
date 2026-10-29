@@ -1,0 +1,13 @@
+{
+  "syntheticDatabase": true,
+  "passed": true,
+  "auditedMutationKinds": 9,
+  "administratorSafeguards": 6,
+  "unchangedAndDuplicateRoleSelectionHandled": true,
+  "userAndRoleRevocation": true,
+  "credentialsExcludedFromAudit": true,
+  "auditChainValid": true,
+  "uncoordinatedJwtCallsRejected": 3,
+  "sessionWritesLeaveCatalogUnchanged": true,
+  "legacyRegistrationPermissionsPreserved": true
+}

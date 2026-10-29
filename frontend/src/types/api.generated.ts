@@ -15203,6 +15203,27 @@ export interface operations {
                     };
                 };
             };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
             /** @description Error interno normalizado; incluye traceId para seguimiento. */
             500: {
                 headers: {
@@ -17268,6 +17289,27 @@ export interface operations {
                     };
                 };
             };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
             /** @description Error interno normalizado; incluye traceId para seguimiento. */
             500: {
                 headers: {
@@ -17357,6 +17399,27 @@ export interface operations {
             };
             /** @description El operador carece de permisos o debe cambiar la contraseña. */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Conflict */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };

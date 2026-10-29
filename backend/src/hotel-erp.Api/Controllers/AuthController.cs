@@ -15,19 +15,16 @@ namespace hotel_erp.Api.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
-        private readonly IAuditService _auditService;
         private readonly AuthenticationSessionCookies _sessionCookies;
-        private readonly IRoleRepository _roles;
+        private readonly SecurityAdministrationService _security;
 
         public AuthController(
             IAuthService authService,
-            IAuditService auditService,
-            AuthenticationSessionCookies sessionCookies, IRoleRepository roles)
+            AuthenticationSessionCookies sessionCookies, SecurityAdministrationService security)
         {
             _authService = authService;
-            _auditService = auditService;
             _sessionCookies = sessionCookies;
-            _roles = roles;
+            _security = security;
         }
 
         [HttpPost("login")]
@@ -47,7 +44,6 @@ namespace hotel_erp.Api.Controllers
             }
             _sessionCookies.Issue(Response, result.RefreshToken!);
             result.RefreshToken = null;
-            await _auditService.LogAsync(result.User?.Id, "Login", null, null, request.Username);
             return Ok(result);
         }
 
@@ -55,21 +51,11 @@ namespace hotel_erp.Api.Controllers
         [HttpPost("register")]
         public async Task<ActionResult<AuthResponse>> Register([FromBody] RegisterRequest request)
         {
-            var defaultRole = (await _roles.GetAllAsync()).SingleOrDefault(role => role.SystemKey == SystemRoleKeys.Reception);
-            if (defaultRole is null) return Conflict("El rol de recepción no está disponible");
-            if (defaultRole.RolePermissions.Any(link => !link.Permission.IsDeleted
-                    && !User.HasClaim(SecurityClaimTypes.Permission, link.Permission.Name)))
-            {
-                await _auditService.LogAsync(Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!),
-                    "SecurityChangeDenied", "User", null, new { Operation = "RegisterReception" });
-                return Forbid();
-            }
-            var result = await _authService.RegisterAsync(request);
-            if (!result.Success)
-                return BadRequest(result);
-            var actorUserId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            await _auditService.LogAsync(actorUserId, "Register", nameof(User), result.User?.Id, request.Username);
-            return Ok(result);
+            var result = await _security.CreateUserAsync(SecurityActor.From(User), new CreateUserRequest(
+                request.Username, request.Password, request.Email, request.FirstName, request.LastName, null),
+                HttpContext.RequestAborted, receptionRegistration: true);
+            return result.Succeeded ? Ok(new AuthResponse { Success = true, User = result.Value, Message = "Usuario registrado" })
+                : StatusCode(result.FailureStatus!.Value, result.FailureDetail);
         }
 
         [HttpPost("refresh")]
@@ -118,9 +104,12 @@ namespace hotel_erp.Api.Controllers
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             try
             {
-                await _authService.LogoutAsync(userId);
-                await _auditService.LogAsync(userId, "Logout", null, userId);
+                await _authService.LogoutAsync(userId, SecurityActor.From(User).Version);
                 return Ok(new { message = "Sesión cerrada exitosamente" });
+            }
+            catch (SecuritySessionRevokedException)
+            {
+                return SessionRejected();
             }
             finally
             {
@@ -139,7 +128,12 @@ namespace hotel_erp.Api.Controllers
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             try
             {
-                await _authService.ChangePasswordAsync(userId, request);
+                await _authService.ChangePasswordAsync(userId, request, SecurityActor.From(User).Version);
+            }
+            catch (SecuritySessionRevokedException)
+            {
+                _sessionCookies.Clear(Response);
+                return SessionRejected();
             }
             catch (UnauthorizedAccessException exception)
             {
@@ -149,7 +143,7 @@ namespace hotel_erp.Api.Controllers
                     statusCode: StatusCodes.Status400BadRequest,
                     detail: exception.Message);
             }
-            catch (InvalidOperationException exception)
+            catch (PasswordChangeRejectedException exception)
             {
                 return Problem(
                     type: "https://httpstatuses.com/400",
@@ -158,7 +152,6 @@ namespace hotel_erp.Api.Controllers
                     detail: exception.Message);
             }
 
-            await _auditService.LogAsync(userId, "ChangePassword", nameof(User), userId);
             _sessionCookies.Clear(Response);
             return Ok(new { message = "Contraseña cambiada exitosamente" });
         }

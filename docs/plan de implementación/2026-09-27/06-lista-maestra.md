@@ -41,10 +41,10 @@ Pendientes externos: [registro único de bloqueos](08-registro-pendientes.md). E
 - [x] P02-03 Inyectar reloj, cálculo, correlativo, auditoría, impresión y respaldo. **Completada en código el 28 de octubre:** contratos registrados y consumidores migrados; sustitución de cálculo/auditoría con rollback y transporte de impresión simulado verificados. La prueba física permanece en Windows.
 - [ ] P02-04 Completar OpenAPI, `ProblemDetails`, paginación, fechas y enums. **Parcial (P02-I, 29 de octubre):** contrato y selectores cubiertos; usuarios/opciones de roles paginados. Quedan límites/volumen de catálogos/reportes y clientes de rutas completas heredadas; 17 lecturas de arrays en páginas clasificadas.
 - [x] P02-05 Generar/validar tipos frontend desde el contrato. **Completada en código y QA (P02-H2C):** tipos compartidos derivados de OpenAPI, snapshot/tipos comparados con la API real; revisión independiente en P02-10.
-- [ ] P02-06 Completar permisos y motivos/aprobaciones sensibles. **Parcial (P02-I):** lecturas/UI por permisos, `adjust_invoices`, dashboard filtrado y protección de cuentas/roles superiores probados. Quedan aprobaciones segregadas y administración de seguridad bajo concurrencia/atomicidad/auditoría de cambios exitosos.
+- [ ] P02-06 Completar permisos y motivos/aprobaciones sensibles. **Parcial (P02-J):** acceso por permisos, administración/sesiones coordinadas, último administrador, atomicidad y auditoría probados. Restan aprobaciones segregadas por monto/medio/origen y motivos/aprobaciones sensibles restantes.
 - [ ] P02-07 Rotar secretos y separar migrador/aplicación/respaldo/bootstrap.
 - [x] P02-08 Crear verificador/exportador de cadena de auditoría.
-- [ ] P02-09 Ejecutar API01–API05, DAT01–DAT03 y SEC01–SEC11. **Parcial (P02-I):** matriz formal con pruebas ejecutadas y brechas registrada; completar cada escenario/entorno antes de aceptación.
+- [ ] P02-09 Ejecutar API01–API05, DAT01–DAT03 y SEC01–SEC11. **Parcial (P02-J):** matriz formal actualizada con 39 rollbacks, ocho carreras y cobertura de revocación/administración; completar las brechas y entornos pendientes antes de aceptación.
 - [ ] P02-10 Registrar revisión técnica independiente.
 - [ ] **G2** Aprobar base técnica y seguridad.
 

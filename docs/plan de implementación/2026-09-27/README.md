@@ -14,7 +14,9 @@ La entrega [P02-H2B](p02-base-tecnica/p02-h2b-finanzas-respaldos.md), del 29 de 
 
 La entrega [P02-H2C](p02-base-tecnica/p02-h2c-selectores-contratos.md) completa los selectores principales y los tipos compartidos derivados del contrato; todos los éxitos 200/201 tienen esquema. QA completa y ocho capturas aprobadas. P02-05 queda completada en código/QA; siguen pendientes seguridad, paginación administrativa/límites restantes, matriz formal y revisión independiente. G2 permanece abierta.
 
-La entrega [P02-I](p02-base-tecnica/p02-i-accesos-seguridad.md) alinea consultas y navegación por permisos, separa notas fiscales, protege cuentas/roles superiores y pagina usuarios/opciones de roles. La [matriz formal API/DAT/SEC](p02-base-tecnica/p02-i-matriz-api-dat-sec.md) registra cobertura y brechas. G2 sigue abierta; la siguiente prioridad es administración de seguridad bajo concurrencia, atomicidad/auditoría y aprobaciones sensibles.
+La entrega [P02-I](p02-base-tecnica/p02-i-accesos-seguridad.md) alinea consultas y navegación por permisos, separa notas fiscales, protege cuentas/roles superiores y pagina usuarios/opciones de roles. La [matriz formal API/DAT/SEC](p02-base-tecnica/p02-i-matriz-api-dat-sec.md) registra cobertura y brechas. G2 sigue abierta; al cierre de P02-I, la siguiente prioridad era administración de seguridad bajo concurrencia, atomicidad/auditoría y aprobaciones sensibles.
+
+La entrega [P02-J](p02-base-tecnica/p02-j-administracion-atomica.md) protege la administración y sesiones con transacciones/bloqueos, conserva el último administrador y confirma auditoría con revocación. Añade 39 rollbacks y ocho carreras; la QA suma 138 unitarias, 8 integraciones y 5 validaciones del expediente. Quedan las aprobaciones sensibles y brechas formales documentadas; G2 permanece abierta.
 
 ## Resultado esperado
 

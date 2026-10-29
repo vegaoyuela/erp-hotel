@@ -21,30 +21,32 @@ namespace hotel_erp.Api.Services
         private readonly IUserRepository _userRepository;
         private readonly IJwtService _jwtService;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
-        private readonly IConfiguration _configuration;
         private readonly ApplicationDbContext _context;
         private readonly IHotelClock _clock;
+        private readonly IAuditService _audit;
+        private readonly IApplicationFailureInjector _failureInjector;
 
         public AuthService(
             IUserRepository userRepository,
             IJwtService jwtService,
-            IMapper mapper,
-            IConfiguration configuration,
             ApplicationDbContext context,
-            IHotelClock clock, IUnitOfWork unitOfWork)
+            IHotelClock clock, IUnitOfWork unitOfWork, IAuditService audit, IApplicationFailureInjector failureInjector)
         {
+            _failureInjector = failureInjector;
+            _audit = audit;
             _unitOfWork = unitOfWork;
             _userRepository = userRepository;
             _jwtService = jwtService;
-            _mapper = mapper;
-            _configuration = configuration;
             _context = context;
             _clock = clock;
         }
 
         public async Task<AuthResponse> LoginAsync(LoginRequest request)
         {
+            var userId = await _context.Users.AsNoTracking().Where(row => row.Username == request.Username)
+                .Select(row => (Guid?)row.Id).SingleOrDefaultAsync();
+            if (userId is null) return new AuthResponse { Success = false, Message = "Credenciales inválidas" };
+            await using var transaction = await SecurityMutationLocks.BeginSessionAsync(_context, userId.Value);
             var user = await _userRepository.GetByUsernameAsync(request.Username);
             if (user == null)
                 return new AuthResponse { Success = false, Message = "Credenciales inválidas" };
@@ -52,7 +54,7 @@ namespace hotel_erp.Api.Services
             if (user.LockoutEnd.HasValue && user.LockoutEnd > _clock.UtcNow)
                 return new AuthResponse { Success = false, Message = "Credenciales inválidas" };
 
-            if (!user.IsActive)
+            if (!user.IsActive || user.IsDeleted)
                 return new AuthResponse { Success = false, Message = "Credenciales inválidas" };
 
             if (!IsValidPassword(request.Password, user.PasswordHash))
@@ -60,18 +62,23 @@ namespace hotel_erp.Api.Services
                 user.FailedLoginAttempts++;
                 if (user.FailedLoginAttempts >= 5)
                     user.LockoutEnd = _clock.UtcNow.AddMinutes(15);
-                await _userRepository.UpdateAsync(user);
                 await _unitOfWork.SaveChangesAsync();
+                await transaction.CommitAsync();
                 return new AuthResponse { Success = false, Message = "Credenciales inválidas" };
             }
 
             user.FailedLoginAttempts = 0;
             user.LockoutEnd = null;
             user.LastLogin = _clock.UtcNow;
-            await _userRepository.UpdateAsync(user);
             await _unitOfWork.SaveChangesAsync();
 
-            return await _jwtService.GenerateTokensAsync(user.Id);
+            await _failureInjector.CheckpointAsync(ApplicationFailureCheckpoints.SecurityAfterPersistence);
+            var session = await _jwtService.GenerateTokensAsync(user.Id);
+            await _failureInjector.CheckpointAsync(ApplicationFailureCheckpoints.SecurityAfterRevocation);
+            await _audit.LogAsync(user.Id, "Login", null, null);
+            await _failureInjector.CheckpointAsync(ApplicationFailureCheckpoints.SecurityAfterAudit);
+            await transaction.CommitAsync();
+            return session;
         }
 
         private static bool IsValidPassword(string password, string passwordHash)
@@ -89,133 +96,74 @@ namespace hotel_erp.Api.Services
             }
         }
 
-        public async Task<AuthResponse> RegisterAsync(RegisterRequest request)
-        {
-            var existingUser = await _userRepository.GetByUsernameAsync(request.Username);
-            if (existingUser != null)
-                return new AuthResponse { Success = false, Message = "El usuario ya existe" };
-
-            existingUser = await _userRepository.GetByEmailAsync(request.Email);
-            if (existingUser != null)
-                return new AuthResponse { Success = false, Message = "El email ya está registrado" };
-
-            var user = new User
-            {
-                Username = request.Username,
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
-                Email = request.Email,
-                FirstName = request.FirstName,
-                LastName = request.LastName,
-                IsActive = true,
-                MustChangePassword = true
-            };
-
-            await _userRepository.AddAsync(user);
-
-            var defaultRole = await _context.Roles.FirstOrDefaultAsync(r => r.SystemKey == SystemRoleKeys.Reception);
-            if (defaultRole != null)
-            {
-                await _context.UserRoles.AddAsync(new UserRole { UserId = user.Id, RoleId = defaultRole.Id });
-            }
-            await _unitOfWork.SaveChangesAsync();
-
-            var roles = await _userRepository.GetUserRolesAsync(user.Id);
-            var permissions = await _userRepository.GetUserPermissionsAsync(user.Id);
-            var userDto = _mapper.Map<UserDto>(user);
-            userDto.Roles = roles.Select(role => role.Name).ToList();
-            userDto.Permissions = permissions.Select(permission => permission.Name).ToList();
-            return new AuthResponse
-            {
-                Success = true,
-                User = userDto,
-                Message = "Usuario registrado"
-            };
-        }
-
         public async Task<AuthResponse> RefreshTokenAsync(RefreshTokenRequest request)
         {
             if (string.IsNullOrWhiteSpace(request.RefreshToken))
                 return new AuthResponse { Success = false, Message = "Token inválido o expirado" };
 
-            var userId = await _jwtService.ConsumeRefreshTokenAsync(request.RefreshToken);
-            if (userId == null)
-                return new AuthResponse { Success = false, Message = "Token inválido o expirado" };
-
-            return await _jwtService.GenerateTokensAsync(userId.Value);
+            var userId = await _context.RefreshTokens.AsNoTracking()
+                .Where(row => row.Token == JwtService.HashToken(request.RefreshToken))
+                .Select(row => (Guid?)row.UserId).SingleOrDefaultAsync();
+            if (userId is null) return new AuthResponse { Success = false, Message = "Token inválido o expirado" };
+            await using var transaction = await SecurityMutationLocks.BeginSessionAsync(_context, userId.Value);
+            var consumedUserId = await _jwtService.ConsumeRefreshTokenAsync(request.RefreshToken);
+            await _failureInjector.CheckpointAsync(ApplicationFailureCheckpoints.SecurityAfterPersistence);
+            var result = consumedUserId is null
+                ? new AuthResponse { Success = false, Message = "Token inválido o expirado" }
+                : await _jwtService.GenerateTokensAsync(consumedUserId.Value);
+            await _failureInjector.CheckpointAsync(ApplicationFailureCheckpoints.SecurityAfterRevocation);
+            await _audit.LogAsync(userId.Value, consumedUserId is null ? "RefreshRejected" : "RefreshSession", nameof(User), userId.Value);
+            await _failureInjector.CheckpointAsync(ApplicationFailureCheckpoints.SecurityAfterAudit);
+            // Replay detection may revoke the entire family even when refresh fails.
+            await transaction.CommitAsync();
+            return result;
         }
 
-        public async Task LogoutAsync(Guid userId)
+        public async Task LogoutAsync(Guid userId, int securityVersion)
         {
+            await using var transaction = await SecurityMutationLocks.BeginSessionAsync(_context, userId);
             var user = await _context.Users.FirstOrDefaultAsync(candidate => candidate.Id == userId);
+            if (user is null || !user.IsActive || user.IsDeleted || user.SecurityVersion != securityVersion)
+                throw new SecuritySessionRevokedException();
             if (user is not null)
             {
                 user.SecurityVersion++;
                 await _context.SaveChangesAsync();
             }
 
+            await _failureInjector.CheckpointAsync(ApplicationFailureCheckpoints.SecurityAfterPersistence);
             await _jwtService.RevokeAllRefreshTokensAsync(userId);
+            await _failureInjector.CheckpointAsync(ApplicationFailureCheckpoints.SecurityAfterRevocation);
+            await _audit.LogAsync(userId, "Logout", null, userId);
+            await _failureInjector.CheckpointAsync(ApplicationFailureCheckpoints.SecurityAfterAudit);
+            await transaction.CommitAsync();
         }
 
-        public async Task ChangePasswordAsync(Guid userId, ChangePasswordRequest request)
+        public async Task ChangePasswordAsync(Guid userId, ChangePasswordRequest request, int securityVersion)
         {
+            await using var transaction = await SecurityMutationLocks.BeginSessionAsync(_context, userId);
             var user = await _userRepository.GetByIdAsync(userId);
-            if (user == null) throw new UnauthorizedAccessException("Usuario no encontrado");
+            if (user is null || !user.IsActive || user.IsDeleted || user.SecurityVersion != securityVersion)
+                throw new SecuritySessionRevokedException();
 
             if (!BCrypt.Net.BCrypt.Verify(request.CurrentPassword, user.PasswordHash))
                 throw new UnauthorizedAccessException("Contraseña actual incorrecta");
 
             if (BCrypt.Net.BCrypt.Verify(request.NewPassword, user.PasswordHash))
-                throw new InvalidOperationException("La contraseña nueva debe ser diferente de la contraseña actual");
+                throw new PasswordChangeRejectedException("La contraseña nueva debe ser diferente de la contraseña actual");
 
             user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
             user.MustChangePassword = false;
             user.SecurityVersion++;
-            await _userRepository.UpdateAsync(user);
             await _unitOfWork.SaveChangesAsync();
+            await _failureInjector.CheckpointAsync(ApplicationFailureCheckpoints.SecurityAfterPersistence);
             await _jwtService.RevokeAllRefreshTokensAsync(userId);
+            await _failureInjector.CheckpointAsync(ApplicationFailureCheckpoints.SecurityAfterRevocation);
+            await _audit.LogAsync(userId, "ChangePassword", nameof(User), userId);
+            await _failureInjector.CheckpointAsync(ApplicationFailureCheckpoints.SecurityAfterAudit);
+            await transaction.CommitAsync();
         }
 
-        public async Task ForgotPasswordAsync(ForgotPasswordRequest request)
-        {
-            var user = await _userRepository.GetByEmailAsync(request.Email);
-            if (user == null) return;
-
-            var tokenBytes = new byte[32];
-            using var rng = RandomNumberGenerator.Create();
-            rng.GetBytes(tokenBytes);
-            var token = Convert.ToHexString(tokenBytes);
-
-            await _context.RefreshTokens.AddAsync(new RefreshToken
-            {
-                UserId = user.Id,
-                Token = $"RESET:{Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(token)))}",
-                ExpiresAt = _clock.UtcNow.AddHours(1),
-                IsRevoked = false
-            });
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task ResetPasswordAsync(ResetPasswordRequest request)
-        {
-            var user = await _userRepository.GetByEmailAsync(request.Email)
-                ?? throw new UnauthorizedAccessException("Usuario no encontrado");
-
-            var tokenHash = $"RESET:{Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(request.Token)))}";
-            var resetToken = await _context.RefreshTokens
-                .FirstOrDefaultAsync(rt => rt.UserId == user.Id && rt.Token == tokenHash && !rt.IsRevoked && rt.ExpiresAt > _clock.UtcNow);
-
-            if (resetToken == null)
-                throw new UnauthorizedAccessException("Token inválido o expirado");
-
-            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
-            user.MustChangePassword = false;
-            user.SecurityVersion++;
-            resetToken.IsRevoked = true;
-            resetToken.RevokedAt = _clock.UtcNow;
-            await _userRepository.UpdateAsync(user);
-            await _context.SaveChangesAsync();
-            await _jwtService.RevokeAllRefreshTokensAsync(user.Id);
-        }
     }
 
     public class JwtService : IJwtService
@@ -237,6 +185,7 @@ namespace hotel_erp.Api.Services
 
         public async Task<AuthResponse> GenerateTokensAsync(Guid userId)
         {
+            RequireTransaction();
             var user = await _userRepository.GetByIdAsync(userId);
             if (user == null || !user.IsActive || user.IsDeleted)
                 return new AuthResponse { Success = false, Message = "Usuario no disponible" };
@@ -304,6 +253,7 @@ namespace hotel_erp.Api.Services
 
         public async Task<Guid?> ConsumeRefreshTokenAsync(string refreshToken)
         {
+            RequireTransaction();
             var tokenHash = HashToken(refreshToken);
             var token = await _context.RefreshTokens
                 .Include(refreshTokenEntity => refreshTokenEntity.User)
@@ -339,6 +289,7 @@ namespace hotel_erp.Api.Services
 
         public async Task RevokeAllRefreshTokensAsync(Guid userId)
         {
+            RequireTransaction();
             var activeTokens = await _context.RefreshTokens
                 .Where(rt => rt.UserId == userId && !rt.IsRevoked)
                 .ToListAsync();
@@ -365,6 +316,12 @@ namespace hotel_erp.Api.Services
             await _context.SaveChangesAsync();
         }
 
+        private void RequireTransaction()
+        {
+            if (_context.Database.CurrentTransaction is null)
+                throw new InvalidOperationException("Las sesiones deben modificarse dentro de una transacción coordinada de seguridad");
+        }
+
         private static string GenerateRefreshToken()
         {
             var randomNumber = new byte[64];
@@ -376,7 +333,7 @@ namespace hotel_erp.Api.Services
                 .Replace('/', '_');
         }
 
-        private static string HashToken(string token)
+        internal static string HashToken(string token)
             => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(token)));
     }
 }

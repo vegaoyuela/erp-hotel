@@ -1,0 +1,39 @@
+{
+  "date_honduras": "2026-10-29",
+  "baseline_commit": "2281700",
+  "contains_secret_values": false,
+  "operations": 185,
+  "successful_200_201_without_schema": [],
+  "binary_responses": 8,
+  "changed_operations": [
+    {
+      "method": "PUT",
+      "path": "/api/Roles/{id}",
+      "responses_added": [
+        "409"
+      ],
+      "responses_removed": []
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/Users/{id}",
+      "responses_added": [
+        "409"
+      ],
+      "responses_removed": []
+    },
+    {
+      "method": "PUT",
+      "path": "/api/Users/{id}",
+      "responses_added": [
+        "409"
+      ],
+      "responses_removed": []
+    }
+  ],
+  "request_and_success_response_shapes": "verified_unchanged",
+  "operations_missing_expected_success": 0,
+  "legacy_rejection_only_operations": 2,
+  "new_database_migration_required": false,
+  "frontend_ui_source_changes": false
+}

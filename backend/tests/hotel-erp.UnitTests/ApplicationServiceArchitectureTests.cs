@@ -7,6 +7,19 @@ namespace hotel_erp.UnitTests;
 public class ApplicationServiceArchitectureTests
 {
     [Theory]
+    [InlineData(typeof(UsersController))]
+    [InlineData(typeof(RolesController))]
+    public void SecurityMutationController_DelegatesToTransactionalService(Type controller)
+    {
+        var dependencies = Assert.Single(controller.GetConstructors()).GetParameters().Select(parameter => parameter.ParameterType).ToArray();
+        Assert.Contains(typeof(SecurityAdministrationService), dependencies);
+        Assert.DoesNotContain(typeof(hotel_erp.Api.Database.ApplicationDbContext), dependencies);
+        Assert.DoesNotContain(typeof(IAuditService), dependencies);
+        Assert.DoesNotContain(typeof(IJwtService), dependencies);
+        Assert.DoesNotContain(typeof(IUnitOfWork), dependencies);
+    }
+
+    [Theory]
     [InlineData(typeof(PaymentsController), typeof(PaymentApplicationService))]
     [InlineData(typeof(RefundsController), typeof(RefundApplicationService))]
     [InlineData(typeof(CardSettlementsController), typeof(CardSettlementApplicationService))]
@@ -83,7 +96,7 @@ public class ApplicationServiceArchitectureTests
     [InlineData(typeof(CashRegisterApplicationService), typeof(IAuditService))]
     [InlineData(typeof(PurchaseInvoiceApplicationService), typeof(IAuditService))]
     [InlineData(typeof(InventoryApplicationService), typeof(IAuditService))]
-    [InlineData(typeof(AuthController), typeof(IAuditService))]
+    [InlineData(typeof(AuthService), typeof(IAuditService))]
     [InlineData(typeof(SettingsController), typeof(IAuditService))]
     [InlineData(typeof(PrintController), typeof(IInvoicePrintRenderer))]
     [InlineData(typeof(PrintController), typeof(IPrinterTransport))]

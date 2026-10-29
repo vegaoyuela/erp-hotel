@@ -133,6 +133,7 @@ builder.Services.AddControllers(options => options.Filters.Add<ApiProblemDetails
         options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter(allowIntegerValues: false));
     });
 builder.Services.AddScoped<HotelListQueryService>();
+builder.Services.AddScoped<SecurityAdministrationService>();
 builder.Services.AddOpenApi(options =>
 {
     options.AddOperationTransformer<ApiOpenApiTransformer>();

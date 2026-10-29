@@ -3579,12 +3579,9 @@ public partial class AuthenticationFlowTests
         public Task<AuthResponse> LoginAsync(LoginRequest request)
             => throw new InvalidOperationException("synthetic-database-failure: Npgsql stack detail");
 
-        public Task<AuthResponse> RegisterAsync(RegisterRequest request) => throw new NotSupportedException();
         public Task<AuthResponse> RefreshTokenAsync(RefreshTokenRequest request) => throw new NotSupportedException();
-        public Task LogoutAsync(Guid userId) => throw new NotSupportedException();
-        public Task ChangePasswordAsync(Guid userId, ChangePasswordRequest request) => throw new NotSupportedException();
-        public Task ForgotPasswordAsync(ForgotPasswordRequest request) => throw new NotSupportedException();
-        public Task ResetPasswordAsync(ResetPasswordRequest request) => throw new NotSupportedException();
+        public Task LogoutAsync(Guid userId, int securityVersion) => throw new NotSupportedException();
+        public Task ChangePasswordAsync(Guid userId, ChangePasswordRequest request, int securityVersion) => throw new NotSupportedException();
     }
 
     private sealed class ThrowingFailureInjector(string targetCheckpoint) : IApplicationFailureInjector

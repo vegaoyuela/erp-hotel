@@ -104,6 +104,10 @@ public partial class AuthenticationFlowTests
             foreach (var operation in path.Value.EnumerateObject())
             {
                 if (!operation.Value.TryGetProperty("responses", out var responses)) continue;
+                var legacyRejection = path.Name == "/api/Invoices/{id}/cancel" && operation.Name == "post"
+                    || path.Name == "/api/Reservations/{id}" && operation.Name == "delete";
+                Assert.True(legacyRejection || responses.EnumerateObject().Any(row => int.TryParse(row.Name, out var status) && status >= 200 && status < 300),
+                    $"La operación {operation.Name} {path.Name} perdió su respuesta de éxito en OpenAPI");
                 foreach (var response in responses.EnumerateObject().Where(row => row.Name is "200" or "201"))
                 {
                     if (!response.Value.TryGetProperty("content", out var content) || !content.EnumerateObject().Any(media => media.Value.TryGetProperty("schema", out _)))

@@ -258,3 +258,26 @@ Acceso por permisos en API/UI, notas fiscales separadas, cuentas superiores prot
 | [p02i-qa-resumen.json](p02i-qa-resumen.json) | Resumen y hashes del bloque. |
 
 El [detalle](../p02-base-tecnica/p02-i-accesos-seguridad.md) y la [matriz formal](../p02-base-tecnica/p02-i-matriz-api-dat-sec.md) distinguen cobertura ejecutada, aprobaciones y pendientes. Windows e impresión mantienen el recordatorio existente.
+
+### P02-J — administración atómica (29 de octubre de 2026)
+
+Administración transaccional de usuarios/roles y coordinación con login/refresh/contraseña/logout. Se conserva el último administrador, se revalida al actor que esperó y se registran cambios sin credenciales.
+
+| Archivo | Resultado |
+|---|---|
+| [p02j-qa.log](p02j-qa.log) | QA final: 138 unitarias, 8 integraciones PostgreSQL, 5 validaciones del expediente, contrato real, npm audit, lint y build. |
+| [p02j-qa-antes-compatibilidad.log](p02j-qa-antes-compatibilidad.log) | QA aprobada antes de comprobar explícitamente los permisos efectivos de la respuesta de registro heredado; sustituida por QA final. |
+| [p02j-qa-antes-contrato.log](p02j-qa-antes-contrato.log) | QA aprobada antes de ampliar la prueba de éxitos OpenAPI y restituir el 200 documentado de actualización de usuario; sustituida por QA final. |
+| [p02j-qa-previa.log](p02j-qa-previa.log) | QA aprobada antes de retirar escrituras del grafo de roles y añadir su comprobación; sustituida por QA final. |
+| [p02j-selectiva.log](p02j-selectiva.log) | Primera ejecución de las tres integraciones nuevas: aprobadas. |
+| [p02j-integracion.log](p02j-integracion.log) | Regresión PostgreSQL completa de ocho pruebas antes de QA final. |
+| [p02j-operaciones.json](p02j-operaciones.json) | Nueve clases de mutación auditadas, seis salvaguardas, revocación y tres llamadas JWT sin transacción rechazadas. |
+| [p02j-concurrencia.json](p02j-concurrencia.json) | Ocho carreras; seis esperas de bloqueo observadas en PostgreSQL. |
+| [p02j-rollback.json](p02j-rollback.json) | 39 fallos: persistencia, revocación y auditoría; estado completo restaurado. |
+| [p02j-modelo-ef.log](p02j-modelo-ef.log) | No requiere migración nueva. |
+| [p02j-base-qa.json](p02j-base-qa.json) | Conteos de base original y bases temporales al cerrar. |
+| [p02j-contrato-validacion.log](p02j-contrato-validacion.log) | La comprobación de contrato restituye y verifica el 200 de usuario; no se pierden éxitos documentados. |
+| [p02j-contratos.json](p02j-contratos.json) | Inventario del contrato y cambios 409 explícitos. |
+| [p02j-qa-resumen.json](p02j-qa-resumen.json) | Resumen, límites y hashes de código/contrato/pruebas/evidencia. |
+
+El [detalle](../p02-base-tecnica/p02-j-administracion-atomica.md) y la [matriz formal](../p02-base-tecnica/p02-i-matriz-api-dat-sec.md) distinguen cobertura y brechas. La UI no se modificó en este bloque. Windows e impresión continúan pendientes con su recordatorio existente.

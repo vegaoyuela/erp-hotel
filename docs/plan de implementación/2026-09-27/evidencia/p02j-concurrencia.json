@@ -1,0 +1,20 @@
+{
+  "syntheticDatabase": true,
+  "passed": true,
+  "races": [
+    "two-self-demotions",
+    "cross-deactivation",
+    "waiting-privilege-revocation",
+    "assign-then-delete-role",
+    "password-reset-vs-login",
+    "password-reset-vs-refresh",
+    "concurrent-refresh-replay",
+    "concurrent-failed-login"
+  ],
+  "waitingRequestsObservedInPostgreSql": 6,
+  "lastAdministratorPreserved": true,
+  "staleSessionCannotWrite": true,
+  "replayRevokesReplacementSession": true,
+  "failedLoginAttemptsPreserved": 5,
+  "auditChainValid": true
+}

@@ -91,3 +91,11 @@ Comprobadas lecturas sensibles y navegación por permisos; el dashboard minimiza
 Se registró la [matriz formal API/DAT/SEC](p02-base-tecnica/p02-i-matriz-api-dat-sec.md), con brechas por caso; P02-09 no queda cerrada. El siguiente bloque debe proteger cambios de seguridad bajo concurrencia (incluido último administrador), unificar atomicidad/auditoría de sus mutaciones exitosas y avanzar las aprobaciones sensibles; los umbrales por monto/medio/origen requieren decisiones del hotel. P02-04 conserva catálogos/reportes, límites de volumen y clientes heredados. P02-07/P02-10, P03-folio y G0/G1 siguen abiertos.
 
 Windows 11, Docker Desktop, QA PowerShell e impresión física permanecen aplazados con el recordatorio diario existente a las 10:00 de Honduras.
+
+### Avance P02-J — administración atómica (29 de octubre de 2026)
+
+Se cerró en código/QA la concurrencia y atomicidad de administración de usuarios/roles, registro heredado y sesiones: revalidación del actor tras esperar, permanencia del último administrador, permisos de Admin, revocación y auditoría conjunta. Pasan 39 fallos con restauración íntegra, ocho carreras y nueve clases de mutación auditadas. El [detalle P02-J](p02-base-tecnica/p02-j-administracion-atomica.md) contiene cambios y evidencia.
+
+P02-06 sigue abierta por aprobaciones segregadas por monto/medio/origen y motivos/aprobaciones sensibles restantes; los umbrales deben provenir del hotel. El siguiente bloque ejecutable debe comprobar revocación durante esperas de operaciones hoteleras/financieras y completar las demás brechas formales API/DAT/SEC independientes de Windows/decisiones del hotel. Persisten P02-04 (límites/volumen y clientes heredados), P02-07, P02-09/P02-10, P03-folio y G0/G1. No se presume aprobación técnica independiente ni fiscal.
+
+Windows 11, Docker Desktop, QA PowerShell e impresión física conservan su aplazamiento y el recordatorio diario existente a las 10:00 de Honduras.

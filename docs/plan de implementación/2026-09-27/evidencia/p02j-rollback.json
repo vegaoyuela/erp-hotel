@@ -1,0 +1,240 @@
+{
+  "syntheticDatabase": true,
+  "passed": true,
+  "scenarios": [
+    {
+      "operation": "create-user",
+      "checkpoint": "security:after-persistence",
+      "status": 500,
+      "fullStateRestored": true
+    },
+    {
+      "operation": "update-user",
+      "checkpoint": "security:after-persistence",
+      "status": 500,
+      "fullStateRestored": true
+    },
+    {
+      "operation": "reset-password",
+      "checkpoint": "security:after-persistence",
+      "status": 500,
+      "fullStateRestored": true
+    },
+    {
+      "operation": "deactivate-user",
+      "checkpoint": "security:after-persistence",
+      "status": 500,
+      "fullStateRestored": true
+    },
+    {
+      "operation": "assign-role",
+      "checkpoint": "security:after-persistence",
+      "status": 500,
+      "fullStateRestored": true
+    },
+    {
+      "operation": "create-role",
+      "checkpoint": "security:after-persistence",
+      "status": 500,
+      "fullStateRestored": true
+    },
+    {
+      "operation": "update-role",
+      "checkpoint": "security:after-persistence",
+      "status": 500,
+      "fullStateRestored": true
+    },
+    {
+      "operation": "delete-role",
+      "checkpoint": "security:after-persistence",
+      "status": 500,
+      "fullStateRestored": true
+    },
+    {
+      "operation": "legacy-register",
+      "checkpoint": "security:after-persistence",
+      "status": 500,
+      "fullStateRestored": true
+    },
+    {
+      "operation": "change-password",
+      "checkpoint": "security:after-persistence",
+      "status": 500,
+      "fullStateRestored": true
+    },
+    {
+      "operation": "logout",
+      "checkpoint": "security:after-persistence",
+      "status": 500,
+      "fullStateRestored": true
+    },
+    {
+      "operation": "login",
+      "checkpoint": "security:after-persistence",
+      "status": 500,
+      "fullStateRestored": true
+    },
+    {
+      "operation": "refresh",
+      "checkpoint": "security:after-persistence",
+      "status": 500,
+      "fullStateRestored": true
+    },
+    {
+      "operation": "create-user",
+      "checkpoint": "security:after-revocation",
+      "status": 500,
+      "fullStateRestored": true
+    },
+    {
+      "operation": "update-user",
+      "checkpoint": "security:after-revocation",
+      "status": 500,
+      "fullStateRestored": true
+    },
+    {
+      "operation": "reset-password",
+      "checkpoint": "security:after-revocation",
+      "status": 500,
+      "fullStateRestored": true
+    },
+    {
+      "operation": "deactivate-user",
+      "checkpoint": "security:after-revocation",
+      "status": 500,
+      "fullStateRestored": true
+    },
+    {
+      "operation": "assign-role",
+      "checkpoint": "security:after-revocation",
+      "status": 500,
+      "fullStateRestored": true
+    },
+    {
+      "operation": "create-role",
+      "checkpoint": "security:after-revocation",
+      "status": 500,
+      "fullStateRestored": true
+    },
+    {
+      "operation": "update-role",
+      "checkpoint": "security:after-revocation",
+      "status": 500,
+      "fullStateRestored": true
+    },
+    {
+      "operation": "delete-role",
+      "checkpoint": "security:after-revocation",
+      "status": 500,
+      "fullStateRestored": true
+    },
+    {
+      "operation": "legacy-register",
+      "checkpoint": "security:after-revocation",
+      "status": 500,
+      "fullStateRestored": true
+    },
+    {
+      "operation": "change-password",
+      "checkpoint": "security:after-revocation",
+      "status": 500,
+      "fullStateRestored": true
+    },
+    {
+      "operation": "logout",
+      "checkpoint": "security:after-revocation",
+      "status": 500,
+      "fullStateRestored": true
+    },
+    {
+      "operation": "login",
+      "checkpoint": "security:after-revocation",
+      "status": 500,
+      "fullStateRestored": true
+    },
+    {
+      "operation": "refresh",
+      "checkpoint": "security:after-revocation",
+      "status": 500,
+      "fullStateRestored": true
+    },
+    {
+      "operation": "create-user",
+      "checkpoint": "security:after-audit",
+      "status": 500,
+      "fullStateRestored": true
+    },
+    {
+      "operation": "update-user",
+      "checkpoint": "security:after-audit",
+      "status": 500,
+      "fullStateRestored": true
+    },
+    {
+      "operation": "reset-password",
+      "checkpoint": "security:after-audit",
+      "status": 500,
+      "fullStateRestored": true
+    },
+    {
+      "operation": "deactivate-user",
+      "checkpoint": "security:after-audit",
+      "status": 500,
+      "fullStateRestored": true
+    },
+    {
+      "operation": "assign-role",
+      "checkpoint": "security:after-audit",
+      "status": 500,
+      "fullStateRestored": true
+    },
+    {
+      "operation": "create-role",
+      "checkpoint": "security:after-audit",
+      "status": 500,
+      "fullStateRestored": true
+    },
+    {
+      "operation": "update-role",
+      "checkpoint": "security:after-audit",
+      "status": 500,
+      "fullStateRestored": true
+    },
+    {
+      "operation": "delete-role",
+      "checkpoint": "security:after-audit",
+      "status": 500,
+      "fullStateRestored": true
+    },
+    {
+      "operation": "legacy-register",
+      "checkpoint": "security:after-audit",
+      "status": 500,
+      "fullStateRestored": true
+    },
+    {
+      "operation": "change-password",
+      "checkpoint": "security:after-audit",
+      "status": 500,
+      "fullStateRestored": true
+    },
+    {
+      "operation": "logout",
+      "checkpoint": "security:after-audit",
+      "status": 500,
+      "fullStateRestored": true
+    },
+    {
+      "operation": "login",
+      "checkpoint": "security:after-audit",
+      "status": 500,
+      "fullStateRestored": true
+    },
+    {
+      "operation": "refresh",
+      "checkpoint": "security:after-audit",
+      "status": 500,
+      "fullStateRestored": true
+    }
+  ]
+}

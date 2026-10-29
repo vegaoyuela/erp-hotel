@@ -1,0 +1,141 @@
+[QA] 11 archivos de repositorio: sin persistencia ni transacciones implícitas
+[QA] Restaurando backend
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+[QA] Compilando backend
+  hotel-erp.Api -> /home/vm/Projects/erp-hotel/backend/src/hotel-erp.Api/bin/Debug/net10.0/hotel-erp.Api.dll
+  hotel-erp.UnitTests -> /home/vm/Projects/erp-hotel/backend/tests/hotel-erp.UnitTests/bin/Debug/net10.0/hotel-erp.UnitTests.dll
+  hotel-erp.IntegrationTests -> /home/vm/Projects/erp-hotel/backend/tests/hotel-erp.IntegrationTests/bin/Debug/net10.0/hotel-erp.IntegrationTests.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:31.94
+[QA] Ejecutando pruebas unitarias
+  hotel-erp.Api -> /home/vm/Projects/erp-hotel/backend/src/hotel-erp.Api/bin/Debug/net10.0/hotel-erp.Api.dll
+  hotel-erp.UnitTests -> /home/vm/Projects/erp-hotel/backend/tests/hotel-erp.UnitTests/bin/Debug/net10.0/hotel-erp.UnitTests.dll
+Test run for /home/vm/Projects/erp-hotel/backend/tests/hotel-erp.UnitTests/bin/Debug/net10.0/hotel-erp.UnitTests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+
+Passed!  - Failed:     0, Passed:   138, Skipped:     0, Total:   138, Duration: 244 ms - hotel-erp.UnitTests.dll (net10.0)
+[QA] Ejecutando integración PostgreSQL
+  hotel-erp.Api -> /home/vm/Projects/erp-hotel/backend/src/hotel-erp.Api/bin/Debug/net10.0/hotel-erp.Api.dll
+  hotel-erp.IntegrationTests -> /home/vm/Projects/erp-hotel/backend/tests/hotel-erp.IntegrationTests/bin/Debug/net10.0/hotel-erp.IntegrationTests.dll
+Test run for /home/vm/Projects/erp-hotel/backend/tests/hotel-erp.IntegrationTests/bin/Debug/net10.0/hotel-erp.IntegrationTests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+
+Passed!  - Failed:     0, Passed:     8, Skipped:     0, Total:     8, Duration: 2 m 23 s - hotel-erp.IntegrationTests.dll (net10.0)
+[QA] Validando expediente fiscal N01-N06
+✔ acepta un expediente sintético completo para QA (5.481159ms)
+✔ rechaza el expediente sintético cuando se exige fuente oficial (1.177965ms)
+✔ rechaza decisiones ausentes o duplicadas (0.855413ms)
+✔ el resultado no copia valores del expediente (2.978772ms)
+✔ rechaza fechas de calendario inexistentes (0.759781ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 173.235398
+[QA] Instalando frontend desde package-lock.json
+
+added 211 packages, and audited 212 packages in 7s
+
+57 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+[QA] Auditando dependencias frontend
+found 0 vulnerabilities
+[QA] Instalando y auditando herramientas del contrato
+
+added 33 packages, and audited 34 packages in 2s
+
+6 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+found 0 vulnerabilities
+[QA] OpenAPI y tipos TypeScript sincronizados
+[QA] Ejecutando lint frontend
+
+> frontend@0.0.0 lint
+> eslint .
+
+
+/home/vm/Projects/erp-hotel/frontend/src/App.tsx
+  92:56  warning  React Hook useMemo has an unnecessary dependency: 'sessionKey'. Either exclude it or remove the dependency array  react-hooks/exhaustive-deps
+
+✖ 1 problem (0 errors, 1 warning)
+
+[QA] Generando frontend de producción
+
+> frontend@0.0.0 build
+> tsc -b && vite build
+
+vite v8.3.5 building client environment for production...
+transforming...
+✓ 2103 modules transformed.
+rendering chunks...
+computing gzip size...
+../backend/src/hotel-erp.Api/wwwroot/index.html                                0.52 kB │ gzip:   0.35 kB
+../backend/src/hotel-erp.Api/wwwroot/assets/index-DJ0CDXe2.css                73.63 kB │ gzip:  12.64 kB
+../backend/src/hotel-erp.Api/wwwroot/assets/check-DJJh0EzM.js                  0.15 kB │ gzip:   0.15 kB
+../backend/src/hotel-erp.Api/wwwroot/assets/plus-C_U9q4RS.js                   0.18 kB │ gzip:   0.16 kB
+../backend/src/hotel-erp.Api/wwwroot/assets/loader-circle-BYNVeerO.js          0.19 kB │ gzip:   0.18 kB
+../backend/src/hotel-erp.Api/wwwroot/assets/rotate-cw-DTC1C_Hg.js              0.23 kB │ gzip:   0.20 kB
+../backend/src/hotel-erp.Api/wwwroot/assets/download-BVxfY-Bu.js               0.26 kB │ gzip:   0.21 kB
+../backend/src/hotel-erp.Api/wwwroot/assets/bed-6S_f4eqy.js                    0.26 kB │ gzip:   0.20 kB
+../backend/src/hotel-erp.Api/wwwroot/assets/pen-MJeT3XCX.js                    0.28 kB │ gzip:   0.23 kB
+../backend/src/hotel-erp.Api/wwwroot/assets/errors-BKM4e9Uv.js                 0.31 kB │ gzip:   0.22 kB
+../backend/src/hotel-erp.Api/wwwroot/assets/arrow-up-right-Cw3pTuRN.js         0.33 kB │ gzip:   0.23 kB
+../backend/src/hotel-erp.Api/wwwroot/assets/printer-C7T6CrL3.js                0.34 kB │ gzip:   0.25 kB
+../backend/src/hotel-erp.Api/wwwroot/assets/refresh-cw-NfRNW4w7.js             0.35 kB │ gzip:   0.24 kB
+../backend/src/hotel-erp.Api/wwwroot/assets/trash-BaLuC73Z.js                  0.37 kB │ gzip:   0.24 kB
+../backend/src/hotel-erp.Api/wwwroot/assets/key-round-BGeoywCg.js              0.38 kB │ gzip:   0.27 kB
+../backend/src/hotel-erp.Api/wwwroot/assets/landmark-V0a6WowQ.js               0.41 kB │ gzip:   0.26 kB
+../backend/src/hotel-erp.Api/wwwroot/assets/circle-check-B8FWp8vQ.js           0.48 kB │ gzip:   0.27 kB
+../backend/src/hotel-erp.Api/wwwroot/assets/useTaxRates-CpoYDnMr.js            0.56 kB │ gzip:   0.36 kB
+../backend/src/hotel-erp.Api/wwwroot/assets/input-CYdz4Efi.js                  0.57 kB │ gzip:   0.36 kB
+../backend/src/hotel-erp.Api/wwwroot/assets/building-DXMBzyut.js               0.59 kB │ gzip:   0.30 kB
+../backend/src/hotel-erp.Api/wwwroot/assets/eye-HMFz1tL4.js                    0.68 kB │ gzip:   0.36 kB
+../backend/src/hotel-erp.Api/wwwroot/assets/NotFoundPage-D5X0dL2W.js           1.14 kB │ gzip:   0.58 kB
+../backend/src/hotel-erp.Api/wwwroot/assets/InlineAlert-9m7wNxBb.js            1.94 kB │ gzip:   0.92 kB
+../backend/src/hotel-erp.Api/wwwroot/assets/PagedSelect-BJy3WbR8.js            1.98 kB │ gzip:   1.00 kB
+../backend/src/hotel-erp.Api/wwwroot/assets/ConfirmDialog-CkEA2bNU.js          2.08 kB │ gzip:   0.94 kB
+../backend/src/hotel-erp.Api/wwwroot/assets/LoginPage-DjOi5n40.js              2.96 kB │ gzip:   1.28 kB
+../backend/src/hotel-erp.Api/wwwroot/assets/InvoiceEditPage-DZCCuBPf.js        3.90 kB │ gzip:   1.47 kB
+../backend/src/hotel-erp.Api/wwwroot/assets/RoomTypesPage-2XmtE7Bl.js          5.58 kB │ gzip:   1.73 kB
+../backend/src/hotel-erp.Api/wwwroot/assets/TrialBalancePage-CITpnb8T.js       5.79 kB │ gzip:   1.66 kB
+../backend/src/hotel-erp.Api/wwwroot/assets/ChangePasswordPage-Bw8nPN6Z.js     5.93 kB │ gzip:   2.07 kB
+../backend/src/hotel-erp.Api/wwwroot/assets/FloorMapPage-DyGEwNX4.js           6.62 kB │ gzip:   2.16 kB
+../backend/src/hotel-erp.Api/wwwroot/assets/ReservationsPage-DZsMBYFx.js       6.76 kB │ gzip:   2.35 kB
+../backend/src/hotel-erp.Api/wwwroot/assets/BackupsPage-DtXD_rIY.js            6.81 kB │ gzip:   2.59 kB
+../backend/src/hotel-erp.Api/wwwroot/assets/DiscountsPage-BJhxhLjm.js          9.17 kB │ gzip:   2.60 kB
+../backend/src/hotel-erp.Api/wwwroot/assets/RoomsPage-B_g1kCtO.js              9.47 kB │ gzip:   2.94 kB
+../backend/src/hotel-erp.Api/wwwroot/assets/FoliosPage-BAvaQDPM.js            10.29 kB │ gzip:   2.60 kB
+../backend/src/hotel-erp.Api/wwwroot/assets/ChartOfAccountsPage-DhmvDiKM.js   10.83 kB │ gzip:   3.42 kB
+../backend/src/hotel-erp.Api/wwwroot/assets/Pagination-CIJkSU4W.js            11.47 kB │ gzip:   4.19 kB
+../backend/src/hotel-erp.Api/wwwroot/assets/AuditLogsPage-BU964ZpO.js         11.98 kB │ gzip:   4.03 kB
+../backend/src/hotel-erp.Api/wwwroot/assets/CustomersPage-C19WkQgy.js         13.12 kB │ gzip:   3.74 kB
+../backend/src/hotel-erp.Api/wwwroot/assets/GuestsPage-s9RHCdc3.js            14.26 kB │ gzip:   3.96 kB
+../backend/src/hotel-erp.Api/wwwroot/assets/DashboardPage-DOENcUWZ.js         15.06 kB │ gzip:   3.44 kB
+../backend/src/hotel-erp.Api/wwwroot/assets/CashRegistersPage-CeApvKVD.js     15.62 kB │ gzip:   4.49 kB
+../backend/src/hotel-erp.Api/wwwroot/assets/CardSettlementsPage-CyKnRxKY.js   17.23 kB │ gzip:   4.78 kB
+../backend/src/hotel-erp.Api/wwwroot/assets/UsersPage-B6-UmJnb.js             19.07 kB │ gzip:   4.88 kB
+../backend/src/hotel-erp.Api/wwwroot/assets/InventoryPage-Dn7j4Xpy.js         21.71 kB │ gzip:   4.91 kB
+../backend/src/hotel-erp.Api/wwwroot/assets/JournalEntriesPage-CFaF0Fje.js    22.80 kB │ gzip:   5.74 kB
+../backend/src/hotel-erp.Api/wwwroot/assets/CheckInPage-BYRjy_Ng.js           23.10 kB │ gzip:   5.87 kB
+../backend/src/hotel-erp.Api/wwwroot/assets/SettingsPage-rFjyfGtF.js          23.73 kB │ gzip:   6.53 kB
+../backend/src/hotel-erp.Api/wwwroot/assets/ReportsPage-VP3OxNJ9.js           24.32 kB │ gzip:   4.71 kB
+../backend/src/hotel-erp.Api/wwwroot/assets/CheckOutPage-B1eYQGje.js          24.51 kB │ gzip:   6.94 kB
+../backend/src/hotel-erp.Api/wwwroot/assets/InvoicesPage-TYJ_uQAC.js          40.31 kB │ gzip:   9.27 kB
+../backend/src/hotel-erp.Api/wwwroot/assets/AuthorizationsPage-4apNM3Ln.js    88.86 kB │ gzip:  25.74 kB
+../backend/src/hotel-erp.Api/wwwroot/assets/index-DGG0LJA9.js                378.86 kB │ gzip: 122.55 kB
+
+✓ built in 1.00s
+[QA] Validando espacios y marcadores de conflicto
+[QA] Todo aprobado
