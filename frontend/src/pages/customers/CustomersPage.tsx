@@ -1,4 +1,5 @@
-import { useEffect, useState, useCallback, useMemo } from 'react'
+import { useState } from 'react'
+import { useDebouncedValue, usePagedList } from '@/hooks/usePagedList'
 import api from '@/lib/axios'
 import { getApiErrorMessage } from '@/lib/errors'
 import type { Customer } from '@/types'
@@ -46,12 +47,10 @@ function sanitize(form: typeof defaultForm) {
 
 export default function CustomersPage() {
   const canManageReservations = useAuthStore((state) => state.hasPermission('manage_reservations'))
-  const [customers, setCustomers] = useState<Customer[]>([])
   const [search, setSearch] = useState('')
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [form, setForm] = useState(defaultForm)
-  const [loading, setLoading] = useState(true)
   const [deleteTarget, setDeleteTarget] = useState<Customer | null>(null)
   const [alertInfo, setAlertInfo] = useState<{ variant: 'error' | 'success' | 'info'; message: string } | null>(null)
   const [actionLoading, setActionLoading] = useState(false)
@@ -60,22 +59,9 @@ export default function CustomersPage() {
   const [currentPage, setCurrentPage] = useState(1)
   const [pageSize, setPageSize] = useState(15)
 
-  const load = useCallback(async () => {
-    setLoading(true)
-    try {
-      const { data } = await api.get<Customer[]>('/customers', { params: { search: search || undefined } })
-      setCustomers(data)
-    } catch {
-      setAlertInfo({ variant: 'error', message: 'Error al consultar la cartera de clientes.' })
-    } finally {
-      setLoading(false)
-    }
-  }, [search])
-
-  useEffect(() => {
-    const timer = window.setTimeout(() => void load(), 0)
-    return () => window.clearTimeout(timer)
-  }, [load])
+  const debouncedSearch = useDebouncedValue(search)
+  const { items: paginatedCustomers, load, loading, error: listError, page, totalItems, totalPages } = usePagedList<Customer>(
+    '/customers/paged', { page: currentPage, pageSize, search: debouncedSearch || undefined })
 
   const startCreate = () => {
     setEditingId(null)
@@ -150,24 +136,6 @@ export default function CustomersPage() {
     }
   }
 
-  const filteredCustomers = useMemo(() => {
-    return customers.filter((c) => {
-      const q = search.toLowerCase()
-      return (
-        c.name.toLowerCase().includes(q) ||
-        (c.rtn && c.rtn.includes(q)) ||
-        (c.phone && c.phone.includes(q)) ||
-        (c.email && c.email.toLowerCase().includes(q))
-      )
-    })
-  }, [customers, search])
-
-  const totalPages = Math.ceil(filteredCustomers.length / pageSize) || 1
-  const paginatedCustomers = useMemo(() => {
-    const start = (currentPage - 1) * pageSize
-    return filteredCustomers.slice(start, start + pageSize)
-  }, [filteredCustomers, currentPage, pageSize])
-
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -198,6 +166,8 @@ export default function CustomersPage() {
       {alertInfo && (
         <InlineAlert variant={alertInfo.variant} message={alertInfo.message} onClose={() => setAlertInfo(null)} />
       )}
+
+      {listError && <InlineAlert variant="error" message="No se pudo cargar la página de clientes. Usa Actualizar para reintentar." />}
 
       {/* Form Card */}
       {showForm && canManageReservations && (
@@ -367,7 +337,7 @@ export default function CustomersPage() {
         <div className="relative">
           <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="Buscar por razón social, RTN, teléfono o correo electrónico..."
+            maxLength={100} placeholder="Buscar por razón social, RTN, teléfono o correo electrónico..."
             value={search}
             onChange={(e) => {
               setSearch(e.target.value)
@@ -384,7 +354,7 @@ export default function CustomersPage() {
           <h3 className="font-semibold text-xs text-foreground uppercase tracking-wider">
             Listado de Clientes y Empresas
           </h3>
-          <span className="text-xs text-muted-foreground">{filteredCustomers.length} cliente(s)</span>
+          <span className="text-xs text-muted-foreground">{totalItems} cliente(s)</span>
         </div>
 
         {loading ? (
@@ -394,7 +364,7 @@ export default function CustomersPage() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-xs">
+            <table className="w-full min-w-[740px] text-xs">
               <thead className="bg-muted/40 font-semibold text-muted-foreground uppercase tracking-wider">
                 <tr>
                   <th className="text-left p-3.5">Cliente / Razón Social</th>
@@ -447,7 +417,7 @@ export default function CustomersPage() {
                     </td>
                   </tr>
                 ))}
-                {paginatedCustomers.length === 0 && (
+                {!listError && paginatedCustomers.length === 0 && (
                   <tr>
                     <td colSpan={6} className="p-8 text-center text-muted-foreground">
                       No se encontraron clientes registrados con los filtros seleccionados.
@@ -460,9 +430,10 @@ export default function CustomersPage() {
         )}
 
         <Pagination
-          currentPage={currentPage}
+          currentPage={page}
+          disabled={loading}
           totalPages={totalPages}
-          totalItems={filteredCustomers.length}
+          totalItems={totalItems}
           pageSize={pageSize}
           onPageChange={setCurrentPage}
           onPageSizeChange={(size) => {

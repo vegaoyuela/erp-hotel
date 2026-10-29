@@ -1,0 +1,185 @@
+{
+  "generated_at": "2026-10-29T16:25:34.832931+00:00",
+  "implementation_date_honduras": "2026-10-29",
+  "baseline_revision": "60134ffdcd2125ca3f0dab71d4b824ab336f4aa8",
+  "scope": "P02-H2A: paged operations and inventory, operational result schemas, generated frontend types",
+  "status": "passed",
+  "contains_secret_values": false,
+  "p02_04_complete": false,
+  "p02_05_complete": false,
+  "validation": {
+    "backend_warnings": 0,
+    "backend_errors": 0,
+    "unit_tests_passed": 109,
+    "postgresql_integration_tests_passed": 5,
+    "fiscal_dossier_tests_passed": 5,
+    "frontend_lint": "passed",
+    "frontend_build": "passed",
+    "frontend_npm_vulnerabilities": 0,
+    "contract_tools_npm_vulnerabilities": 0,
+    "live_openapi_matches_snapshot": true,
+    "generated_types_match_snapshot": true,
+    "ef_model_changes": false,
+    "dotnet_format_applied_to_changed_cs": true,
+    "new_inventory_endpoints_role_matrix": "admin 200, reception/cashier/accountant 403",
+    "new_paged_collections_anonymous": "401"
+  },
+  "implementation": {
+    "new_paged_collections": [
+      "reservations",
+      "folios",
+      "customers",
+      "inventory/products",
+      "inventory/movements"
+    ],
+    "folio_list_projects_item_count_without_items": true,
+    "historical_deleted_guest_preserved": true,
+    "inventory_summary_global": true,
+    "product_picker_searchable_and_paged": true,
+    "product_picker_preserves_selection_across_search": true,
+    "inactive_inventory_tabs_do_not_load_full_collections": true,
+    "explicit_operational_success_schemas": [
+      "ReservationVersionResult",
+      "ReservationStateResult",
+      "CheckInResult",
+      "CheckOutResult",
+      "FolioChargeResult"
+    ],
+    "generated_frontend_aliases_added": 9
+  },
+  "browser": {
+    "status": "passed",
+    "synthetic_database": true,
+    "contains_secret_values": false,
+    "flows": {
+      "reservations_page_filter_reset": true,
+      "customer_email_from_later_page": true,
+      "folio_page_status_and_detail": true,
+      "inventory_global_counts_survive_filter": true,
+      "kardex_page_and_global_product_picker_preserves_selection": true,
+      "no_unbounded_inventory_product_or_movement_requests": true,
+      "customer_error_and_refresh_recovery": true
+    },
+    "mobile_document_overflow": {
+      "reservaciones": false,
+      "clientes": false,
+      "folios": false,
+      "inventario-productos": false,
+      "inventario-kardex": false
+    },
+    "javascript_errors": 0,
+    "screenshots": 10
+  },
+  "mechanical_design_findings": [],
+  "metrics": {
+    "syntheticDatabase": true,
+    "lists": [
+      {
+        "path": "/api/reservations/paged?search=Operaci%C3%B3n%20QA-H2",
+        "matchedRows": 31,
+        "legacyRows": 33,
+        "pageRows": 10,
+        "legacyBytes": 12190,
+        "pageBytes": 3760
+      },
+      {
+        "path": "/api/folios/paged?search=Operaci%C3%B3n%20QA-H2",
+        "matchedRows": 31,
+        "legacyRows": 33,
+        "pageRows": 10,
+        "legacyBytes": 18611,
+        "pageBytes": 2195
+      },
+      {
+        "path": "/api/customers/paged?search=Operaci%C3%B3n%20QA-H2",
+        "matchedRows": 31,
+        "legacyRows": 31,
+        "pageRows": 10,
+        "legacyBytes": 11595,
+        "pageBytes": 3805
+      },
+      {
+        "path": "/api/inventory/products/paged?search=Operaci%C3%B3n%20QA-H2",
+        "matchedRows": 31,
+        "legacyRows": 31,
+        "pageRows": 10,
+        "legacyBytes": 8421,
+        "pageBytes": 2788
+      },
+      {
+        "path": "/api/inventory/movements/paged?productId=01a18877-a886-7d0b-af5b-7e4deba15dbe",
+        "matchedRows": 31,
+        "legacyRows": 31,
+        "pageRows": 10,
+        "legacyBytes": 8935,
+        "pageBytes": 2946
+      }
+    ]
+  },
+  "preserved_qa_database": {
+    "database": "hotel_erp_qa",
+    "table_count": 42,
+    "total_rows": 345,
+    "migration_count": 11,
+    "temporary_databases_remaining": 0
+  },
+  "temporary_ui_resources_removed": true,
+  "remaining": [
+    "H2B financial collections, operational selectors, remaining success response schemas/manual frontend types",
+    "P03: replace existing browser-only folio detail monetary breakdown; discount is not subtracted from the displayed total",
+    "P02-06/07 security and secret rotation",
+    "P02-09 formal matrix and P02-10 independent review",
+    "G0/G1 official evidence and hotel/accountant decisions",
+    "Windows 11 Docker Desktop, PowerShell QA, physical printing and fiscal acceptance"
+  ],
+  "reminder": {
+    "status": "ACTIVE",
+    "automation_id": "pendientes-windows-11-e-impresi-n-del-hotel",
+    "frequency": "daily",
+    "time": "10:00",
+    "timezone": "America/Tegucigalpa",
+    "until": "Windows and physical printing both completed and accepted"
+  },
+  "sha256": {
+    "backend/src/hotel-erp.Api/Controllers/CustomersController.cs": "069d882101ea0dd7226b3140f02e00d9cb107eabb2306554c2b7100ff2f781e7",
+    "backend/src/hotel-erp.Api/Controllers/FoliosController.cs": "77938b9ed60a44f1948a0429b1db0dc9159dd46b0e15b39017666aa21a5c361f",
+    "backend/src/hotel-erp.Api/Controllers/InventoryController.cs": "2425254999634d1e1a8056beac8e5968f572e471d8d47ac87d96d8a14fce80d7",
+    "backend/src/hotel-erp.Api/Controllers/ReservationsController.cs": "1fd4557ee1a65f69ecd5379be9f286aeea18fa0c99e6101eec265d8c980b3575",
+    "backend/src/hotel-erp.Api/Dtos/PaginationDtos.cs": "e847ee6f8b415649369ca98c1641e5e8f5e3e93883c7dd009edc2080a0c3faff",
+    "backend/src/hotel-erp.Api/Services/HotelListQueryService.Operations.cs": "e8d23bfd72da6d5fbef0ef1f63a6313555efd27a7cbbccb65b830ac531064169",
+    "backend/src/hotel-erp.Api/Services/HotelListQueryService.cs": "5ef5546252f5f96192efd468b8c5e1ac756cd98d4b4f3eb279a724c2379b6788",
+    "backend/tests/hotel-erp.IntegrationTests/AuthenticationFlowTests.OperationsPagination.cs": "f1a791d0ad5cfb3acb79cca43f5b22c01b1e7af1f00ee3a2c857314b46c8ae03",
+    "backend/tests/hotel-erp.IntegrationTests/AuthenticationFlowTests.cs": "8e3e6557283696b72f135c38e8af3670bd697fbcf3b2f0923bfb663b771db3bd",
+    "docs/plan de implementación/2026-09-27/06-lista-maestra.md": "cc4c495afd1fa531cac047c23000fccd0972d57412bab5b0467abdc30a7bfb16",
+    "docs/plan de implementación/2026-09-27/08-registro-pendientes.md": "7ce72e07f40b4074f4292ecbb403da79e5bce805ed80fac82adfbf0403b30a13",
+    "docs/plan de implementación/2026-09-27/README.md": "041350f9b8896968950e4c603ce74f8a0e87c41768dd069958496948d595229c",
+    "docs/plan de implementación/2026-09-27/contratos/openapi-v1.json": "004ec6fef9772d1cb651f4c9a95a1d8e698820834f1c44c9e1c54b1192a9a6f7",
+    "docs/plan de implementación/2026-09-27/evidencia/README.md": "3eee6f3494a9b342d90f1d6bc709c1da2c1f7cd74db53ec0dc0955a9553f49ea",
+    "docs/plan de implementación/2026-09-27/evidencia/p02h2a-base-qa.json": "076874156e9035d3c469766115de3cf81f05ead59c1b537e1b681893cd9ce834",
+    "docs/plan de implementación/2026-09-27/evidencia/p02h2a-impeccable.json": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+    "docs/plan de implementación/2026-09-27/evidencia/p02h2a-inventario-contratos.json": "bc5ef7abe61b06650af6c7e456cad058fddfced0e8f04caa3e6f897d6757fb7f",
+    "docs/plan de implementación/2026-09-27/evidencia/p02h2a-modelo-ef.log": "815c5cd494b61a9d8737ba7653cd05fb05926e7b40a924683fa4eef4ca87566c",
+    "docs/plan de implementación/2026-09-27/evidencia/p02h2a-paginacion.json": "db8c1d96f3ba3289df790aa789f0c94aa8fada3239efaf1f908418a4f8777289",
+    "docs/plan de implementación/2026-09-27/evidencia/p02h2a-qa.log": "2332b4aa8b1d02a49c568ab434071b3d483fbc937b3995e30ccbda84bc47f155",
+    "docs/plan de implementación/2026-09-27/evidencia/ui-p02h2a/clientes-escritorio.png": "5db2deea107f0fd1acaff51b7cc86ed022982c22866a18549ec5e9298ceade61",
+    "docs/plan de implementación/2026-09-27/evidencia/ui-p02h2a/clientes-movil.png": "15a72a52d4832dad6188ce90948212bb670d3004627bf97e8d3439c4670e9d2e",
+    "docs/plan de implementación/2026-09-27/evidencia/ui-p02h2a/folios-escritorio.png": "21147c37c2ade8d69393eb5b1280971136a4da2dae286842d54aa47169a33315",
+    "docs/plan de implementación/2026-09-27/evidencia/ui-p02h2a/folios-movil.png": "070383a4ca4b85f04ec6e456bdbc2eb802045083d3d161a85485ab3e83f2efd1",
+    "docs/plan de implementación/2026-09-27/evidencia/ui-p02h2a/inventario-kardex-escritorio.png": "b357cba9a8752bdbe153bb9a9f8e1763917cd8b3474e35522e1f7f651736f16c",
+    "docs/plan de implementación/2026-09-27/evidencia/ui-p02h2a/inventario-kardex-movil.png": "4a54a6e893827b9041ee26bb40bdb2b34827025d728d36e84f873b4e2e2e4dde",
+    "docs/plan de implementación/2026-09-27/evidencia/ui-p02h2a/inventario-productos-escritorio.png": "43252db116d09a7031639dadc707507502e347b71ba0c4ed9d74a3986d6891bb",
+    "docs/plan de implementación/2026-09-27/evidencia/ui-p02h2a/inventario-productos-movil.png": "2d552afd5c9f6d66552d2316a56a15b789b36fd4ee95be9be5ddae39c43d27da",
+    "docs/plan de implementación/2026-09-27/evidencia/ui-p02h2a/reservaciones-escritorio.png": "432cea2392975c0d93bf13c196f5ffd6a5cf94476b339c173adb403e62762bfd",
+    "docs/plan de implementación/2026-09-27/evidencia/ui-p02h2a/reservaciones-movil.png": "5435a29d73970fe7868b90a6d4c98fe3f3e25fd4f3a996bb50f823a3c7293660",
+    "docs/plan de implementación/2026-09-27/evidencia/ui-p02h2a/resultado.json": "38c40cb0e9df64ca51017e8c09309ea0e93ab8628ea1ad28aa6457ea45291f78",
+    "docs/plan de implementación/2026-09-27/p02-base-tecnica/README.md": "ca657303421e054aaaaee452aa3bce6e2995dcd2767f4467592af8a63b8f4fb4",
+    "docs/plan de implementación/2026-09-27/p02-base-tecnica/p02-h2a-operacion-inventario.md": "aa4a066abc6a3f07c424f9a4e4022d5aa9b3442100bc575aa8fbf954cf72c6e9",
+    "frontend/src/hooks/usePagedList.ts": "64c24b4662941bfc1417bd1ce25217551e4d512ddc44cd68c1c0d9f805945976",
+    "frontend/src/pages/customers/CustomersPage.tsx": "adaef600417feb3a6590bc9476d665aad4b8ea48c9860f24e7b211ebb2a36d9c",
+    "frontend/src/pages/folios/FoliosPage.tsx": "1a365e829a3c01d85d06d941481e4feb48dd7ff54800de121ca4e8e03705691b",
+    "frontend/src/pages/inventory/InventoryPage.tsx": "6687e2f89ce3fbf6a5300b30006cb7b76a7c4a37005831f1a0c7ebb939cb48b1",
+    "frontend/src/pages/reservations/ReservationsPage.tsx": "c2d7b6c5de4cf160d5d99181bb7589485445f29205d4e24a8484bd5cf2283145",
+    "frontend/src/types/api.generated.ts": "c477e6c46bf5436187be007b85be467eb7d4143570168d9158b3d73c9caf8764",
+    "frontend/src/types/index.ts": "0553ec40dbf02cfe99127de436927aa92e2756ea90f301c7e984fde24f525381"
+  }
+}

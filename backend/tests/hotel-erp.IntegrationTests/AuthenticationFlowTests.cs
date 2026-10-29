@@ -220,6 +220,14 @@ public partial class AuthenticationFlowTests
         await AssertEndpointStatusAsync(client, cashier.AccessToken, "/api/inventory/categories", HttpStatusCode.Forbidden);
         await AssertEndpointStatusAsync(client, accountant.AccessToken, "/api/inventory/categories", HttpStatusCode.Forbidden);
         await AssertEndpointStatusAsync(client, administrator.AccessToken, "/api/inventory/categories", HttpStatusCode.OK);
+        foreach (var path in new[] { "/api/inventory/products/paged", "/api/inventory/movements/paged", "/api/inventory/summary" })
+        {
+            await AssertEndpointStatusAsync(client, reception.AccessToken, path, HttpStatusCode.Forbidden);
+            await AssertEndpointStatusAsync(client, cashier.AccessToken, path, HttpStatusCode.Forbidden);
+            await AssertEndpointStatusAsync(client, accountant.AccessToken, path, HttpStatusCode.Forbidden);
+            await AssertEndpointStatusAsync(client, administrator.AccessToken, path, HttpStatusCode.OK);
+        }
+
 
         await AssertEndpointStatusAsync(client, reception.AccessToken, "/api/suppliers", HttpStatusCode.Forbidden);
         await AssertEndpointStatusAsync(client, cashier.AccessToken, "/api/suppliers", HttpStatusCode.Forbidden);
@@ -563,6 +571,7 @@ public partial class AuthenticationFlowTests
 
         await AssertExplicitPersistenceConsumersAsync(client, factory.Services, currentSession.AccessToken!);
         await AssertApiContractAndPaginationAsync(client, factory.Services, currentSession.AccessToken!);
+        await AssertOperationsPaginationAsync(client, factory.Services, currentSession.AccessToken!);
 
         using var retirementRequest = Authorized(HttpMethod.Post, "/api/settings/business/retire", currentSession.AccessToken!);
         retirementRequest.Content = JsonContent.Create(new

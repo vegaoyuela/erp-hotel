@@ -1,0 +1,23 @@
+{
+  "status": "passed",
+  "synthetic_database": true,
+  "contains_secret_values": false,
+  "flows": {
+    "reservations_page_filter_reset": true,
+    "customer_email_from_later_page": true,
+    "folio_page_status_and_detail": true,
+    "inventory_global_counts_survive_filter": true,
+    "kardex_page_and_global_product_picker_preserves_selection": true,
+    "no_unbounded_inventory_product_or_movement_requests": true,
+    "customer_error_and_refresh_recovery": true
+  },
+  "mobile_document_overflow": {
+    "reservaciones": false,
+    "clientes": false,
+    "folios": false,
+    "inventario-productos": false,
+    "inventario-kardex": false
+  },
+  "javascript_errors": 0,
+  "screenshots": 10
+}

@@ -1,0 +1,45 @@
+{
+  "syntheticDatabase": true,
+  "lists": [
+    {
+      "path": "/api/reservations/paged?search=Operaci%C3%B3n%20QA-H2",
+      "matchedRows": 31,
+      "legacyRows": 33,
+      "pageRows": 10,
+      "legacyBytes": 12190,
+      "pageBytes": 3760
+    },
+    {
+      "path": "/api/folios/paged?search=Operaci%C3%B3n%20QA-H2",
+      "matchedRows": 31,
+      "legacyRows": 33,
+      "pageRows": 10,
+      "legacyBytes": 18611,
+      "pageBytes": 2195
+    },
+    {
+      "path": "/api/customers/paged?search=Operaci%C3%B3n%20QA-H2",
+      "matchedRows": 31,
+      "legacyRows": 31,
+      "pageRows": 10,
+      "legacyBytes": 11595,
+      "pageBytes": 3805
+    },
+    {
+      "path": "/api/inventory/products/paged?search=Operaci%C3%B3n%20QA-H2",
+      "matchedRows": 31,
+      "legacyRows": 31,
+      "pageRows": 10,
+      "legacyBytes": 8421,
+      "pageBytes": 2788
+    },
+    {
+      "path": "/api/inventory/movements/paged?productId=01a18877-a886-7d0b-af5b-7e4deba15dbe",
+      "matchedRows": 31,
+      "legacyRows": 31,
+      "pageRows": 10,
+      "legacyBytes": 8935,
+      "pageBytes": 2946
+    }
+  ]
+}

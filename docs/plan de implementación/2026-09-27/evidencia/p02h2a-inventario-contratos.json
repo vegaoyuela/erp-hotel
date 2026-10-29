@@ -1,0 +1,614 @@
+{
+  "date_honduras": "2026-10-29",
+  "contains_secret_values": false,
+  "sql_paged_lists_completed_this_delivery": [
+    "reservations",
+    "folios",
+    "customers",
+    "inventory/products",
+    "inventory/movements"
+  ],
+  "generated_aliases_added": [
+    [
+      "Reservation",
+      "ReservationDto"
+    ],
+    [
+      "Customer",
+      "CustomerDto"
+    ],
+    [
+      "Category",
+      "CategoryDto"
+    ],
+    [
+      "Product",
+      "ProductDto"
+    ],
+    [
+      "InventoryMovement",
+      "InventoryMovementDto"
+    ],
+    [
+      "FolioItem",
+      "FolioItemDto"
+    ],
+    [
+      "Folio",
+      "FolioDto"
+    ],
+    [
+      "FolioList",
+      "FolioListDto"
+    ],
+    [
+      "InventorySummary",
+      "InventorySummaryDto"
+    ]
+  ],
+  "remaining_frontend_array_reads": [
+    {
+      "file": "frontend/src/pages/accounting/ChartOfAccountsPage.tsx",
+      "line": 134,
+      "expression": "const { data } = await api.get<AccountingAccount[]>('/accounts')"
+    },
+    {
+      "file": "frontend/src/pages/accounting/JournalEntriesPage.tsx",
+      "line": 124,
+      "expression": "api.get<AccountingEntry[]>('/accounts/journal-entries'),"
+    },
+    {
+      "file": "frontend/src/pages/accounting/JournalEntriesPage.tsx",
+      "line": 125,
+      "expression": "api.get<AccountingAccount[]>('/accounts/flat'),"
+    },
+    {
+      "file": "frontend/src/pages/accounting/TrialBalancePage.tsx",
+      "line": 18,
+      "expression": "const { data } = await api.get<TrialBalanceItem[]>('/accounts/trial-balance')"
+    },
+    {
+      "file": "frontend/src/pages/admin/AuditLogsPage.tsx",
+      "line": 50,
+      "expression": "(await api.get<string[]>('/audit-logs/actions', { signal })).data })"
+    },
+    {
+      "file": "frontend/src/pages/backups/BackupsPage.tsx",
+      "line": 20,
+      "expression": "const { data } = await api.get<BackupLog[]>('/backup/logs')"
+    },
+    {
+      "file": "frontend/src/pages/cash/CardSettlementsPage.tsx",
+      "line": 77,
+      "expression": "api.get<EligibleCardPayment[]>('/card-settlements/eligible-payments'),"
+    },
+    {
+      "file": "frontend/src/pages/cash/CardSettlementsPage.tsx",
+      "line": 78,
+      "expression": "api.get<CardSettlement[]>('/card-settlements'),"
+    },
+    {
+      "file": "frontend/src/pages/cash/CashRegistersPage.tsx",
+      "line": 55,
+      "expression": "const { data } = await api.get<CashMovement[]>(`/cash-registers/${id}/movements`)"
+    },
+    {
+      "file": "frontend/src/pages/cash/CashRegistersPage.tsx",
+      "line": 66,
+      "expression": "const { data } = await api.get<CashRegister[]>('/cash-registers')"
+    },
+    {
+      "file": "frontend/src/pages/discounts/DiscountsPage.tsx",
+      "line": 32,
+      "expression": "const { data } = await api.get<Discount[]>('/discounts')"
+    },
+    {
+      "file": "frontend/src/pages/inventory/InventoryPage.tsx",
+      "line": 65,
+      "expression": "(await api.get<Category[]>('/inventory/categories', { signal })).data })"
+    },
+    {
+      "file": "frontend/src/pages/invoices/AuthorizationsPage.tsx",
+      "line": 64,
+      "expression": "api.get<CAI[]>('/cai'),"
+    },
+    {
+      "file": "frontend/src/pages/invoices/AuthorizationsPage.tsx",
+      "line": 65,
+      "expression": "api.get<DocumentAuthorization[]>('/document-authorizations')"
+    },
+    {
+      "file": "frontend/src/pages/invoices/InvoicesPage.tsx",
+      "line": 179,
+      "expression": "api.get<CAI[]>('/cai'),"
+    },
+    {
+      "file": "frontend/src/pages/invoices/InvoicesPage.tsx",
+      "line": 180,
+      "expression": "api.get<DocumentAuthorization[]>('/document-authorizations'),"
+    },
+    {
+      "file": "frontend/src/pages/invoices/InvoicesPage.tsx",
+      "line": 217,
+      "expression": "const { data } = await api.get<Payment[]>('/payments', { params: { invoiceId } })"
+    },
+    {
+      "file": "frontend/src/pages/invoices/InvoicesPage.tsx",
+      "line": 260,
+      "expression": "const { data } = await api.get<CashRegister[]>('/cash-registers')"
+    },
+    {
+      "file": "frontend/src/pages/invoices/InvoicesPage.tsx",
+      "line": 341,
+      "expression": "api.get<Invoice[]>('/invoices/search', { params: { originalInvoiceId: selectedInvoice.id } }),"
+    },
+    {
+      "file": "frontend/src/pages/invoices/InvoicesPage.tsx",
+      "line": 343,
+      "expression": "? api.get<CashRegister[]>('/cash-registers')"
+    },
+    {
+      "file": "frontend/src/pages/reservations/CheckInPage.tsx",
+      "line": 110,
+      "expression": "api.get<Room[]>('/rooms/available', { params: { checkIn: checkIn.checkInDate, checkOut: checkIn.checkOutDate } }).then(({ data }) => setAvailableRooms(data))"
+    },
+    {
+      "file": "frontend/src/pages/reservations/CheckInPage.tsx",
+      "line": 115,
+      "expression": "api.get<Discount[]>('/discounts').then(({ data }) => {"
+    },
+    {
+      "file": "frontend/src/pages/reservations/CheckInPage.tsx",
+      "line": 122,
+      "expression": "const { data } = await api.get<Guest[]>('/guests', { params: { search: searchTerm } })"
+    },
+    {
+      "file": "frontend/src/pages/reservations/CheckOutPage.tsx",
+      "line": 100,
+      "expression": "api.get<Reservation[]>('/reservations', { params: { status: 'CheckIn' } }),"
+    },
+    {
+      "file": "frontend/src/pages/reservations/CheckOutPage.tsx",
+      "line": 101,
+      "expression": "api.get<CAI[]>('/cai'),"
+    },
+    {
+      "file": "frontend/src/pages/reservations/CheckOutPage.tsx",
+      "line": 102,
+      "expression": "api.get<Discount[]>('/discounts'),"
+    },
+    {
+      "file": "frontend/src/pages/reservations/CheckOutPage.tsx",
+      "line": 103,
+      "expression": "api.get<CashRegister[]>('/cash-registers'),"
+    },
+    {
+      "file": "frontend/src/pages/rooms/FloorMapPage.tsx",
+      "line": 30,
+      "expression": "const r = await api.get<Room[]>('/rooms')"
+    },
+    {
+      "file": "frontend/src/pages/rooms/RoomTypesPage.tsx",
+      "line": 32,
+      "expression": "const { data } = await api.get<RoomType[]>('/room-types')"
+    },
+    {
+      "file": "frontend/src/pages/rooms/RoomsPage.tsx",
+      "line": 34,
+      "expression": "api.get<Room[]>('/rooms'),"
+    },
+    {
+      "file": "frontend/src/pages/rooms/RoomsPage.tsx",
+      "line": 35,
+      "expression": "api.get<RoomType[]>('/room-types'),"
+    },
+    {
+      "file": "frontend/src/pages/settings/SettingsPage.tsx",
+      "line": 141,
+      "expression": "void api.get<string[]>('/print/printers')"
+    },
+    {
+      "file": "frontend/src/pages/settings/SettingsPage.tsx",
+      "line": 499,
+      "expression": "<Button size=\"sm\" variant=\"outline\" onClick={() => api.get<string[]>('/print/printers').then(({ data }) => setPrinters(data)).catch(() => {})}>Recargar</Button>"
+    },
+    {
+      "file": "frontend/src/pages/users/UsersPage.tsx",
+      "line": 74,
+      "expression": "api.get<User[]>('/users'),"
+    },
+    {
+      "file": "frontend/src/pages/users/UsersPage.tsx",
+      "line": 75,
+      "expression": "api.get<Role[]>('/roles'),"
+    }
+  ],
+  "remaining_types_declared_manually": [
+    "User",
+    "AuthResponse",
+    "LoginRequest",
+    "RegisterRequest",
+    "RoomType",
+    "Room",
+    "CAI",
+    "CashRegister",
+    "PaymentApplication",
+    "RefundApplication",
+    "Refund",
+    "Payment",
+    "EligibleCardPayment",
+    "CardSettlementApplication",
+    "CardSettlement",
+    "CashMovement",
+    "DocumentAuthorization",
+    "BusinessSettings",
+    "FiscalProfileRevision",
+    "InvoicePrintData",
+    "AccountingAccount",
+    "AccountingEntry",
+    "EntryItem",
+    "DashboardStat",
+    "DashboardAlert",
+    "DashboardInvoice",
+    "DashboardReservation",
+    "DashboardCash",
+    "DashboardSummary",
+    "TrialBalanceItem",
+    "AccountMovement",
+    "CreateAccountRequest",
+    "Discount",
+    "BackupLog",
+    "Role",
+    "CreateUserRequest",
+    "UpdateUserRequest"
+  ],
+  "successful_200_201_responses_without_schema_for_review": [
+    {
+      "method": "DELETE",
+      "path": "/api/Accounts/{id}",
+      "status": "200",
+      "operationId": "Accounts_Deactivate"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/Accounts/{id}",
+      "status": "200",
+      "operationId": "Accounts_Update"
+    },
+    {
+      "method": "POST",
+      "path": "/api/Auth/change-password",
+      "status": "200",
+      "operationId": "Auth_ChangePassword"
+    },
+    {
+      "method": "POST",
+      "path": "/api/Auth/logout",
+      "status": "200",
+      "operationId": "Auth_Logout"
+    },
+    {
+      "method": "GET",
+      "path": "/api/Auth/me",
+      "status": "200",
+      "operationId": "Auth_GetCurrentUser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/Backup/logs",
+      "status": "200",
+      "operationId": "Backup_GetLogs"
+    },
+    {
+      "method": "POST",
+      "path": "/api/Backup/manual",
+      "status": "200",
+      "operationId": "Backup_CreateManualBackup"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/CAI/{id}",
+      "status": "200",
+      "operationId": "CAI_Delete"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/Customers/{id}",
+      "status": "200",
+      "operationId": "Customers_Delete"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/Customers/{id}",
+      "status": "200",
+      "operationId": "Customers_Update"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/Discounts/{id}",
+      "status": "200",
+      "operationId": "Discounts_Delete"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/Discounts/{id}",
+      "status": "200",
+      "operationId": "Discounts_Update"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/Guests/{id}",
+      "status": "200",
+      "operationId": "Guests_Delete"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/Guests/{id}",
+      "status": "200",
+      "operationId": "Guests_Update"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/Guests/{id}/classification",
+      "status": "200",
+      "operationId": "Guests_UpdateClassification"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/Inventory/categories/{id}",
+      "status": "200",
+      "operationId": "Inventory_DeleteCategory"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/Inventory/categories/{id}",
+      "status": "200",
+      "operationId": "Inventory_UpdateCategory"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/Inventory/products/{id}",
+      "status": "200",
+      "operationId": "Inventory_DeleteProduct"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/Inventory/products/{id}",
+      "status": "200",
+      "operationId": "Inventory_UpdateProduct"
+    },
+    {
+      "method": "POST",
+      "path": "/api/Invoices/{id}/cancel",
+      "status": "200",
+      "operationId": "Invoices_Cancel"
+    },
+    {
+      "method": "POST",
+      "path": "/api/Print/invoice/{id}",
+      "status": "200",
+      "operationId": "Print_PrintInvoice"
+    },
+    {
+      "method": "GET",
+      "path": "/api/Print/invoice/{id}/preview",
+      "status": "200",
+      "operationId": "Print_GetPreview"
+    },
+    {
+      "method": "GET",
+      "path": "/api/Print/printers",
+      "status": "200",
+      "operationId": "Print_GetPrinters"
+    },
+    {
+      "method": "GET",
+      "path": "/api/Print/test",
+      "status": "200",
+      "operationId": "Print_TestPrinter"
+    },
+    {
+      "method": "GET",
+      "path": "/api/Print/test-preview",
+      "status": "200",
+      "operationId": "Print_GetTestPreview"
+    },
+    {
+      "method": "POST",
+      "path": "/api/Print/test-print",
+      "status": "200",
+      "operationId": "Print_PrintTest"
+    },
+    {
+      "method": "POST",
+      "path": "/api/Print/test-ruler",
+      "status": "200",
+      "operationId": "Print_GetTestRuler"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/Reservations/{id}",
+      "status": "200",
+      "operationId": "Reservations_Delete"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/Roles/{id}",
+      "status": "200",
+      "operationId": "Roles_Delete"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/Roles/{id}",
+      "status": "200",
+      "operationId": "Roles_Update"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/Rooms/{id}",
+      "status": "200",
+      "operationId": "Rooms_Delete"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/Rooms/{id}",
+      "status": "200",
+      "operationId": "Rooms_Update"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/Suppliers/{id}",
+      "status": "200",
+      "operationId": "Suppliers_Delete"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/Suppliers/{id}",
+      "status": "200",
+      "operationId": "Suppliers_Update"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/Users/{id}",
+      "status": "200",
+      "operationId": "Users_Delete"
+    },
+    {
+      "method": "POST",
+      "path": "/api/Users/{id}/reset-password",
+      "status": "200",
+      "operationId": "Users_ResetPassword"
+    },
+    {
+      "method": "POST",
+      "path": "/api/Users/{userId}/roles/{roleId}",
+      "status": "200",
+      "operationId": "Users_AssignRole"
+    },
+    {
+      "method": "GET",
+      "path": "/api/audit-logs/export-integrity",
+      "status": "200",
+      "operationId": "AuditLogs_ExportIntegrity"
+    },
+    {
+      "method": "POST",
+      "path": "/api/cash-registers/{id}/close",
+      "status": "200",
+      "operationId": "CashRegisters_Close"
+    },
+    {
+      "method": "POST",
+      "path": "/api/cash-registers/{id}/open",
+      "status": "200",
+      "operationId": "CashRegisters_Open"
+    },
+    {
+      "method": "GET",
+      "path": "/api/data/export/guests",
+      "status": "200",
+      "operationId": "DataExport_ExportGuestsXlsx"
+    },
+    {
+      "method": "GET",
+      "path": "/api/data/export/invoices",
+      "status": "200",
+      "operationId": "DataExport_ExportInvoicesXlsx"
+    },
+    {
+      "method": "GET",
+      "path": "/api/data/export/reservations",
+      "status": "200",
+      "operationId": "DataExport_ExportReservationsXlsx"
+    },
+    {
+      "method": "GET",
+      "path": "/api/data/export/rooms",
+      "status": "200",
+      "operationId": "DataExport_ExportRoomsXlsx"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/document-authorizations/{id}",
+      "status": "200",
+      "operationId": "DocumentAuthorizations_Delete"
+    },
+    {
+      "method": "GET",
+      "path": "/api/document-authorizations/{id}/file",
+      "status": "200",
+      "operationId": "DocumentAuthorizations_GetFile"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/purchase-invoices/{id}",
+      "status": "200",
+      "operationId": "PurchaseInvoices_Delete"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/purchase-invoices/{id}/pay",
+      "status": "200",
+      "operationId": "PurchaseInvoices_MarkAsPaid"
+    },
+    {
+      "method": "GET",
+      "path": "/api/reports/sar/purchases-book",
+      "status": "200",
+      "operationId": "Reports_GetPurchasesBookXlsx"
+    },
+    {
+      "method": "GET",
+      "path": "/api/reports/sar/sales-book",
+      "status": "200",
+      "operationId": "Reports_GetSalesBookXlsx"
+    },
+    {
+      "method": "GET",
+      "path": "/api/reports/tax-summary",
+      "status": "200",
+      "operationId": "Reports_GetTaxSummary"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/room-types/{id}",
+      "status": "200",
+      "operationId": "RoomTypes_Delete"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/room-types/{id}",
+      "status": "200",
+      "operationId": "RoomTypes_Update"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/tax-configurations/{id}",
+      "status": "200",
+      "operationId": "TaxConfigurations_Delete"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/tax-configurations/{id}",
+      "status": "200",
+      "operationId": "TaxConfigurations_Update"
+    },
+    {
+      "method": "GET",
+      "path": "/health",
+      "status": "200",
+      "operationId": null
+    }
+  ],
+  "interpretation": "Inventory for follow-up, not every array is a defect: small catalogs, reports and filtered operational selectors require individual review. Success without a schema may be an intentional empty response.",
+  "next_priorities": [
+    "cash registers and movements",
+    "card settlements and eligible payments",
+    "journal entries",
+    "backup logs",
+    "authorization catalogs and high-volume operational selectors",
+    "remaining explicit success response schemas and generated frontend types"
+  ],
+  "windows_and_physical_printing": "deferred at user request; daily reminder at 10:00 America/Tegucigalpa until both accepted",
+  "reminder_automation_id": "pendientes-windows-11-e-impresi-n-del-hotel"
+}

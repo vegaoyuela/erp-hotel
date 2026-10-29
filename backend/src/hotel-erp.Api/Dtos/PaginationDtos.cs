@@ -44,3 +44,48 @@ public sealed class AuditPageQuery : PageQuery
 }
 
 public sealed record PagedResult<T>(IReadOnlyList<T> Items, int Page, int PageSize, int TotalItems, int TotalPages);
+
+public class SearchPageQuery : PageQuery
+{
+    [StringLength(100)]
+    public string? Search { get; set; }
+}
+
+public sealed class ReservationPageQuery : SearchPageQuery
+{
+    [RegularExpression("^(Pendiente|Confirmada|CheckIn|CheckOut|Cancelada)$")]
+    public string? Status { get; set; }
+}
+
+public sealed class FolioPageQuery : SearchPageQuery
+{
+    [RegularExpression("^(Abierto|Cerrado|PendientePago)$")]
+    public string? Status { get; set; }
+}
+
+public sealed class ProductPageQuery : SearchPageQuery
+{
+    public Guid? CategoryId { get; set; }
+    public bool? IsActive { get; set; }
+}
+
+public sealed class InventoryMovementPageQuery : SearchPageQuery
+{
+    public Guid? ProductId { get; set; }
+    [RegularExpression("^(Entrada|Salida|Ajuste|Compra|Venta)$")]
+    public string? MovementType { get; set; }
+}
+
+public sealed record FolioListDto
+{
+    public Guid Id { get; init; }
+    public string GuestName { get; init; } = string.Empty;
+    public string RoomNumber { get; init; } = string.Empty;
+    public DateTime OpeningDate { get; init; }
+    public DateTime? ClosingDate { get; init; }
+    public decimal TotalAmount { get; init; }
+    public string Status { get; init; } = string.Empty;
+    public int ItemCount { get; init; }
+}
+
+public sealed record InventorySummaryDto(int TotalProducts, int ActiveProducts, int LowStockProducts, int TotalMovements);

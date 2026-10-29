@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace hotel_erp.Api.Services;
 
-public sealed class HotelListQueryService(ApplicationDbContext context, IMapper mapper)
+public sealed partial class HotelListQueryService(ApplicationDbContext context, IMapper mapper)
 {
     public async Task<PagedResult<GuestDto>> GuestsAsync(GuestPageQuery request, CancellationToken token)
     {

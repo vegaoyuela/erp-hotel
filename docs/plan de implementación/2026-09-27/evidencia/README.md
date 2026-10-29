@@ -183,3 +183,21 @@ Huéspedes, facturas y auditoría consultan páginas y filtros en PostgreSQL. El
 | [p02h1-qa-resumen.json](p02h1-qa-resumen.json) | Resumen verificable y hashes de fuentes, contrato, pruebas y evidencia. |
 
 El [detalle de entrega](../p02-base-tecnica/p02-h1-contrato-paginacion.md) registra rutas, comandos, capturas y P02-H2. La prueba PowerShell y la impresión física continúan pendientes en Windows.
+
+
+### P02-H2A — operación e inventario (29 de octubre de 2026)
+
+Cinco nuevas colecciones paginadas en PostgreSQL: reservas, folios, clientes, productos y Kardex. Los indicadores son globales y el selector de productos también está paginado. Se tiparon los resultados de reservas/cargos de folio y se migraron nueve contratos frontend.
+
+| Archivo | Resultado |
+|---|---|
+| [p02h2a-qa.log](p02h2a-qa.log) | Build sin advertencias, 109 unitarias, 5 integraciones PostgreSQL, 5 validaciones del expediente, npm audit, contrato real, lint y build. |
+| [p02h2a-modelo-ef.log](p02h2a-modelo-ef.log) | Sin cambio de modelo ni migración requerida. |
+| [p02h2a-base-qa.json](p02h2a-base-qa.json) | Conteos reales de base QA y bases temporales residuales al cerrar. |
+| [p02h2a-paginacion.json](p02h2a-paginacion.json) | Filas y bytes reales de respuestas completas/paginadas para cinco colecciones sintéticas. |
+| [p02h2a-inventario-contratos.json](p02h2a-inventario-contratos.json) | Inventario de arrays y respuestas a revisar, tipos restantes y siguientes prioridades. |
+| [p02h2a-impeccable.json](p02h2a-impeccable.json) | Detector sobre cuatro pantallas modificadas: cero hallazgos. |
+| [ui-p02h2a/resultado.json](ui-p02h2a/resultado.json) | Siete comprobaciones de flujo, diez capturas, cinco comprobaciones móviles y cero errores JavaScript. |
+| [p02h2a-qa-resumen.json](p02h2a-qa-resumen.json) | Resumen y SHA-256 de fuentes, contrato, pruebas y evidencia. |
+
+El [detalle H2A](../p02-base-tecnica/p02-h2a-operacion-inventario.md) conserva las diez capturas y H2B. Windows e impresión física siguen aplazados por el usuario, con recordatorio diario.

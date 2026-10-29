@@ -12,11 +12,12 @@ export function useDebouncedValue(value: string, delay = 250) {
   return debounced
 }
 
-export function usePagedList<T>(path: string, params: Record<string, string | number | undefined>) {
+export function usePagedList<T>(path: string, params: Record<string, string | number | undefined>, options: { enabled?: boolean } = {}) {
   const query = useQuery({
     queryKey: [path, params],
     queryFn: async ({ signal }) => (await api.get<PagedResult<T>>(path, { params, signal })).data,
     retry: false,
+    enabled: options.enabled,
   })
   return {
     items: query.data?.items ?? [],

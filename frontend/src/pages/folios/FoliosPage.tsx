@@ -1,30 +1,27 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState } from 'react'
+import { useDebouncedValue, usePagedList } from '@/hooks/usePagedList'
+import { Pagination } from '@/components/ui/Pagination'
+import { useAuthStore } from '@/store/authStore'
 import api from '@/lib/axios'
-import type { Folio } from '@/types'
+import type { Folio, FolioList } from '@/types'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { InlineAlert } from '@/components/ui/InlineAlert'
 
 export default function FoliosPage() {
-  const [folios, setFolios] = useState<Folio[]>([])
+  const canCreateInvoices = useAuthStore(state => state.hasPermission('create_invoices'))
+  const [search, setSearch] = useState('')
+  const [statusFilter, setStatusFilter] = useState('')
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pageSize, setPageSize] = useState(15)
   const [selectedFolio, setSelectedFolio] = useState<Folio | null>(null)
   const [showAddItem, setShowAddItem] = useState(false)
   const [newItem, setNewItem] = useState({ description: '', quantity: 1, unitPrice: 0, isExempt: false, isvRate: 0.15, isTouristTaxable: false, discountPercentage: 0 })
   const [alertInfo, setAlertInfo] = useState<{ variant: 'error' | 'success' | 'info'; message: string } | null>(null)
 
-  const load = useCallback(async () => {
-    try {
-      const { data } = await api.get<Folio[]>('/folios')
-      setFolios(data)
-    } catch {
-      setAlertInfo({ variant: 'error', message: 'Error al cargar folios' })
-    }
-  }, [])
-
-  useEffect(() => {
-    const timer = window.setTimeout(() => void load(), 0)
-    return () => window.clearTimeout(timer)
-  }, [load])
+  const debouncedSearch = useDebouncedValue(search)
+  const { items: folios, loading, error: listError, load, page, totalItems, totalPages } = usePagedList<FolioList>(
+    '/folios/paged', { page: currentPage, pageSize, search: debouncedSearch || undefined, status: statusFilter || undefined })
 
   const viewFolio = async (id: string) => {
     try {
@@ -44,7 +41,8 @@ export default function FoliosPage() {
       await api.post(`/folios/${selectedFolio.id}/items`, newItem)
       setShowAddItem(false)
       setNewItem({ description: '', quantity: 1, unitPrice: 0, isExempt: false, isvRate: 0.15, isTouristTaxable: false, discountPercentage: 0 })
-      viewFolio(selectedFolio.id)
+      await viewFolio(selectedFolio.id)
+      await load()
     } catch {
       setAlertInfo({ variant: 'error', message: 'Error al agregar item al folio' })
     }
@@ -79,7 +77,7 @@ export default function FoliosPage() {
           </div>
         </div>
 
-        <div className="border border-border rounded-lg overflow-hidden">
+        <div className="border border-border rounded-lg overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-muted"><tr>
               <th className="text-left p-3">Descripción</th><th className="text-right p-3">Cant.</th>
@@ -102,7 +100,7 @@ export default function FoliosPage() {
           </table>
         </div>
 
-        {selectedFolio.status === 'Abierto' && (
+        {canCreateInvoices && selectedFolio.status === 'Abierto' && (
           <div className="space-y-3">
             {showAddItem ? (
               <div className="border border-border rounded-lg p-4 bg-card space-y-3">
@@ -144,35 +142,47 @@ export default function FoliosPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Folios / Consumos</h1>
-        <Button variant="outline" onClick={load}>Actualizar</Button>
+        <Button variant="outline" onClick={() => void load()} disabled={loading}>Actualizar</Button>
       </div>
 
       {alertInfo && !selectedFolio && (
         <InlineAlert variant={alertInfo.variant} message={alertInfo.message} onClose={() => setAlertInfo(null)} />
       )}
 
+      <div className="flex flex-col gap-2 sm:flex-row">
+        <Input aria-label="Buscar folios" placeholder="Buscar huésped o habitación..." maxLength={100} value={search} onChange={e => { setSearch(e.target.value); setCurrentPage(1) }} className="sm:max-w-md" />
+        <select aria-label="Estado del folio" value={statusFilter} onChange={e => { setStatusFilter(e.target.value); setCurrentPage(1) }} className="border border-input rounded-md px-3 py-2 text-sm bg-background">
+          <option value="">Todos los estados</option><option value="Abierto">Abierto</option><option value="PendientePago">Pendiente de pago</option><option value="Cerrado">Cerrado</option>
+        </select>
+      </div>
+      {listError && <InlineAlert variant="error" message="No se pudo cargar la página de folios. Usa Actualizar para reintentar." />}
       <div className="border border-border rounded-lg overflow-hidden">
-        <table className="w-full text-sm">
+        <div className="overflow-x-auto">
+        <table className="w-full min-w-[700px] text-sm">
           <thead className="bg-muted"><tr>
             <th className="text-left p-3">Huésped</th><th className="text-left p-3">Habitación</th>
             <th className="text-left p-3">Apertura</th><th className="text-right p-3">Total</th>
             <th className="text-left p-3">Items</th><th className="text-left p-3">Estado</th><th className="text-left p-3"></th>
           </tr></thead>
           <tbody>
-            {folios.map(f => (
+            {!loading && folios.map(f => (
               <tr key={f.id} className="border-t border-border">
                 <td className="p-3">{f.guestName}</td>
                 <td className="p-3">#{f.roomNumber}</td>
                 <td className="p-3">{new Date(f.openingDate).toLocaleDateString()}</td>
                 <td className="p-3 text-right font-semibold">L {f.totalAmount.toFixed(2)}</td>
-                <td className="p-3">{f.items?.length || 0}</td>
+                <td className="p-3">{f.itemCount}</td>
                 <td className="p-3"><span className={`px-2 py-0.5 rounded text-xs font-medium ${f.status === 'Abierto' ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' : 'bg-gray-100 dark:bg-gray-800/50 text-gray-800 dark:text-gray-300'}`}>{f.status}</span></td>
                 <td className="p-3"><Button size="sm" variant="outline" onClick={() => viewFolio(f.id)}>Ver</Button></td>
               </tr>
             ))}
-            {folios.length === 0 && <tr><td colSpan={7} className="p-6 text-center text-muted-foreground">No hay folios registrados</td></tr>}
+            {loading && <tr><td colSpan={7} className="p-6 text-center text-muted-foreground" role="status">Cargando folios…</td></tr>}
+            {!loading && !listError && folios.length === 0 && <tr><td colSpan={7} className="p-6 text-center text-muted-foreground">No hay folios registrados</td></tr>}
           </tbody>
         </table>
+        </div>
+        <Pagination currentPage={page} totalPages={totalPages} totalItems={totalItems} pageSize={pageSize} disabled={loading}
+          onPageChange={setCurrentPage} onPageSizeChange={size => { setPageSize(size); setCurrentPage(1) }} />
       </div>
     </div>
   )

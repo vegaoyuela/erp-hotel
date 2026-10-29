@@ -16,7 +16,8 @@ public class ReservationsController(
     IReservationRepository repository,
     ReservationApplicationService reservationService,
     IHotelClock clock,
-    IMapper mapper) : ControllerBase
+    IMapper mapper,
+    HotelListQueryService lists) : ControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<IEnumerable<ReservationDto>>> GetAll([FromQuery] string? status)
@@ -27,7 +28,13 @@ public class ReservationsController(
         return Ok(mapper.Map<IEnumerable<ReservationDto>>(await repository.GetAllAsync()));
     }
 
+    [HttpGet("paged")]
+    public async Task<ActionResult<PagedResult<ReservationDto>>> GetPage([FromQuery] ReservationPageQuery query)
+        => Ok(await lists.ReservationsAsync(query, HttpContext.RequestAborted));
+
     [HttpGet("{id}")]
+    [ProducesResponseType(typeof(ReservationDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ReservationDto>> GetById(Guid id)
     {
         var reservation = await repository.GetByIdAsync(id);
@@ -54,6 +61,9 @@ public class ReservationsController(
     }
 
     [HttpPost]
+    [ProducesResponseType(typeof(ReservationDto), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     [Authorize(Policy = PermissionNames.ManageReservations)]
     public async Task<ActionResult<ReservationDto>> Create([FromBody] CreateReservationRequest request)
     {
@@ -68,40 +78,55 @@ public class ReservationsController(
     }
 
     [HttpPut("{id}")]
+    [ProducesResponseType(typeof(ReservationVersionResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     [Authorize(Policy = PermissionNames.ManageReservations)]
-    public async Task<ActionResult> Update(Guid id, [FromBody] UpdateReservationRequest request)
+    public async Task<ActionResult<ReservationVersionResult>> Update(Guid id, [FromBody] UpdateReservationRequest request)
     {
         var result = await reservationService.UpdateAsync(id, CurrentUserId(), request, HttpContext.RequestAborted);
         return result.Succeeded ? Ok(result.Value) : Failure(result);
     }
 
     [HttpPost("{id}/confirm")]
+    [ProducesResponseType(typeof(ReservationStateResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     [Authorize(Policy = PermissionNames.ManageReservations)]
-    public async Task<ActionResult> Confirm(Guid id, [FromBody] ConfirmReservationRequest request)
+    public async Task<ActionResult<ReservationStateResult>> Confirm(Guid id, [FromBody] ConfirmReservationRequest request)
     {
         var result = await reservationService.ConfirmAsync(id, CurrentUserId(), request, HttpContext.RequestAborted);
         return result.Succeeded ? Ok(result.Value) : Failure(result);
     }
 
     [HttpPost("{id}/cancel")]
+    [ProducesResponseType(typeof(ReservationStateResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     [Authorize(Policy = PermissionNames.ManageReservations)]
-    public async Task<ActionResult> Cancel(Guid id, [FromBody] CancelReservationRequest request)
+    public async Task<ActionResult<ReservationStateResult>> Cancel(Guid id, [FromBody] CancelReservationRequest request)
     {
         var result = await reservationService.CancelAsync(id, CurrentUserId(), request, HttpContext.RequestAborted);
         return result.Succeeded ? Ok(result.Value) : Failure(result);
     }
 
     [HttpPost("checkin")]
+    [ProducesResponseType(typeof(CheckInResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     [Authorize(Policy = PermissionNames.ManageReservations)]
-    public async Task<ActionResult> CheckIn([FromBody] CheckInRequest request)
+    public async Task<ActionResult<CheckInResult>> CheckIn([FromBody] CheckInRequest request)
     {
         var result = await reservationService.CheckInAsync(CurrentUserId(), request, HttpContext.RequestAborted);
         return result.Succeeded ? Ok(result.Value) : Failure(result);
     }
 
     [HttpPost("checkout/{id}")]
+    [ProducesResponseType(typeof(CheckOutResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     [Authorize(Policy = PermissionNames.ManageReservations)]
-    public async Task<ActionResult> CheckOut(Guid id, [FromBody] CheckOutRequest request)
+    public async Task<ActionResult<CheckOutResult>> CheckOut(Guid id, [FromBody] CheckOutRequest request)
     {
         var result = await reservationService.CheckOutAsync(id, CurrentUserId(), request, HttpContext.RequestAborted);
         return result.Succeeded ? Ok(result.Value) : Failure(result);

@@ -330,6 +330,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/Customers/paged": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Customers: GetPage */
+        get: operations["Customers_GetPage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/Customers/{id}": {
         parameters: {
             query?: never;
@@ -412,6 +429,23 @@ export interface paths {
         };
         /** Folios: GetByReservation */
         get: operations["Folios_GetByReservation"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/Folios/paged": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Folios: GetPage */
+        get: operations["Folios_GetPage"];
         put?: never;
         post?: never;
         delete?: never;
@@ -596,6 +630,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/Inventory/movements/paged": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Inventory: GetMovementsPage */
+        get: operations["Inventory_GetMovementsPage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/Inventory/products": {
         parameters: {
             query?: never;
@@ -608,6 +659,23 @@ export interface paths {
         put?: never;
         /** Inventory: CreateProduct */
         post: operations["Inventory_CreateProduct"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/Inventory/products/paged": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Inventory: GetProductsPage */
+        get: operations["Inventory_GetProductsPage"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -627,6 +695,23 @@ export interface paths {
         post?: never;
         /** Inventory: DeleteProduct */
         delete: operations["Inventory_DeleteProduct"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/Inventory/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Inventory: GetSummary */
+        get: operations["Inventory_GetSummary"];
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -967,6 +1052,23 @@ export interface paths {
         };
         /** Reservations: GetByDateRange */
         get: operations["Reservations_GetByDateRange"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/Reservations/paged": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Reservations: GetPage */
+        get: operations["Reservations_GetPage"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2335,9 +2437,41 @@ export interface components {
             /** Format: uuid */
             roomId: string;
         };
+        CheckInResult: {
+            /** Format: double */
+            discountAmount: number | string;
+            /** Format: double */
+            discountPercent: number | string;
+            /** Format: uuid */
+            folioId: string;
+            /** Format: double */
+            isv: number | string;
+            /** Format: double */
+            isvRate: number | string;
+            message: string;
+            /** Format: int32 */
+            nights: number | string;
+            /** Format: double */
+            sellingPricePerNight: number | string;
+            /** Format: double */
+            subtotal: number | string;
+            /** Format: double */
+            total: number | string;
+            /** Format: double */
+            touristTax: number | string;
+            /** Format: double */
+            touristTaxRate: number | string;
+            /** Format: int32 */
+            version: number | string;
+        };
         CheckOutRequest: {
             /** Format: uuid */
             invoiceId: string;
+        };
+        CheckOutResult: {
+            /** Format: uuid */
+            invoiceId: string;
+            message: string;
         };
         CloseCashRegisterRequest: {
             /** Format: double */
@@ -2822,6 +2956,13 @@ export interface components {
             /** Format: int32 */
             version: number | string;
         };
+        FolioChargeResult: {
+            /** Format: uuid */
+            itemId: string;
+            message: string;
+            /** Format: double */
+            totalAmount: number | string;
+        };
         FolioDto: {
             /** Format: date-time */
             closingDate?: null | string;
@@ -2858,6 +2999,21 @@ export interface components {
             quantity?: number | string;
             /** Format: double */
             unitPrice?: number | string;
+        };
+        FolioListDto: {
+            /** Format: date-time */
+            closingDate?: null | string;
+            guestName?: string;
+            /** Format: uuid */
+            id?: string;
+            /** Format: int32 */
+            itemCount?: number | string;
+            /** Format: date-time */
+            openingDate?: string;
+            roomNumber?: string;
+            status?: string;
+            /** Format: double */
+            totalAmount?: number | string;
         };
         GuestDto: {
             classification?: null | string;
@@ -2933,6 +3089,16 @@ export interface components {
             /** Format: double */
             unitPrice?: null | number | string;
             userName?: null | string;
+        };
+        InventorySummaryDto: {
+            /** Format: int32 */
+            activeProducts: number | string;
+            /** Format: int32 */
+            lowStockProducts: number | string;
+            /** Format: int32 */
+            totalMovements: number | string;
+            /** Format: int32 */
+            totalProducts: number | string;
         };
         InvoiceDto: {
             /** Format: uuid */
@@ -3048,6 +3214,28 @@ export interface components {
             /** Format: int32 */
             totalPages: number | string;
         };
+        PagedResultOfCustomerDto: {
+            items: components["schemas"]["CustomerDto"][];
+            /** Format: int32 */
+            page: number | string;
+            /** Format: int32 */
+            pageSize: number | string;
+            /** Format: int32 */
+            totalItems: number | string;
+            /** Format: int32 */
+            totalPages: number | string;
+        };
+        PagedResultOfFolioListDto: {
+            items: components["schemas"]["FolioListDto"][];
+            /** Format: int32 */
+            page: number | string;
+            /** Format: int32 */
+            pageSize: number | string;
+            /** Format: int32 */
+            totalItems: number | string;
+            /** Format: int32 */
+            totalPages: number | string;
+        };
         PagedResultOfGuestDto: {
             items: components["schemas"]["GuestDto"][];
             /** Format: int32 */
@@ -3059,8 +3247,41 @@ export interface components {
             /** Format: int32 */
             totalPages: number | string;
         };
+        PagedResultOfInventoryMovementDto: {
+            items: components["schemas"]["InventoryMovementDto"][];
+            /** Format: int32 */
+            page: number | string;
+            /** Format: int32 */
+            pageSize: number | string;
+            /** Format: int32 */
+            totalItems: number | string;
+            /** Format: int32 */
+            totalPages: number | string;
+        };
         PagedResultOfInvoiceDto: {
             items: components["schemas"]["InvoiceDto"][];
+            /** Format: int32 */
+            page: number | string;
+            /** Format: int32 */
+            pageSize: number | string;
+            /** Format: int32 */
+            totalItems: number | string;
+            /** Format: int32 */
+            totalPages: number | string;
+        };
+        PagedResultOfProductDto: {
+            items: components["schemas"]["ProductDto"][];
+            /** Format: int32 */
+            page: number | string;
+            /** Format: int32 */
+            pageSize: number | string;
+            /** Format: int32 */
+            totalItems: number | string;
+            /** Format: int32 */
+            totalPages: number | string;
+        };
+        PagedResultOfReservationDto: {
+            items: components["schemas"]["ReservationDto"][];
             /** Format: int32 */
             page: number | string;
             /** Format: int32 */
@@ -3121,6 +3342,14 @@ export interface components {
             /** Format: uuid */
             id?: string;
             name?: string;
+        };
+        ProblemDetails: {
+            detail?: null | string;
+            instance?: null | string;
+            /** Format: int32 */
+            status?: null | number | string;
+            title?: null | string;
+            type?: null | string;
         };
         ProductDto: {
             /** Format: uuid */
@@ -3251,6 +3480,15 @@ export interface components {
             status?: string;
             /** Format: int32 */
             version?: number | string;
+        };
+        ReservationStateResult: {
+            message: string;
+            /** Format: int32 */
+            version: number | string;
+        };
+        ReservationVersionResult: {
+            /** Format: int32 */
+            version: number | string;
         };
         RetireFiscalProfileRequest: {
             reason: string;
@@ -6235,6 +6473,116 @@ export interface operations {
             };
         };
     };
+    Customers_GetPage: {
+        parameters: {
+            query?: {
+                Search?: string;
+                Page?: number | string;
+                PageSize?: number | string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PagedResultOfCustomerDto"];
+                    "text/json": components["schemas"]["PagedResultOfCustomerDto"];
+                    "text/plain": components["schemas"]["PagedResultOfCustomerDto"];
+                };
+            };
+            /** @description Solicitud inválida; los errores de validación se indican por campo. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Se requiere una sesión válida. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description El operador carece de permisos o debe cambiar la contraseña. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Error interno normalizado; incluye traceId para seguimiento. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+        };
+    };
     Customers_GetById: {
         parameters: {
             query?: never;
@@ -7288,6 +7636,27 @@ export interface operations {
                     };
                 };
             };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
             /** @description Error interno normalizado; incluye traceId para seguimiento. */
             500: {
                 headers: {
@@ -7311,29 +7680,30 @@ export interface operations {
             };
         };
     };
-    Folios_AddItem: {
+    Folios_GetPage: {
         parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                folioId: string;
+            query?: {
+                Status?: string;
+                Search?: string;
+                Page?: number | string;
+                PageSize?: number | string;
             };
+            header?: never;
+            path?: never;
             cookie?: never;
         };
-        requestBody: {
-            content: {
-                "application/*+json": components["schemas"]["AddFolioItemRequest"];
-                "application/json": components["schemas"]["AddFolioItemRequest"];
-                "text/json": components["schemas"]["AddFolioItemRequest"];
-            };
-        };
+        requestBody?: never;
         responses: {
             /** @description OK */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["PagedResultOfFolioListDto"];
+                    "text/json": components["schemas"]["PagedResultOfFolioListDto"];
+                    "text/plain": components["schemas"]["PagedResultOfFolioListDto"];
+                };
             };
             /** @description Solicitud inválida; los errores de validación se indican por campo. */
             400: {
@@ -7379,6 +7749,162 @@ export interface operations {
             };
             /** @description El operador carece de permisos o debe cambiar la contraseña. */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Error interno normalizado; incluye traceId para seguimiento. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+        };
+    };
+    Folios_AddItem: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                folioId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/*+json": components["schemas"]["AddFolioItemRequest"];
+                "application/json": components["schemas"]["AddFolioItemRequest"];
+                "text/json": components["schemas"]["AddFolioItemRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FolioChargeResult"];
+                    "text/json": components["schemas"]["FolioChargeResult"];
+                    "text/plain": components["schemas"]["FolioChargeResult"];
+                };
+            };
+            /** @description Solicitud inválida; los errores de validación se indican por campo. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Se requiere una sesión válida. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description El operador carece de permisos o debe cambiar la contraseña. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Conflict */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -7487,6 +8013,27 @@ export interface operations {
             };
             /** @description El operador carece de permisos o debe cambiar la contraseña. */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Not Found */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -9051,6 +9598,118 @@ export interface operations {
             };
         };
     };
+    Inventory_GetMovementsPage: {
+        parameters: {
+            query?: {
+                ProductId?: string;
+                MovementType?: string;
+                Search?: string;
+                Page?: number | string;
+                PageSize?: number | string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PagedResultOfInventoryMovementDto"];
+                    "text/json": components["schemas"]["PagedResultOfInventoryMovementDto"];
+                    "text/plain": components["schemas"]["PagedResultOfInventoryMovementDto"];
+                };
+            };
+            /** @description Solicitud inválida; los errores de validación se indican por campo. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Se requiere una sesión válida. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description El operador carece de permisos o debe cambiar la contraseña. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Error interno normalizado; incluye traceId para seguimiento. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+        };
+    };
     Inventory_GetProducts: {
         parameters: {
             query?: {
@@ -9271,6 +9930,118 @@ export interface operations {
             };
         };
     };
+    Inventory_GetProductsPage: {
+        parameters: {
+            query?: {
+                CategoryId?: string;
+                IsActive?: boolean;
+                Search?: string;
+                Page?: number | string;
+                PageSize?: number | string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PagedResultOfProductDto"];
+                    "text/json": components["schemas"]["PagedResultOfProductDto"];
+                    "text/plain": components["schemas"]["PagedResultOfProductDto"];
+                };
+            };
+            /** @description Solicitud inválida; los errores de validación se indican por campo. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Se requiere una sesión válida. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description El operador carece de permisos o debe cambiar la contraseña. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Error interno normalizado; incluye traceId para seguimiento. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+        };
+    };
     Inventory_UpdateProduct: {
         parameters: {
             query?: never;
@@ -9398,6 +10169,112 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Solicitud inválida; los errores de validación se indican por campo. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Se requiere una sesión válida. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description El operador carece de permisos o debe cambiar la contraseña. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Error interno normalizado; incluye traceId para seguimiento. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+        };
+    };
+    Inventory_GetSummary: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InventorySummaryDto"];
+                    "text/json": components["schemas"]["InventorySummaryDto"];
+                    "text/plain": components["schemas"]["InventorySummaryDto"];
+                };
             };
             /** @description Solicitud inválida; los errores de validación se indican por campo. */
             400: {
@@ -11448,8 +12325,8 @@ export interface operations {
             };
         };
         responses: {
-            /** @description OK */
-            200: {
+            /** @description Created */
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -11503,6 +12380,48 @@ export interface operations {
             };
             /** @description El operador carece de permisos o debe cambiar la contraseña. */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Conflict */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -11674,7 +12593,11 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["CheckInResult"];
+                    "text/json": components["schemas"]["CheckInResult"];
+                    "text/plain": components["schemas"]["CheckInResult"];
+                };
             };
             /** @description Solicitud inválida; los errores de validación se indican por campo. */
             400: {
@@ -11720,6 +12643,48 @@ export interface operations {
             };
             /** @description El operador carece de permisos o debe cambiar la contraseña. */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Conflict */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -11784,7 +12749,162 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["CheckOutResult"];
+                    "text/json": components["schemas"]["CheckOutResult"];
+                    "text/plain": components["schemas"]["CheckOutResult"];
+                };
+            };
+            /** @description Solicitud inválida; los errores de validación se indican por campo. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Se requiere una sesión válida. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description El operador carece de permisos o debe cambiar la contraseña. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Error interno normalizado; incluye traceId para seguimiento. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+        };
+    };
+    Reservations_GetByDateRange: {
+        parameters: {
+            query?: {
+                start?: string;
+                end?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReservationDto"][];
+                    "text/json": components["schemas"]["ReservationDto"][];
+                    "text/plain": components["schemas"]["ReservationDto"][];
+                };
             };
             /** @description Solicitud inválida; los errores de validación se indican por campo. */
             400: {
@@ -11872,11 +12992,13 @@ export interface operations {
             };
         };
     };
-    Reservations_GetByDateRange: {
+    Reservations_GetPage: {
         parameters: {
             query?: {
-                start?: string;
-                end?: string;
+                Status?: string;
+                Search?: string;
+                Page?: number | string;
+                PageSize?: number | string;
             };
             header?: never;
             path?: never;
@@ -11890,9 +13012,9 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ReservationDto"][];
-                    "text/json": components["schemas"]["ReservationDto"][];
-                    "text/plain": components["schemas"]["ReservationDto"][];
+                    "application/json": components["schemas"]["PagedResultOfReservationDto"];
+                    "text/json": components["schemas"]["PagedResultOfReservationDto"];
+                    "text/plain": components["schemas"]["PagedResultOfReservationDto"];
                 };
             };
             /** @description Solicitud inválida; los errores de validación se indican por campo. */
@@ -12066,6 +13188,27 @@ export interface operations {
                     };
                 };
             };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
             /** @description Error interno normalizado; incluye traceId para seguimiento. */
             500: {
                 headers: {
@@ -12111,7 +13254,11 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ReservationVersionResult"];
+                    "text/json": components["schemas"]["ReservationVersionResult"];
+                    "text/plain": components["schemas"]["ReservationVersionResult"];
+                };
             };
             /** @description Solicitud inválida; los errores de validación se indican por campo. */
             400: {
@@ -12157,6 +13304,48 @@ export interface operations {
             };
             /** @description El operador carece de permisos o debe cambiar la contraseña. */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Conflict */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -12325,7 +13514,11 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ReservationStateResult"];
+                    "text/json": components["schemas"]["ReservationStateResult"];
+                    "text/plain": components["schemas"]["ReservationStateResult"];
+                };
             };
             /** @description Solicitud inválida; los errores de validación se indican por campo. */
             400: {
@@ -12371,6 +13564,48 @@ export interface operations {
             };
             /** @description El operador carece de permisos o debe cambiar la contraseña. */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Conflict */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -12435,7 +13670,11 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ReservationStateResult"];
+                    "text/json": components["schemas"]["ReservationStateResult"];
+                    "text/plain": components["schemas"]["ReservationStateResult"];
+                };
             };
             /** @description Solicitud inválida; los errores de validación se indican por campo. */
             400: {
@@ -12481,6 +13720,48 @@ export interface operations {
             };
             /** @description El operador carece de permisos o debe cambiar la contraseña. */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Conflict */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };

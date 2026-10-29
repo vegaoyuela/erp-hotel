@@ -55,74 +55,17 @@ export interface Room {
   capacity: number
 }
 
-export interface Reservation {
-  id: string
-  guestId: string
-  guestName: string
-  roomId: string
-  roomNumber: string
-  checkInDate: string
-  checkOutDate: string
-  adults: number
-  children: number
-  paymentMethod?: string
-  advancePayment: number
-  status: string
-  notes?: string
-  version: number
-}
+export type Reservation = Wire<components['schemas']['ReservationDto']>
 
 export type Guest = Wire<components['schemas']['GuestDto']>
 
-export interface Customer {
-  id: string
-  rtn?: string
-  name: string
-  address?: string
-  phone?: string
-  email?: string
-  taxpayerType: string
-  exonerationOrderNumber?: string
-  sefinExonerationCertificateNumber?: string
-  sagRegistryNumber?: string
-  isIsvExempt: boolean
-  isTouristTaxExempt: boolean
-  exonerationValidFrom?: string
-  exonerationValidTo?: string
-}
+export type Customer = Wire<components['schemas']['CustomerDto']>
 
-export interface Category {
-  id: string
-  name: string
-  description?: string
-}
+export type Category = Wire<components['schemas']['CategoryDto']>
 
-export interface Product {
-  id: string
-  name: string
-  description?: string
-  sku?: string
-  categoryId?: string
-  categoryName?: string
-  unitPrice: number
-  currentStock: number
-  minStockLevel: number
-  isActive: boolean
-}
+export type Product = Wire<components['schemas']['ProductDto']>
 
-export interface InventoryMovement {
-  id: string
-  productId: string
-  productName: string
-  movementType: string
-  quantity: number
-  movementDate: string
-  unitPrice?: number
-  totalValue?: number
-  newStock: number
-  referenceId?: string
-  userName?: string
-}
+export type InventoryMovement = Wire<components['schemas']['InventoryMovementDto']>
 
 export interface CAI {
   id: string
@@ -460,31 +403,9 @@ export interface Discount {
   priority: number
 }
 
-export interface FolioItem {
-  id: string
-  description: string
-  quantity: number
-  unitPrice: number
-  lineTotal: number
-  isExempt: boolean
-  isvRate: number
-  isTouristTaxable: boolean
-  discountPercentage: number
-}
+export type FolioItem = Wire<components['schemas']['FolioItemDto']>
 
-export interface Folio {
-  id: string
-  reservationId: string
-  guestId: string
-  guestName: string
-  roomId: string
-  roomNumber: string
-  openingDate: string
-  closingDate: string | null
-  totalAmount: number
-  status: string
-  items: FolioItem[]
-}
+export type Folio = Wire<components['schemas']['FolioDto']>
 
 export interface BackupLog {
   id: string
@@ -522,3 +443,6 @@ export interface UpdateUserRequest {
   isActive?: boolean
   roles?: string[]
 }
+
+export type FolioList = Wire<components['schemas']['FolioListDto']>
+export type InventorySummary = Wire<components['schemas']['InventorySummaryDto']>

@@ -1,4 +1,7 @@
-import { useEffect, useMemo, useState, useCallback } from 'react'
+import { useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { useDebouncedValue, usePagedList } from '@/hooks/usePagedList'
+import type { InventorySummary } from '@/types'
 import api from '@/lib/axios'
 import { getApiErrorMessage } from '@/lib/errors'
 import type { Category, InventoryMovement, Product } from '@/types'
@@ -33,9 +36,6 @@ const movementDefault = {
 
 export default function InventoryPage() {
   const [tab, setTab] = useState<'products' | 'categories' | 'movements'>('products')
-  const [categories, setCategories] = useState<Category[]>([])
-  const [products, setProducts] = useState<Product[]>([])
-  const [movements, setMovements] = useState<InventoryMovement[]>([])
   const [search, setSearch] = useState('')
   const [categoryFilter, setCategoryFilter] = useState('')
   const [categoryForm, setCategoryForm] = useState(categoryDefault)
@@ -43,7 +43,6 @@ export default function InventoryPage() {
   const [movementForm, setMovementForm] = useState(movementDefault)
   const [editingCategoryId, setEditingCategoryId] = useState<string | null>(null)
   const [editingProductId, setEditingProductId] = useState<string | null>(null)
-  const [loading, setLoading] = useState(true)
   const [actionLoading, setActionLoading] = useState(false)
   const [alertInfo, setAlertInfo] = useState<{ variant: 'error' | 'success' | 'info'; message: string } | null>(null)
   const [deleteProductTarget, setDeleteProductTarget] = useState<Product | null>(null)
@@ -57,41 +56,35 @@ export default function InventoryPage() {
   const [movPage, setMovPage] = useState(1)
   const [movPageSize, setMovPageSize] = useState(15)
 
-  const loadAll = useCallback(async () => {
-    setLoading(true)
-    try {
-      const [categoriesRes, productsRes, movementsRes] = await Promise.all([
-        api.get<Category[]>('/inventory/categories'),
-        api.get<Product[]>('/inventory/products'),
-        api.get<InventoryMovement[]>('/inventory/movements'),
-      ])
-      setCategories(categoriesRes.data)
-      setProducts(productsRes.data)
-      setMovements(movementsRes.data)
-    } catch {
-      setAlertInfo({ variant: 'error', message: 'Error al cargar el inventario hotelero.' })
-    } finally {
-      setLoading(false)
-    }
-  }, [])
-
-  useEffect(() => {
-    const timer = window.setTimeout(() => void loadAll(), 0)
-    return () => window.clearTimeout(timer)
-  }, [loadAll])
-
-  const filteredProducts = useMemo(() => {
-    return products.filter((p) => {
-      const q = search.toLowerCase()
-      const matchesSearch =
-        q === '' ||
-        p.name.toLowerCase().includes(q) ||
-        (p.sku && p.sku.toLowerCase().includes(q)) ||
-        (p.description && p.description.toLowerCase().includes(q))
-      const matchesCat = categoryFilter === '' || p.categoryId === categoryFilter
-      return matchesSearch && matchesCat
-    })
-  }, [products, search, categoryFilter])
+  const [productLookupSearch, setProductLookupSearch] = useState('')
+  const [productLookupPage, setProductLookupPage] = useState(1)
+  const [selectedMovementProduct, setSelectedMovementProduct] = useState<Product | null>(null)
+  const debouncedSearch = useDebouncedValue(search)
+  const debouncedLookupSearch = useDebouncedValue(productLookupSearch)
+  const categoriesQuery = useQuery({ queryKey: ['inventory-categories'], queryFn: async ({ signal }) =>
+    (await api.get<Category[]>('/inventory/categories', { signal })).data })
+  const summaryQuery = useQuery({ queryKey: ['inventory-summary'], queryFn: async ({ signal }) =>
+    (await api.get<InventorySummary>('/inventory/summary', { signal })).data })
+  const productsQuery = usePagedList<Product>('/inventory/products/paged', {
+    page: productPage, pageSize: productPageSize, search: debouncedSearch || undefined, categoryId: categoryFilter || undefined,
+  }, { enabled: tab === 'products' })
+  const movementsQuery = usePagedList<InventoryMovement>('/inventory/movements/paged', {
+    page: movPage, pageSize: movPageSize,
+  }, { enabled: tab === 'movements' })
+  const lookupQuery = usePagedList<Product>('/inventory/products/paged', {
+    page: productLookupPage, pageSize: 10, search: debouncedLookupSearch || undefined,
+  }, { enabled: tab === 'movements' })
+  const categories = categoriesQuery.data ?? []
+  const paginatedProducts = productsQuery.items
+  const paginatedMovements = movementsQuery.items
+  const summary = summaryQuery.data
+  const lowStockCount = summary?.lowStockProducts ?? 0
+  const loading = categoriesQuery.isFetching || summaryQuery.isFetching || (tab === 'products' ? productsQuery.loading : tab === 'movements' ? movementsQuery.loading : false)
+  const listError = categoriesQuery.error || summaryQuery.error || (tab === 'products' ? productsQuery.error : tab === 'movements' ? movementsQuery.error || lookupQuery.error : null)
+  const loadAll = async () => {
+    await Promise.all([categoriesQuery.refetch(), summaryQuery.refetch(),
+      ...(tab === 'products' ? [productsQuery.load()] : tab === 'movements' ? [movementsQuery.load(), lookupQuery.load()] : [])])
+  }
 
   const saveCategory = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -208,6 +201,7 @@ export default function InventoryPage() {
         targetStock: movementForm.targetStock ? Number(movementForm.targetStock) : null,
       })
       setMovementForm(movementDefault)
+      setSelectedMovementProduct(null)
       setAlertInfo({ variant: 'success', message: 'Movimiento de inventario registrado correctamente.' })
       loadAll()
     } catch (error: unknown) {
@@ -216,23 +210,6 @@ export default function InventoryPage() {
       setActionLoading(false)
     }
   }
-
-  const lowStockCount = useMemo(
-    () => products.filter((p) => p.isActive && p.currentStock <= p.minStockLevel).length,
-    [products]
-  )
-
-  const productTotalPages = Math.ceil(filteredProducts.length / productPageSize) || 1
-  const paginatedProducts = useMemo(() => {
-    const start = (productPage - 1) * productPageSize
-    return filteredProducts.slice(start, start + productPageSize)
-  }, [filteredProducts, productPage, productPageSize])
-
-  const movTotalPages = Math.ceil(movements.length / movPageSize) || 1
-  const paginatedMovements = useMemo(() => {
-    const start = (movPage - 1) * movPageSize
-    return movements.slice(start, start + movPageSize)
-  }, [movements, movPage, movPageSize])
 
   return (
     <div className="space-y-6">
@@ -257,11 +234,13 @@ export default function InventoryPage() {
         <InlineAlert variant={alertInfo.variant} message={alertInfo.message} onClose={() => setAlertInfo(null)} />
       )}
 
+      {listError && <InlineAlert variant="error" message="No se pudo cargar el inventario. Usa Actualizar para reintentar." />}
+
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="border border-border rounded-xl p-4 bg-card shadow-xs">
           <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Total Productos Activos</p>
-          <p className="text-2xl font-bold text-foreground mt-1">{products.filter((p) => p.isActive).length}</p>
+          <p className="text-2xl font-bold text-foreground mt-1">{summary?.activeProducts ?? '—'}</p>
         </div>
         <div className="border border-border rounded-xl p-4 bg-card shadow-xs">
           <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Categorías de Almacén</p>
@@ -271,7 +250,7 @@ export default function InventoryPage() {
           <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Alertas de Stock Bajo</p>
           <div className="flex items-center gap-2 mt-1">
             <p className={`text-2xl font-bold ${lowStockCount > 0 ? 'text-amber-500' : 'text-emerald-500'}`}>
-              {lowStockCount}
+              {summary ? lowStockCount : '—'}
             </p>
             {lowStockCount > 0 && (
               <span className="text-[11px] text-amber-600 dark:text-amber-400 flex items-center gap-1 font-semibold">
@@ -283,21 +262,21 @@ export default function InventoryPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 border-b border-border pb-2">
+      <div className="flex flex-wrap gap-2 border-b border-border pb-2">
         <Button variant={tab === 'products' ? 'default' : 'outline'} size="sm" onClick={() => setTab('products')}>
-          Productos ({products.length})
+          Productos ({summary?.totalProducts ?? '—'})
         </Button>
         <Button variant={tab === 'categories' ? 'default' : 'outline'} size="sm" onClick={() => setTab('categories')}>
           Categorías ({categories.length})
         </Button>
         <Button variant={tab === 'movements' ? 'default' : 'outline'} size="sm" onClick={() => setTab('movements')}>
-          Kardex / Movimientos ({movements.length})
+          Kardex / Movimientos ({summary?.totalMovements ?? '—'})
         </Button>
       </div>
 
       {/* TAB 1: PRODUCTS */}
       {tab === 'products' && (
-        <div className="grid gap-6 xl:grid-cols-[400px_1fr] animate-in fade-in">
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-[400px_minmax(0,1fr)] animate-in fade-in">
           {/* Form */}
           <form onSubmit={saveProduct} className="border border-border rounded-xl p-5 bg-card space-y-3.5 shadow-xs h-fit">
             <h3 className="font-bold text-sm text-foreground flex items-center justify-between">
@@ -395,7 +374,7 @@ export default function InventoryPage() {
               </div>
             </div>
 
-            <div className="flex items-center justify-between pt-2 border-t border-border">
+            <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-border">
               <label className="flex items-center gap-2 text-xs text-muted-foreground cursor-pointer">
                 <input
                   type="checkbox"
@@ -416,12 +395,12 @@ export default function InventoryPage() {
           </form>
 
           {/* Table */}
-          <div className="space-y-3">
+          <div className="min-w-0 space-y-3">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 rounded-xl border border-border bg-card shadow-xs">
               <div className="relative">
                 <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
                 <Input
-                  placeholder="Buscar por nombre o SKU..."
+                  aria-label="Buscar productos" maxLength={100} placeholder="Buscar por nombre o SKU..."
                   value={search}
                   onChange={(e) => {
                     setSearch(e.target.value)
@@ -431,7 +410,7 @@ export default function InventoryPage() {
                 />
               </div>
               <select
-                value={categoryFilter}
+                aria-label="Filtrar por categoría" value={categoryFilter}
                 onChange={(e) => {
                   setCategoryFilter(e.target.value)
                   setProductPage(1)
@@ -448,7 +427,8 @@ export default function InventoryPage() {
             </div>
 
             <div className="border border-border rounded-xl bg-card overflow-hidden shadow-xs flex flex-col">
-              <table className="w-full text-xs">
+              <div className="overflow-x-auto">
+              <table className="w-full min-w-[600px] text-xs">
                 <thead className="bg-muted/40 font-semibold text-muted-foreground uppercase tracking-wider">
                   <tr>
                     <th className="text-left p-3">Producto</th>
@@ -460,7 +440,7 @@ export default function InventoryPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/60">
-                  {paginatedProducts.map((p) => {
+                  {!productsQuery.loading && paginatedProducts.map((p) => {
                     const isLow = p.currentStock <= p.minStockLevel
                     return (
                       <tr key={p.id} className="hover:bg-accent/20 transition-colors">
@@ -496,7 +476,8 @@ export default function InventoryPage() {
                       </tr>
                     )
                   })}
-                  {paginatedProducts.length === 0 && (
+                  {productsQuery.loading && <tr><td colSpan={6} className="p-8 text-center text-muted-foreground" role="status">Cargando productos…</td></tr>}
+                  {!productsQuery.loading && !productsQuery.error && paginatedProducts.length === 0 && (
                     <tr>
                       <td colSpan={6} className="p-8 text-center text-muted-foreground">
                         No se encontraron productos en el inventario.
@@ -505,11 +486,13 @@ export default function InventoryPage() {
                   )}
                 </tbody>
               </table>
+              </div>
 
               <Pagination
-                currentPage={productPage}
-                totalPages={productTotalPages}
-                totalItems={filteredProducts.length}
+                currentPage={productsQuery.page}
+                disabled={productsQuery.loading}
+                totalPages={productsQuery.totalPages}
+                totalItems={productsQuery.totalItems}
                 pageSize={productPageSize}
                 onPageChange={setProductPage}
                 onPageSizeChange={(size) => {
@@ -524,7 +507,7 @@ export default function InventoryPage() {
 
       {/* TAB 2: CATEGORIES */}
       {tab === 'categories' && (
-        <div className="grid gap-6 lg:grid-cols-[360px_1fr] animate-in fade-in">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[360px_minmax(0,1fr)] animate-in fade-in">
           <form onSubmit={saveCategory} className="border border-border rounded-xl p-5 bg-card space-y-3.5 shadow-xs h-fit">
             <h3 className="font-bold text-sm text-foreground">
               {editingCategoryId ? 'Editar Categoría' : 'Nueva Categoría'}
@@ -592,25 +575,37 @@ export default function InventoryPage() {
 
       {/* TAB 3: MOVEMENTS / KARDEX */}
       {tab === 'movements' && (
-        <div className="grid gap-6 lg:grid-cols-[380px_1fr] animate-in fade-in">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[380px_minmax(0,1fr)] animate-in fade-in">
           <form onSubmit={recordMovement} className="border border-border rounded-xl p-5 bg-card space-y-3.5 shadow-xs h-fit">
             <h3 className="font-bold text-sm text-foreground">Registrar Movimiento de Kardex</h3>
 
             <div>
-              <label className="text-xs font-semibold text-muted-foreground">Producto *</label>
+              <label htmlFor="movement-product-search" className="text-xs font-semibold text-muted-foreground">Buscar producto por nombre o SKU</label>
+              <Input id="movement-product-search" value={productLookupSearch} maxLength={100} onChange={e => { setProductLookupSearch(e.target.value); setProductLookupPage(1) }} placeholder="Buscar en todo el inventario..." className="mt-1 mb-3 text-xs" />
+              <label htmlFor="movement-product" className="text-xs font-semibold text-muted-foreground">Producto *</label>
               <select
+                id="movement-product"
                 required
                 value={movementForm.productId}
-                onChange={(e) => setMovementForm({ ...movementForm, productId: e.target.value })}
+                onChange={(e) => {
+                  setMovementForm({ ...movementForm, productId: e.target.value })
+                  setSelectedMovementProduct(lookupQuery.items.find(product => product.id === e.target.value) ?? null)
+                }}
                 className="w-full border border-input rounded-md px-2.5 py-2 text-xs bg-background mt-1"
               >
                 <option value="">-- Seleccione Producto --</option>
-                {products.map((p) => (
+                {selectedMovementProduct && !lookupQuery.items.some(product => product.id === selectedMovementProduct.id) &&
+                  <option value={selectedMovementProduct.id}>{selectedMovementProduct.name}</option>}
+                {lookupQuery.items.map((p) => (
                   <option key={p.id} value={p.id}>
                     {p.name} (Stock: {p.currentStock})
                   </option>
                 ))}
               </select>
+              {lookupQuery.loading && <p className="mt-1 text-xs text-muted-foreground" role="status">Buscando productos…</p>}
+              {!lookupQuery.loading && lookupQuery.totalItems === 0 && <p className="mt-1 text-xs text-muted-foreground">No hay productos con esa búsqueda.</p>}
+              <Pagination currentPage={lookupQuery.page} totalPages={lookupQuery.totalPages} totalItems={lookupQuery.totalItems} pageSize={10}
+                disabled={lookupQuery.loading} onPageChange={setProductLookupPage} />
             </div>
 
             <div className="grid grid-cols-2 gap-2">
@@ -659,7 +654,8 @@ export default function InventoryPage() {
           </form>
 
           <div className="border border-border rounded-xl bg-card overflow-hidden shadow-xs flex flex-col">
-            <table className="w-full text-xs">
+            <div className="overflow-x-auto">
+            <table className="w-full min-w-[580px] text-xs">
               <thead className="bg-muted/40 font-semibold text-muted-foreground uppercase tracking-wider">
                 <tr>
                   <th className="text-left p-3">Fecha</th>
@@ -670,7 +666,7 @@ export default function InventoryPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/60">
-                {paginatedMovements.map((m) => (
+                {!movementsQuery.loading && paginatedMovements.map((m) => (
                   <tr key={m.id} className="hover:bg-accent/20">
                     <td className="p-3 font-mono text-muted-foreground">
                       {new Date(m.movementDate).toLocaleDateString('es-HN')}
@@ -685,13 +681,17 @@ export default function InventoryPage() {
                     <td className="p-3 text-muted-foreground">{m.referenceId || '—'}</td>
                   </tr>
                 ))}
+                {movementsQuery.loading && <tr><td colSpan={5} className="p-8 text-center text-muted-foreground" role="status">Cargando movimientos…</td></tr>}
+                {!movementsQuery.loading && !movementsQuery.error && paginatedMovements.length === 0 && <tr><td colSpan={5} className="p-8 text-center text-muted-foreground">No hay movimientos registrados.</td></tr>}
               </tbody>
             </table>
+            </div>
 
             <Pagination
-              currentPage={movPage}
-              totalPages={movTotalPages}
-              totalItems={movements.length}
+              currentPage={movementsQuery.page}
+              disabled={movementsQuery.loading}
+              totalPages={movementsQuery.totalPages}
+              totalItems={movementsQuery.totalItems}
               pageSize={movPageSize}
               onPageChange={setMovPage}
               onPageSizeChange={(size) => {

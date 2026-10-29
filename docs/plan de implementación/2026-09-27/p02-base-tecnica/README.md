@@ -2,7 +2,7 @@
 
 **Inicio:** 27 de septiembre de 2026
 
-**Estado:** en ejecución; entregas P02-A a P02-H1 aprobadas por pruebas automáticas. Última ejecución: 28 de octubre de 2026.
+**Estado:** en ejecución; entregas P02-A a P02-H2A aprobadas por pruebas automáticas. Última ejecución: 29 de octubre de 2026.
 
 Este registro divide P02 en entregas comprobables. No se declara G2 mientras queden controladores con lógica de negocio, repositorios que confirman cambios por su cuenta o contratos sin prueba.
 
@@ -31,8 +31,8 @@ La versión anterior calculaba el hash con ticks de 100 ns antes de guardar un `
 | P02-01 | Completada | Finanzas, factura/notas, reservas, check-in/out, folios, caja, compras, inventario y respaldo delegan sus mutaciones a servicios. |
 | P02-02 | Completada | Persistencia explícita con `IUnitOfWork`, cero guardados/transacciones en repositorios y pruebas de aislamiento, rollback y regresión HTTP. |
 | P02-03 | Completada en código | Contratos inyectables de reloj, cálculo, correlativo, auditoría, impresión y respaldo; sustitución/rollback y transporte simulado probados. Prueba física pendiente en Windows. |
-| P02-04 | Parcial (P02-H1) | Seguridad/errores OpenAPI, convenciones y paginación SQL de huéspedes, facturas y auditoría probadas; faltan las demás colecciones y esquemas explícitos de respuestas de éxito. |
-| P02-05 | Parcial (P02-H1) | Tipos generados y comparación del contrato real en QA; huéspedes, facturas, líneas y bitácora migrados. Faltan los contratos manuales restantes. |
+| P02-04 | Parcial (P02-H2A) | Ocho colecciones paginadas, seguridad/errores, convenciones y respuestas operativas de reservas/folios probadas; faltan colecciones financieras y otros esquemas explícitos de éxito. |
+| P02-05 | Parcial (P02-H2A) | Contrato real validado en QA; migrados huéspedes, facturas, bitácora, reservas, clientes, folios e inventario. Faltan los contratos manuales restantes. |
 | P02-06 | Parcial previo | Existe matriz de permisos y prueba reflectiva; faltan motivos/aprobaciones por monto y revalidar todas las lecturas sensibles. |
 | P02-07 | Parcial previo | Existen roles PostgreSQL y migración separada; la rotación de secretos se ejecutará durante instalación Windows. |
 | P02-08 | Completada | Verificador, exportador, UI, compatibilidad histórica y pruebas. |
@@ -87,8 +87,12 @@ El contrato OpenAPI queda versionado y genera tipos TypeScript. QA compara el do
 
 El [detalle de P02-H1](p02-h1-contrato-paginacion.md) contiene rutas, convenciones, comandos, capturas, límites y próximos pasos. Se aprobaron 109 unitarias, 5 integraciones PostgreSQL, 5 validaciones del expediente, compilación, lint y comparación del contrato; además se comprobó el rechazo de una divergencia deliberada y seis capturas en navegador.
 
+## Entrega P02-H2A — operación e inventario
+
+El 29 de octubre se incorporaron páginas SQL para reservas, folios, clientes, productos y movimientos de inventario. Los indicadores usan agregados globales; el selector del Kardex busca y pagina sin cargar todos los productos. El listado de folios usa un DTO compacto y conserva referencias históricas. Los resultados de reservas y cargos de folio tienen esquemas explícitos y nueve tipos frontend adicionales derivan del contrato. El [detalle de H2A](p02-h2a-operacion-inventario.md) conserva QA, diez capturas y pendientes.
+
 ## Criterio para la siguiente entrega
 
-P02-H2 continuará con la paginación de las colecciones restantes, respuestas de éxito explícitas y migración de los contratos manuales frontend. G2 sigue abierta hasta cubrir los pendientes de la tabla y obtener la revisión independiente.
+P02-H2B continuará con caja, liquidaciones, asientos, respaldos, selectores pendientes, respuestas de éxito explícitas y migración de los contratos manuales frontend. G2 sigue abierta hasta cubrir los pendientes de la tabla y obtener la revisión independiente.
 
 La evidencia de QA y compatibilidad se conserva en el [expediente general](../evidencia/README.md#p02--base-técnica-primera-entrega).

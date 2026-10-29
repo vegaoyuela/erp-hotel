@@ -3,6 +3,7 @@ using hotel_erp.Api.Authorization;
 using hotel_erp.Api.Database;
 using hotel_erp.Api.Database.Entities;
 using hotel_erp.Api.Dtos.Inventory;
+using hotel_erp.Api.Dtos.Common;
 using hotel_erp.Api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,7 +16,8 @@ namespace hotel_erp.Api.Controllers;
 [Authorize(Policy = PermissionNames.ManageInventory)]
 public class InventoryController(
     ApplicationDbContext context,
-    InventoryApplicationService inventoryService) : ControllerBase
+    InventoryApplicationService inventoryService,
+    HotelListQueryService lists) : ControllerBase
 {
     [HttpGet("categories")]
     public async Task<ActionResult<IEnumerable<CategoryDto>>> GetCategories()
@@ -94,6 +96,18 @@ public class InventoryController(
             })
             .ToListAsync(HttpContext.RequestAborted));
     }
+
+    [HttpGet("products/paged")]
+    public async Task<ActionResult<PagedResult<ProductDto>>> GetProductsPage([FromQuery] ProductPageQuery query)
+        => Ok(await lists.ProductsAsync(query, HttpContext.RequestAborted));
+
+    [HttpGet("movements/paged")]
+    public async Task<ActionResult<PagedResult<InventoryMovementDto>>> GetMovementsPage([FromQuery] InventoryMovementPageQuery query)
+        => Ok(await lists.InventoryMovementsAsync(query, HttpContext.RequestAborted));
+
+    [HttpGet("summary")]
+    public async Task<ActionResult<InventorySummaryDto>> GetSummary()
+        => Ok(await lists.InventorySummaryAsync(HttpContext.RequestAborted));
 
     [HttpPost("products")]
     public async Task<ActionResult<ProductDto>> CreateProduct([FromBody] CreateProductRequest request)

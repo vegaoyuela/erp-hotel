@@ -1,4 +1,8 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState } from 'react'
+import { useDebouncedValue, usePagedList } from '@/hooks/usePagedList'
+import { Pagination } from '@/components/ui/Pagination'
+import { Input } from '@/components/ui/input'
+import { useAuthStore } from '@/store/authStore'
 import api from '@/lib/axios'
 import type { Reservation } from '@/types'
 import { Button } from '@/components/ui/button'
@@ -16,7 +20,10 @@ const statusColors: Record<string, string> = {
 }
 
 export default function ReservationsPage() {
-  const [reservations, setReservations] = useState<Reservation[]>([])
+  const canManageReservations = useAuthStore(state => state.hasPermission('manage_reservations'))
+  const [search, setSearch] = useState('')
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pageSize, setPageSize] = useState(15)
   const [statusFilter, setStatusFilter] = useState('')
   const navigate = useNavigate()
 
@@ -24,19 +31,9 @@ export default function ReservationsPage() {
   const [reservationToCancel, setReservationToCancel] = useState<Reservation | null>(null)
   const [cancelReason, setCancelReason] = useState('')
 
-  const load = useCallback(async () => {
-    try {
-      const { data } = await api.get<Reservation[]>('/reservations', { params: { status: statusFilter || undefined } })
-      setReservations(data)
-    } catch {
-      setAlertInfo({ variant: 'error', message: 'Error al cargar reservaciones' })
-    }
-  }, [statusFilter])
-
-  useEffect(() => {
-    const timer = window.setTimeout(() => void load(), 0)
-    return () => window.clearTimeout(timer)
-  }, [load])
+  const debouncedSearch = useDebouncedValue(search)
+  const { items: reservations, loading, error: listError, load, page, totalItems, totalPages } = usePagedList<Reservation>(
+    '/reservations/paged', { page: currentPage, pageSize, status: statusFilter || undefined, search: debouncedSearch || undefined })
 
   const handleCancelReservation = async () => {
     if (!reservationToCancel || cancelReason.trim().length < 3) return
@@ -68,7 +65,7 @@ export default function ReservationsPage() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-2xl font-bold">Reservaciones</h1>
         <div className="flex gap-2">
           <Button variant="outline" onClick={async () => {
@@ -81,12 +78,13 @@ export default function ReservationsPage() {
               setAlertInfo({ variant: 'error', message: 'Error al exportar reservaciones' })
             }
           }}>Exportar XLSX</Button>
-          <Button onClick={() => navigate('/checkin')}>Nuevo Check-In</Button>
+          {canManageReservations && <Button onClick={() => navigate('/checkin')}>Nuevo Check-In</Button>}
         </div>
       </div>
 
-      <div className="flex gap-2">
-        <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="border border-input rounded-md px-3 py-2 text-sm bg-background">
+      <div className="flex flex-col gap-2 sm:flex-row">
+        <Input aria-label="Buscar reservaciones" placeholder="Buscar huésped, documento o habitación..." maxLength={100} value={search} onChange={e => { setSearch(e.target.value); setCurrentPage(1) }} className="sm:max-w-md" />
+        <select aria-label="Estado de reservación" value={statusFilter} onChange={e => { setStatusFilter(e.target.value); setCurrentPage(1) }} className="border border-input rounded-md px-3 py-2 text-sm bg-background">
           <option value="">Todos los estados</option>
           <option value="Pendiente">Pendiente</option>
           <option value="Confirmada">Confirmada</option>
@@ -104,15 +102,18 @@ export default function ReservationsPage() {
         />
       )}
 
+      {listError && <InlineAlert variant="error" message="No se pudo cargar la página de reservaciones." />}
+      <Button variant="outline" onClick={() => void load()} disabled={loading}>Actualizar</Button>
       <div className="border border-border rounded-lg overflow-hidden">
-        <table className="w-full text-sm">
+        <div className="overflow-x-auto">
+        <table className="w-full min-w-[760px] text-sm">
           <thead className="bg-muted"><tr>
             <th className="text-left p-3">Huésped</th><th className="text-left p-3">Habitación</th>
             <th className="text-left p-3">Check-In</th><th className="text-left p-3">Check-Out</th>
             <th className="text-left p-3">Estado</th><th className="text-left p-3">Acciones</th>
           </tr></thead>
           <tbody>
-            {reservations.map(r => (
+            {!loading && reservations.map(r => (
               <tr key={r.id} className="border-t border-border">
                 <td className="p-3">{r.guestName}</td>
                 <td className="p-3">{r.roomNumber}</td>
@@ -120,16 +121,20 @@ export default function ReservationsPage() {
                 <td className="p-3">{r.checkOutDate}</td>
                 <td className="p-3"><span className={`px-2 py-0.5 rounded text-xs font-medium ${statusColors[r.status] || ''}`}>{r.status}</span></td>
                 <td className="p-3 space-x-1">
-                  {r.status === 'Pendiente' && <Button size="sm" onClick={() => void confirmReservation(r)}>Confirmar</Button>}
-                  {r.status === 'Confirmada' && <Button size="sm" onClick={() => navigate(`/checkin?reservationId=${r.id}`)}>Check-In</Button>}
-                  {r.status === 'CheckIn' && <Button size="sm" onClick={() => navigate(`/checkout?reservationId=${r.id}`)}>Check-Out</Button>}
-                  {(r.status === 'Pendiente' || r.status === 'Confirmada') && <Button size="sm" variant="destructive" onClick={() => { setReservationToCancel(r); setCancelReason('') }}>Cancelar</Button>}
+                  {canManageReservations && r.status === 'Pendiente' && <Button size="sm" onClick={() => void confirmReservation(r)}>Confirmar</Button>}
+                  {canManageReservations && r.status === 'Confirmada' && <Button size="sm" onClick={() => navigate(`/checkin?reservationId=${r.id}`)}>Check-In</Button>}
+                  {canManageReservations && r.status === 'CheckIn' && <Button size="sm" onClick={() => navigate(`/checkout?reservationId=${r.id}`)}>Check-Out</Button>}
+                  {canManageReservations && (r.status === 'Pendiente' || r.status === 'Confirmada') && <Button size="sm" variant="destructive" onClick={() => { setReservationToCancel(r); setCancelReason('') }}>Cancelar</Button>}
                 </td>
               </tr>
             ))}
-            {reservations.length === 0 && <tr><td colSpan={6} className="p-6 text-center text-muted-foreground">No hay reservaciones</td></tr>}
+            {loading && <tr><td colSpan={6} className="p-6 text-center text-muted-foreground" role="status">Cargando reservaciones…</td></tr>}
+            {!loading && !listError && reservations.length === 0 && <tr><td colSpan={6} className="p-6 text-center text-muted-foreground">No hay reservaciones</td></tr>}
           </tbody>
         </table>
+        </div>
+        <Pagination currentPage={page} totalPages={totalPages} totalItems={totalItems} pageSize={pageSize} disabled={loading}
+          onPageChange={setCurrentPage} onPageSizeChange={size => { setPageSize(size); setCurrentPage(1) }} />
       </div>
       
       <ConfirmDialog

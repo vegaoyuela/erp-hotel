@@ -1,6 +1,6 @@
 # 08 — Registro de pendientes y bloqueos
 
-**Última actualización:** 28 de octubre de 2026
+**Última actualización:** 29 de octubre de 2026
 
 Este registro separa lo que depende del código de aquello que requiere información o aprobación del hotel. Una tarea externa no se cierra con datos supuestos ni con el expediente sintético de QA.
 
@@ -59,3 +59,12 @@ Las entregas P02-A a P02-G completaron la extracción de casos críticos, el rol
 OpenAPI y tipos TypeScript están versionados y se validan contra el contrato de una API real en QA. Huéspedes, facturas y auditoría consumen paginación SQL; los filtros fiscales se combinan y la bitácora ya no queda limitada a los 200 primeros eventos. Se verificaron escritorio y móvil con datos sintéticos.
 
 P02-H2 debe completar las demás colecciones paginadas, declarar los esquemas de éxito de las acciones aún sin DTO explícito y sustituir los tipos frontend manuales restantes. P02-04 y P02-05 siguen parciales. No cambia el estado de G0/G1, P02-06/P02-07/P02-09/P02-10 ni la aceptación fiscal, impresión física y ejecución de QA PowerShell en Windows. Véase [entrega P02-H1](p02-base-tecnica/p02-h1-contrato-paginacion.md).
+
+
+### Avance P02-H2A — operación e inventario (29 de octubre de 2026)
+
+Se paginaron reservas, folios, clientes, productos y movimientos; los indicadores globales y el selector paginado de Kardex evitan depender de una sola página. Se migraron nueve tipos a OpenAPI y se documentaron los resultados de reservas y cargos de folio. El inventario identifica 35 lecturas frontend de arrays y 56 respuestas 200/201 sin esquema para revisión individual; no todas son defectos.
+
+H2B debe cubrir caja, liquidaciones, asientos, respaldos, selectores y contratos restantes. Se registra para P03 el recálculo de totales de detalle de folio en frontend, que debe reemplazarse por desglose backend y probar descuentos/redondeos. El [detalle H2A](p02-base-tecnica/p02-h2a-operacion-inventario.md) contiene rutas, límites y evidencia.
+
+**Windows e impresión aplazados por el usuario:** retomar QA PowerShell, instalación Docker Desktop/Windows 11 e impresión física y aceptación de factura. Recordatorio diario activo a las 10:00 de Honduras hasta completar ambas; ID `pendientes-windows-11-e-impresi-n-del-hotel`. No se cierran con las pruebas Linux ni con transporte simulado.
