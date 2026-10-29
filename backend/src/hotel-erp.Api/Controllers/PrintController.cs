@@ -1,3 +1,4 @@
+using hotel_erp.Api.Dtos.Common;
 using System.Text;
 using hotel_erp.Api.Authorization;
 using hotel_erp.Api.Services.Interfaces;
@@ -38,6 +39,7 @@ namespace hotel_erp.Api.Controllers
 
         [HttpGet("printers")]
         [Authorize(Policy = PermissionNames.ManageSettings)]
+        [ProducesResponseType(typeof(IReadOnlyList<string>), StatusCodes.Status200OK)]
         public ActionResult GetPrinters()
         {
             if (!_printerTransport.IsSupported) return PrinterPlatformUnavailable();
@@ -47,6 +49,7 @@ namespace hotel_erp.Api.Controllers
 
         [HttpGet("test")]
         [Authorize(Policy = PermissionNames.ManageSettings)]
+        [ProducesResponseType(typeof(PrinterConnectionDto), StatusCodes.Status200OK)]
         public ActionResult TestPrinter([FromQuery] string name)
         {
             if (!_printerTransport.IsSupported) return PrinterPlatformUnavailable();
@@ -59,6 +62,7 @@ namespace hotel_erp.Api.Controllers
 
         [HttpGet("test-preview")]
         [Authorize(Policy = PermissionNames.ManageSettings)]
+        [ProducesResponseType(typeof(PrintPreviewDto), StatusCodes.Status200OK)]
         public async Task<ActionResult> GetTestPreview([FromQuery] int? width)
         {
             var settings = await _settingsRepo.GetAsync() ?? new BusinessSettings();
@@ -71,6 +75,7 @@ namespace hotel_erp.Api.Controllers
 
         [HttpPost("test-print")]
         [Authorize(Policy = PermissionNames.ManageSettings)]
+        [ProducesResponseType(typeof(MessageResponseDto), StatusCodes.Status200OK)]
         public async Task<ActionResult> PrintTest([FromQuery] int? width)
         {
             if (!_printerTransport.IsSupported) return PrinterPlatformUnavailable();
@@ -96,6 +101,7 @@ namespace hotel_erp.Api.Controllers
 
         [HttpPost("test-ruler")]
         [Authorize(Policy = PermissionNames.ManageSettings)]
+        [ProducesResponseType(typeof(MessageResponseDto), StatusCodes.Status200OK)]
         public async Task<ActionResult> GetTestRuler()
         {
             if (!_printerTransport.IsSupported) return PrinterPlatformUnavailable();
@@ -147,6 +153,7 @@ namespace hotel_erp.Api.Controllers
         }
 
         [HttpGet("invoice/{id}/preview")]
+        [ProducesResponseType(typeof(PrintPreviewDto), StatusCodes.Status200OK)]
         public async Task<ActionResult> GetPreview(Guid id)
         {
             var invoice = await _invoiceRepo.GetByIdAsync(id);
@@ -168,6 +175,7 @@ namespace hotel_erp.Api.Controllers
         }
 
         [HttpPost("invoice/{id}")]
+        [ProducesResponseType(typeof(PrintedInvoiceDto), StatusCodes.Status200OK)]
         public async Task<ActionResult> PrintInvoice(Guid id)
         {
             if (!_printerTransport.IsSupported) return PrinterPlatformUnavailable();

@@ -1,3 +1,4 @@
+using hotel_erp.Api.Infrastructure;
 using ClosedXML.Excel;
 using hotel_erp.Api.Authorization;
 using hotel_erp.Api.Services.Interfaces;
@@ -29,6 +30,7 @@ namespace hotel_erp.Api.Controllers
         }
 
         [HttpGet("guests")]
+        [ApiFileResponse("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")]
         public async Task<IActionResult> ExportGuestsXlsx()
         {
             var guests = await _guestRepo.GetAllAsync();
@@ -80,6 +82,7 @@ namespace hotel_erp.Api.Controllers
         }
 
         [HttpGet("invoices")]
+        [ApiFileResponse("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")]
         public async Task<IActionResult> ExportInvoicesXlsx([FromQuery] DateTime? from, [FromQuery] DateTime? to)
         {
             var invoices = from.HasValue && to.HasValue
@@ -140,6 +143,7 @@ namespace hotel_erp.Api.Controllers
         }
 
         [HttpGet("reservations")]
+        [ApiFileResponse("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")]
         public async Task<IActionResult> ExportReservationsXlsx([FromQuery] DateTime? from, [FromQuery] DateTime? to)
         {
             var allReservations = await _reservationRepo.GetAllAsync();
@@ -191,6 +195,7 @@ namespace hotel_erp.Api.Controllers
         }
 
         [HttpGet("rooms")]
+        [ApiFileResponse("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")]
         public async Task<IActionResult> ExportRoomsXlsx()
         {
             var rooms = await _roomRepo.GetAllAsync();

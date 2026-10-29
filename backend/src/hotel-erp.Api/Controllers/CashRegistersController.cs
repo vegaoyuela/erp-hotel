@@ -39,7 +39,7 @@ public class CashRegistersController(
 
     [HttpGet("paged")]
     [Authorize(Policy = PermissionNames.ManageCash)]
-    public async Task<ActionResult<PagedResult<CashRegisterDto>>> GetPage([FromQuery] SearchPageQuery query)
+    public async Task<ActionResult<PagedResult<CashRegisterDto>>> GetPage([FromQuery] CashRegisterPageQuery query)
         => Ok(await lists.CashRegistersAsync(query, HttpContext.RequestAborted));
 
     [HttpGet("{id:guid}")]

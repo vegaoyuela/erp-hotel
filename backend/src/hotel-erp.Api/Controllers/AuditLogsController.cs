@@ -122,6 +122,7 @@ namespace hotel_erp.Api.Controllers
         }
 
         [HttpGet("export-integrity")]
+        [ProducesResponseType(typeof(AuditChainExport), StatusCodes.Status200OK)]
         public async Task<IActionResult> ExportIntegrity(CancellationToken cancellationToken)
         {
             var export = await _auditChain.ExportAsync(cancellationToken);

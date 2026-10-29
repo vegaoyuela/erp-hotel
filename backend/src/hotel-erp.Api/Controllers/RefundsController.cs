@@ -52,6 +52,7 @@ namespace hotel_erp.Api.Controllers
         }
 
         [HttpPost]
+        [ProducesResponseType(typeof(RefundDto), StatusCodes.Status201Created)]
         public async Task<ActionResult<RefundDto>> Create(
             Guid paymentId,
             [FromBody] CreateRefundRequest request,

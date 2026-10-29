@@ -1842,6 +1842,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/document-authorizations/options/paged": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** DocumentAuthorizations: GetOptionsPage */
+        get: operations["DocumentAuthorizations_GetOptionsPage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/document-authorizations/with-file": {
         parameters: {
             query?: never;
@@ -2268,24 +2285,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
+        get: operations["Health_Get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2377,6 +2377,33 @@ export interface components {
             /** Format: date */
             validUntil: null | string;
         };
+        AuditChainExport: {
+            /** Format: date-time */
+            generatedAt: string;
+            integrity: components["schemas"]["AuditIntegrityResult"];
+            records: components["schemas"]["AuditChainExportEntry"][];
+            /** Format: int32 */
+            schemaVersion: number | string;
+        };
+        AuditChainExportEntry: {
+            action: string;
+            changes: null | string;
+            correlativeNumber: null | string;
+            /** Format: uuid */
+            entityId: null | string;
+            entityName: null | string;
+            hash: string;
+            /** Format: date-time */
+            hondurasTimestamp: string;
+            /** Format: uuid */
+            id: string;
+            paymentMethod: null | string;
+            previousHash: null | string;
+            /** Format: date-time */
+            timestamp: string;
+            /** Format: uuid */
+            userId: null | string;
+        };
         AuditIntegrityResult: {
             /** Format: uuid */
             brokenLogId?: null | string;
@@ -2416,6 +2443,23 @@ export interface components {
             message?: null | string;
             success?: boolean;
             user?: null | components["schemas"]["UserDto"];
+        };
+        AuthorizationOptionDto: {
+            caiNumber?: string;
+            currentCorrelative?: string;
+            documentType?: string;
+            /** Format: date */
+            dueDate?: string;
+            finalRange?: string;
+            hasAttachment?: boolean;
+            /** Format: uuid */
+            id?: string;
+            initialRange?: string;
+            isExpiringSoon?: boolean;
+            /** Format: date */
+            issueDate?: string;
+            source?: string;
+            status?: string;
         };
         BackupLogDto: {
             /** Format: date-time */
@@ -2998,6 +3042,15 @@ export interface components {
             /** Format: int32 */
             quantity: number | string;
         };
+        CurrentUserDto: {
+            email: null | string;
+            fullName: null | string;
+            id: null | string;
+            mustChangePassword: boolean;
+            permissions: string[];
+            roles: string[];
+            username: null | string;
+        };
         CustomerDto: {
             address?: null | string;
             email?: null | string;
@@ -3219,6 +3272,9 @@ export interface components {
             /** Format: double */
             totalAmount?: number | string;
         };
+        GuestClassificationDto: {
+            classification: null | string;
+        };
         GuestDto: {
             classification?: null | string;
             company?: null | string;
@@ -3256,6 +3312,11 @@ export interface components {
             lastVisit?: null | string;
             /** Format: int32 */
             totalVisits?: number | string;
+        };
+        HealthResponseDto: {
+            status: string;
+            /** Format: date-time */
+            timestamp: string;
         };
         /** Format: binary */
         IFormFile: string;
@@ -3409,6 +3470,9 @@ export interface components {
             password: string;
             username: string;
         };
+        MessageResponseDto: {
+            message: string;
+        };
         OpenCashRegisterRequest: {
             /** Format: double */
             initialAmount: number | string;
@@ -3426,6 +3490,17 @@ export interface components {
         };
         PagedResultOfAuditLogDto: {
             items: components["schemas"]["AuditLogDto"][];
+            /** Format: int32 */
+            page: number | string;
+            /** Format: int32 */
+            pageSize: number | string;
+            /** Format: int32 */
+            totalItems: number | string;
+            /** Format: int32 */
+            totalPages: number | string;
+        };
+        PagedResultOfAuthorizationOptionDto: {
+            items: components["schemas"]["AuthorizationOptionDto"][];
             /** Format: int32 */
             page: number | string;
             /** Format: int32 */
@@ -3618,6 +3693,22 @@ export interface components {
             /** Format: uuid */
             id?: string;
             name?: string;
+        };
+        PrintPreviewDto: {
+            logoBase64: null | string;
+            /** Format: int32 */
+            printLogoHeight: number | string;
+            /** Format: int32 */
+            printWidth: number | string;
+            text: string;
+        };
+        PrintedInvoiceDto: {
+            message: string;
+            printer: string;
+        };
+        PrinterConnectionDto: {
+            message: string;
+            success: boolean;
         };
         ProblemDetails: {
             detail?: null | string;
@@ -3822,6 +3913,28 @@ export interface components {
             name?: string;
             /** Format: double */
             rate?: number | string;
+        };
+        TaxSummaryDto: {
+            /** Format: date-time */
+            from: string;
+            /** Format: double */
+            isvCollected15: number | string;
+            /** Format: double */
+            isvCollected18: number | string;
+            /** Format: double */
+            isvOnPurchases: number | string;
+            /** Format: double */
+            netIsvToPay: number | string;
+            /** Format: double */
+            salesExempt: number | string;
+            /** Format: double */
+            salesTaxed15: number | string;
+            /** Format: double */
+            salesTaxed18: number | string;
+            /** Format: date-time */
+            to: string;
+            /** Format: double */
+            touristTaxCollected: number | string;
         };
         TrialBalanceItem: {
             /** Format: uuid */
@@ -4158,8 +4271,8 @@ export interface operations {
             };
         };
         responses: {
-            /** @description OK */
-            200: {
+            /** @description Created */
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -5155,8 +5268,8 @@ export interface operations {
             };
         };
         responses: {
-            /** @description OK */
-            200: {
+            /** @description No Content */
+            204: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -5264,7 +5377,11 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["MessageResponseDto"];
+                    "text/json": components["schemas"]["MessageResponseDto"];
+                    "text/plain": components["schemas"]["MessageResponseDto"];
+                };
             };
             /** @description Solicitud inválida; los errores de validación se indican por campo. */
             400: {
@@ -5480,7 +5597,11 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["MessageResponseDto"];
+                    "text/json": components["schemas"]["MessageResponseDto"];
+                    "text/plain": components["schemas"]["MessageResponseDto"];
+                };
             };
             /** @description Solicitud inválida; los errores de validación se indican por campo. */
             400: {
@@ -5652,7 +5773,11 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["MessageResponseDto"];
+                    "text/json": components["schemas"]["MessageResponseDto"];
+                    "text/plain": components["schemas"]["MessageResponseDto"];
+                };
             };
             /** @description Solicitud inválida; los errores de validación se indican por campo. */
             400: {
@@ -5754,7 +5879,11 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["CurrentUserDto"];
+                    "text/json": components["schemas"]["CurrentUserDto"];
+                    "text/plain": components["schemas"]["CurrentUserDto"];
+                };
             };
             /** @description Solicitud inválida; los errores de validación se indican por campo. */
             400: {
@@ -6252,12 +6381,14 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description OK */
+            /** @description Archivo descargable. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/octet-stream": string;
+                };
             };
             /** @description Solicitud inválida; los errores de validación se indican por campo. */
             400: {
@@ -6466,8 +6597,8 @@ export interface operations {
             };
         };
         responses: {
-            /** @description OK */
-            200: {
+            /** @description Created */
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -6788,8 +6919,8 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description OK */
-            200: {
+            /** @description No Content */
+            204: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -7004,8 +7135,8 @@ export interface operations {
             };
         };
         responses: {
-            /** @description OK */
-            200: {
+            /** @description Created */
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -7336,8 +7467,8 @@ export interface operations {
             };
         };
         responses: {
-            /** @description OK */
-            200: {
+            /** @description No Content */
+            204: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -7440,8 +7571,8 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description OK */
-            200: {
+            /** @description No Content */
+            204: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -7654,8 +7785,8 @@ export interface operations {
             };
         };
         responses: {
-            /** @description OK */
-            200: {
+            /** @description Created */
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -7876,8 +8007,8 @@ export interface operations {
             };
         };
         responses: {
-            /** @description OK */
-            200: {
+            /** @description No Content */
+            204: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -7980,8 +8111,8 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description OK */
-            200: {
+            /** @description No Content */
+            204: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -8827,8 +8958,8 @@ export interface operations {
             };
         };
         responses: {
-            /** @description OK */
-            200: {
+            /** @description Created */
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -9159,8 +9290,8 @@ export interface operations {
             };
         };
         responses: {
-            /** @description OK */
-            200: {
+            /** @description No Content */
+            204: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -9263,8 +9394,8 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description OK */
-            200: {
+            /** @description No Content */
+            204: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -9378,7 +9509,11 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["GuestClassificationDto"];
+                    "text/json": components["schemas"]["GuestClassificationDto"];
+                    "text/plain": components["schemas"]["GuestClassificationDto"];
+                };
             };
             /** @description Solicitud inválida; los errores de validación se indican por campo. */
             400: {
@@ -9809,8 +9944,8 @@ export interface operations {
             };
         };
         responses: {
-            /** @description OK */
-            200: {
+            /** @description No Content */
+            204: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -9913,8 +10048,8 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description OK */
-            200: {
+            /** @description No Content */
+            204: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -10687,8 +10822,8 @@ export interface operations {
             };
         };
         responses: {
-            /** @description OK */
-            200: {
+            /** @description No Content */
+            204: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -10791,8 +10926,8 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description OK */
-            200: {
+            /** @description No Content */
+            204: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -11113,8 +11248,8 @@ export interface operations {
             };
         };
         responses: {
-            /** @description OK */
-            200: {
+            /** @description Created */
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -11781,13 +11916,6 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
             /** @description Solicitud inválida; los errores de validación se indican por campo. */
             400: {
                 headers: {
@@ -11851,6 +11979,27 @@ export interface operations {
                     };
                 };
             };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
             /** @description Error interno normalizado; incluye traceId para seguimiento. */
             500: {
                 headers: {
@@ -11893,8 +12042,8 @@ export interface operations {
             };
         };
         responses: {
-            /** @description OK */
-            200: {
+            /** @description Created */
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -12009,8 +12158,8 @@ export interface operations {
             };
         };
         responses: {
-            /** @description OK */
-            200: {
+            /** @description Created */
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -12122,7 +12271,11 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["PrintedInvoiceDto"];
+                    "text/json": components["schemas"]["PrintedInvoiceDto"];
+                    "text/plain": components["schemas"]["PrintedInvoiceDto"];
+                };
             };
             /** @description Solicitud inválida; los errores de validación se indican por campo. */
             400: {
@@ -12226,7 +12379,11 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["PrintPreviewDto"];
+                    "text/json": components["schemas"]["PrintPreviewDto"];
+                    "text/plain": components["schemas"]["PrintPreviewDto"];
+                };
             };
             /** @description Solicitud inválida; los errores de validación se indican por campo. */
             400: {
@@ -12328,7 +12485,11 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": string[];
+                    "text/json": string[];
+                    "text/plain": string[];
+                };
             };
             /** @description Solicitud inválida; los errores de validación se indican por campo. */
             400: {
@@ -12432,7 +12593,11 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["PrinterConnectionDto"];
+                    "text/json": components["schemas"]["PrinterConnectionDto"];
+                    "text/plain": components["schemas"]["PrinterConnectionDto"];
+                };
             };
             /** @description Solicitud inválida; los errores de validación se indican por campo. */
             400: {
@@ -12536,7 +12701,11 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["PrintPreviewDto"];
+                    "text/json": components["schemas"]["PrintPreviewDto"];
+                    "text/plain": components["schemas"]["PrintPreviewDto"];
+                };
             };
             /** @description Solicitud inválida; los errores de validación se indican por campo. */
             400: {
@@ -12640,7 +12809,11 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["MessageResponseDto"];
+                    "text/json": components["schemas"]["MessageResponseDto"];
+                    "text/plain": components["schemas"]["MessageResponseDto"];
+                };
             };
             /** @description Solicitud inválida; los errores de validación se indican por campo. */
             400: {
@@ -12742,7 +12915,11 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["MessageResponseDto"];
+                    "text/json": components["schemas"]["MessageResponseDto"];
+                    "text/plain": components["schemas"]["MessageResponseDto"];
+                };
             };
             /** @description Solicitud inválida; los errores de validación se indican por campo. */
             400: {
@@ -14027,13 +14204,6 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
             /** @description Solicitud inválida; los errores de validación se indican por campo. */
             400: {
                 headers: {
@@ -14078,6 +14248,27 @@ export interface operations {
             };
             /** @description El operador carece de permisos o debe cambiar la contraseña. */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Not Found */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -14553,8 +14744,8 @@ export interface operations {
             };
         };
         responses: {
-            /** @description OK */
-            200: {
+            /** @description Created */
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -14881,8 +15072,8 @@ export interface operations {
             };
         };
         responses: {
-            /** @description OK */
-            200: {
+            /** @description No Content */
+            204: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -14985,8 +15176,8 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description OK */
-            200: {
+            /** @description No Content */
+            204: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -15199,8 +15390,8 @@ export interface operations {
             };
         };
         responses: {
-            /** @description OK */
-            200: {
+            /** @description Created */
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -15638,8 +15829,8 @@ export interface operations {
             };
         };
         responses: {
-            /** @description OK */
-            200: {
+            /** @description No Content */
+            204: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -15742,8 +15933,8 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description OK */
-            200: {
+            /** @description No Content */
+            204: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -15958,8 +16149,8 @@ export interface operations {
             };
         };
         responses: {
-            /** @description OK */
-            200: {
+            /** @description Created */
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -16180,8 +16371,8 @@ export interface operations {
             };
         };
         responses: {
-            /** @description OK */
-            200: {
+            /** @description No Content */
+            204: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -16284,8 +16475,8 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description OK */
-            200: {
+            /** @description No Content */
+            204: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -16498,8 +16689,8 @@ export interface operations {
             };
         };
         responses: {
-            /** @description OK */
-            200: {
+            /** @description Created */
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -16833,7 +17024,11 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["MessageResponseDto"];
+                    "text/json": components["schemas"]["MessageResponseDto"];
+                    "text/plain": components["schemas"]["MessageResponseDto"];
+                };
             };
             /** @description Solicitud inválida; los errores de validación se indican por campo. */
             400: {
@@ -16943,7 +17138,11 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["MessageResponseDto"];
+                    "text/json": components["schemas"]["MessageResponseDto"];
+                    "text/plain": components["schemas"]["MessageResponseDto"];
+                };
             };
             /** @description Solicitud inválida; los errores de validación se indican por campo. */
             400: {
@@ -17048,7 +17247,11 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["MessageResponseDto"];
+                    "text/json": components["schemas"]["MessageResponseDto"];
+                    "text/plain": components["schemas"]["MessageResponseDto"];
+                };
             };
             /** @description Solicitud inválida; los errores de validación se indican por campo. */
             400: {
@@ -17368,7 +17571,11 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["AuditChainExport"];
+                    "text/json": components["schemas"]["AuditChainExport"];
+                    "text/plain": components["schemas"]["AuditChainExport"];
+                };
             };
             /** @description Solicitud inválida; los errores de validación se indican por campo. */
             400: {
@@ -18717,6 +18924,7 @@ export interface operations {
     CashRegisters_GetPage: {
         parameters: {
             query?: {
+                OpenOnly?: boolean;
                 Search?: string;
                 Page?: number | string;
                 PageSize?: number | string;
@@ -19626,12 +19834,14 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description OK */
+            /** @description Archivo descargable. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": string;
+                };
             };
             /** @description Solicitud inválida; los errores de validación se indican por campo. */
             400: {
@@ -19731,12 +19941,14 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description OK */
+            /** @description Archivo descargable. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": string;
+                };
             };
             /** @description Solicitud inválida; los errores de validación se indican por campo. */
             400: {
@@ -19836,12 +20048,14 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description OK */
+            /** @description Archivo descargable. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": string;
+                };
             };
             /** @description Solicitud inválida; los errores de validación se indican por campo. */
             400: {
@@ -19938,12 +20152,14 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description OK */
+            /** @description Archivo descargable. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": string;
+                };
             };
             /** @description Solicitud inválida; los errores de validación se indican por campo. */
             400: {
@@ -20152,8 +20368,8 @@ export interface operations {
             };
         };
         responses: {
-            /** @description OK */
-            200: {
+            /** @description Created */
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -20357,6 +20573,119 @@ export interface operations {
             };
         };
     };
+    DocumentAuthorizations_GetOptionsPage: {
+        parameters: {
+            query?: {
+                Source?: string;
+                DocumentType?: string;
+                ActiveOnly?: boolean;
+                Search?: string;
+                Page?: number | string;
+                PageSize?: number | string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PagedResultOfAuthorizationOptionDto"];
+                    "text/json": components["schemas"]["PagedResultOfAuthorizationOptionDto"];
+                    "text/plain": components["schemas"]["PagedResultOfAuthorizationOptionDto"];
+                };
+            };
+            /** @description Solicitud inválida; los errores de validación se indican por campo. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Se requiere una sesión válida. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description El operador carece de permisos o debe cambiar la contraseña. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+            /** @description Error interno normalizado; incluye traceId para seguimiento. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": {
+                        code: string;
+                        detail: string;
+                        errors?: null | {
+                            [key: string]: string[];
+                        };
+                        instance: string;
+                        /** Format: int32 */
+                        status: number | string;
+                        title: string;
+                        traceId: string;
+                        type: string;
+                    };
+                };
+            };
+        };
+    };
     DocumentAuthorizations_CreateWithFile: {
         parameters: {
             query?: never;
@@ -20381,8 +20710,8 @@ export interface operations {
             };
         };
         responses: {
-            /** @description OK */
-            200: {
+            /** @description Created */
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -20597,8 +20926,8 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description OK */
-            200: {
+            /** @description No Content */
+            204: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -20701,12 +21030,14 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description OK */
+            /** @description Archivo descargable. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/pdf": string;
+                };
             };
             /** @description Solicitud inválida; los errores de validación se indican por campo. */
             400: {
@@ -20919,8 +21250,8 @@ export interface operations {
             };
         };
         responses: {
-            /** @description OK */
-            200: {
+            /** @description Created */
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -21251,8 +21582,8 @@ export interface operations {
             };
         };
         responses: {
-            /** @description OK */
-            200: {
+            /** @description Created */
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -21580,8 +21911,8 @@ export interface operations {
             };
         };
         responses: {
-            /** @description OK */
-            200: {
+            /** @description Created */
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -21905,8 +22236,8 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description OK */
-            200: {
+            /** @description No Content */
+            204: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -22009,8 +22340,8 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description OK */
-            200: {
+            /** @description No Content */
+            204: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -22331,12 +22662,14 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description OK */
+            /** @description Archivo descargable. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": string;
+                };
             };
             /** @description Solicitud inválida; los errores de validación se indican por campo. */
             400: {
@@ -22436,12 +22769,14 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description OK */
+            /** @description Archivo descargable. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": string;
+                };
             };
             /** @description Solicitud inválida; los errores de validación se indican por campo. */
             400: {
@@ -22546,7 +22881,11 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["TaxSummaryDto"];
+                    "text/json": components["schemas"]["TaxSummaryDto"];
+                    "text/plain": components["schemas"]["TaxSummaryDto"];
+                };
             };
             /** @description Solicitud inválida; los errores de validación se indican por campo. */
             400: {
@@ -22755,8 +23094,8 @@ export interface operations {
             };
         };
         responses: {
-            /** @description OK */
-            200: {
+            /** @description Created */
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -22977,8 +23316,8 @@ export interface operations {
             };
         };
         responses: {
-            /** @description OK */
-            200: {
+            /** @description No Content */
+            204: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -23081,8 +23420,8 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description OK */
-            200: {
+            /** @description No Content */
+            204: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -23843,8 +24182,8 @@ export interface operations {
             };
         };
         responses: {
-            /** @description OK */
-            200: {
+            /** @description Created */
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -23957,8 +24296,8 @@ export interface operations {
             };
         };
         responses: {
-            /** @description OK */
-            200: {
+            /** @description No Content */
+            204: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -24061,8 +24400,8 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description OK */
-            200: {
+            /** @description No Content */
+            204: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -24150,6 +24489,26 @@ export interface operations {
                         traceId: string;
                         type: string;
                     };
+                };
+            };
+        };
+    };
+    Health_Get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HealthResponseDto"];
                 };
             };
         };

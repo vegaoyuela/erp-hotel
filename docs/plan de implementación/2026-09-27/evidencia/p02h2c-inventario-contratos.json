@@ -1,0 +1,1485 @@
+{
+  "date_honduras": "2026-10-29",
+  "contains_secret_values": false,
+  "baseline_commit": "f03ae30",
+  "successful_responses": [
+    {
+      "method": "GET",
+      "path": "/api/Accounts",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/Accounts",
+      "status": "201",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/Accounts/flat",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/Accounts/journal-entries",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/Accounts/journal-entries",
+      "status": "201",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/Accounts/journal-entries/paged",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/Accounts/journal-entries/summary",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/Accounts/journal-entries/{id}",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/Accounts/trial-balance",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/Accounts/{id}",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/Accounts/{id}",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "PUT",
+      "path": "/api/Accounts/{id}",
+      "status": "204",
+      "has_schema": false,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/Accounts/{id}/movements",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/Auth/change-password",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/Auth/login",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/Auth/logout",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/Auth/me",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/Auth/refresh",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/Auth/register",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/Backup/logs",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/Backup/logs/paged",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/Backup/manual",
+      "status": "200",
+      "has_schema": true,
+      "binary": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/CAI",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/CAI",
+      "status": "201",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/CAI/active",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/CAI/{id}",
+      "status": "204",
+      "has_schema": false,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/CAI/{id}",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/Customers",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/Customers",
+      "status": "201",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/Customers/paged",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/Customers/{id}",
+      "status": "204",
+      "has_schema": false,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/Customers/{id}",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "PUT",
+      "path": "/api/Customers/{id}",
+      "status": "204",
+      "has_schema": false,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/Discounts",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/Discounts",
+      "status": "201",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/Discounts/{id}",
+      "status": "204",
+      "has_schema": false,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/Discounts/{id}",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "PUT",
+      "path": "/api/Discounts/{id}",
+      "status": "204",
+      "has_schema": false,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/Folios",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/Folios/by-reservation/{reservationId}",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/Folios/paged",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/Folios/{folioId}/items",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/Folios/{id}",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/Guests",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/Guests",
+      "status": "201",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/Guests/paged",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/Guests/{id}",
+      "status": "204",
+      "has_schema": false,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/Guests/{id}",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "PUT",
+      "path": "/api/Guests/{id}",
+      "status": "204",
+      "has_schema": false,
+      "binary": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/Guests/{id}/classification",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/Guests/{id}/stats",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/Inventory/categories",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/Inventory/categories",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/Inventory/categories/{id}",
+      "status": "204",
+      "has_schema": false,
+      "binary": false
+    },
+    {
+      "method": "PUT",
+      "path": "/api/Inventory/categories/{id}",
+      "status": "204",
+      "has_schema": false,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/Inventory/movements",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/Inventory/movements",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/Inventory/movements/paged",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/Inventory/products",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/Inventory/products",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/Inventory/products/paged",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/Inventory/products/{id}",
+      "status": "204",
+      "has_schema": false,
+      "binary": false
+    },
+    {
+      "method": "PUT",
+      "path": "/api/Inventory/products/{id}",
+      "status": "204",
+      "has_schema": false,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/Inventory/summary",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/Invoices",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/Invoices",
+      "status": "201",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/Invoices/date-range",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/Invoices/paged",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/Invoices/search",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/Invoices/{id}",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "PUT",
+      "path": "/api/Invoices/{id}",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/Invoices/{id}/credit-note",
+      "status": "201",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/Invoices/{id}/debit-note",
+      "status": "201",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/Print/invoice/{id}",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/Print/invoice/{id}/preview",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/Print/printers",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/Print/test",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/Print/test-preview",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/Print/test-print",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/Print/test-ruler",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/Reservations",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/Reservations",
+      "status": "201",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/Reservations/calendar",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/Reservations/checkin",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/Reservations/checkout/{id}",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/Reservations/date-range",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/Reservations/paged",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/Reservations/{id}",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "PUT",
+      "path": "/api/Reservations/{id}",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/Reservations/{id}/cancel",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/Reservations/{id}/confirm",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/Roles",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/Roles",
+      "status": "201",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/Roles/permissions",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/Roles/{id}",
+      "status": "204",
+      "has_schema": false,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/Roles/{id}",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "PUT",
+      "path": "/api/Roles/{id}",
+      "status": "204",
+      "has_schema": false,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/Rooms",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/Rooms",
+      "status": "201",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/Rooms/available",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/Rooms/status/{status}",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/Rooms/{id}",
+      "status": "204",
+      "has_schema": false,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/Rooms/{id}",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "PUT",
+      "path": "/api/Rooms/{id}",
+      "status": "204",
+      "has_schema": false,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/Suppliers",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/Suppliers",
+      "status": "201",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/Suppliers/{id}",
+      "status": "204",
+      "has_schema": false,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/Suppliers/{id}",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "PUT",
+      "path": "/api/Suppliers/{id}",
+      "status": "204",
+      "has_schema": false,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/Users",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/Users",
+      "status": "201",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/Users/{id}",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/Users/{id}",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "PUT",
+      "path": "/api/Users/{id}",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/Users/{id}/reset-password",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/Users/{userId}/roles/{roleId}",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/audit-logs",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/audit-logs/actions",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/audit-logs/export-integrity",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/audit-logs/paged",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/audit-logs/verify-integrity",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/card-settlements",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/card-settlements",
+      "status": "201",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/card-settlements/eligible-payments",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/card-settlements/eligible-payments/paged",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/card-settlements/eligible-payments/summary",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/card-settlements/paged",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/card-settlements/{id}",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/cash-registers",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/cash-registers",
+      "status": "201",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/cash-registers/paged",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/cash-registers/{id}",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/cash-registers/{id}/close",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/cash-registers/{id}/movements",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/cash-registers/{id}/movements/paged",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/cash-registers/{id}/open",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/dashboard/summary",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/data/export/guests",
+      "status": "200",
+      "has_schema": true,
+      "binary": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/data/export/invoices",
+      "status": "200",
+      "has_schema": true,
+      "binary": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/data/export/reservations",
+      "status": "200",
+      "has_schema": true,
+      "binary": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/data/export/rooms",
+      "status": "200",
+      "has_schema": true,
+      "binary": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/document-authorizations",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/document-authorizations",
+      "status": "201",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/document-authorizations/active/{documentType}",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/document-authorizations/options/paged",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/document-authorizations/with-file",
+      "status": "201",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/document-authorizations/{id}",
+      "status": "204",
+      "has_schema": false,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/document-authorizations/{id}",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/document-authorizations/{id}/file",
+      "status": "200",
+      "has_schema": true,
+      "binary": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/payments",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/payments",
+      "status": "201",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/payments/{id}",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/payments/{paymentId}/refunds",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/payments/{paymentId}/refunds",
+      "status": "201",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/payments/{paymentId}/refunds/{id}",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/purchase-invoices",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/purchase-invoices",
+      "status": "201",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/purchase-invoices/date-range",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/purchase-invoices/{id}",
+      "status": "204",
+      "has_schema": false,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/purchase-invoices/{id}",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "PUT",
+      "path": "/api/purchase-invoices/{id}/pay",
+      "status": "204",
+      "has_schema": false,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/reports/financial/balance-sheet",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/reports/financial/income-statement",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/reports/sar/purchases-book",
+      "status": "200",
+      "has_schema": true,
+      "binary": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/reports/sar/sales-book",
+      "status": "200",
+      "has_schema": true,
+      "binary": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/reports/tax-summary",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/room-types",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/room-types",
+      "status": "201",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/room-types/{id}",
+      "status": "204",
+      "has_schema": false,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/room-types/{id}",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "PUT",
+      "path": "/api/room-types/{id}",
+      "status": "204",
+      "has_schema": false,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/settings/business",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "PUT",
+      "path": "/api/settings/business",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/settings/business/approve",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/settings/business/history",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/settings/business/retire",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/tax-configurations",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/tax-configurations",
+      "status": "201",
+      "has_schema": true,
+      "binary": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/tax-configurations/{id}",
+      "status": "204",
+      "has_schema": false,
+      "binary": false
+    },
+    {
+      "method": "PUT",
+      "path": "/api/tax-configurations/{id}",
+      "status": "204",
+      "has_schema": false,
+      "binary": false
+    },
+    {
+      "method": "GET",
+      "path": "/health",
+      "status": "200",
+      "has_schema": true,
+      "binary": false
+    }
+  ],
+  "successful_200_201_without_schema": [],
+  "binary_response_count": 8,
+  "explicit_204_count": 25,
+  "explicit_201_count": 23,
+  "shared_manual_interfaces_remaining": [],
+  "previous_manual_interfaces": [
+    "User",
+    "AuthResponse",
+    "LoginRequest",
+    "RegisterRequest",
+    "RoomType",
+    "Room",
+    "CAI",
+    "PaymentApplication",
+    "RefundApplication",
+    "Refund",
+    "Payment",
+    "DocumentAuthorization",
+    "BusinessSettings",
+    "FiscalProfileRevision",
+    "InvoicePrintData",
+    "AccountingAccount",
+    "DashboardStat",
+    "DashboardAlert",
+    "DashboardInvoice",
+    "DashboardReservation",
+    "DashboardCash",
+    "DashboardSummary",
+    "TrialBalanceItem",
+    "AccountMovement",
+    "CreateAccountRequest",
+    "Discount",
+    "Role",
+    "CreateUserRequest",
+    "UpdateUserRequest"
+  ],
+  "migrated_manual_interfaces": [
+    "User",
+    "AuthResponse",
+    "LoginRequest",
+    "RegisterRequest",
+    "RoomType",
+    "Room",
+    "CAI",
+    "PaymentApplication",
+    "RefundApplication",
+    "Refund",
+    "Payment",
+    "DocumentAuthorization",
+    "BusinessSettings",
+    "FiscalProfileRevision",
+    "AccountingAccount",
+    "DashboardStat",
+    "DashboardAlert",
+    "DashboardInvoice",
+    "DashboardReservation",
+    "DashboardCash",
+    "DashboardSummary",
+    "TrialBalanceItem",
+    "AccountMovement",
+    "CreateAccountRequest",
+    "Discount",
+    "Role",
+    "CreateUserRequest",
+    "UpdateUserRequest"
+  ],
+  "unused_type_removed": "InvoicePrintData",
+  "remaining_frontend_array_reads": [
+    {
+      "file": "frontend/src/pages/accounting/ChartOfAccountsPage.tsx",
+      "line": 134,
+      "expression": "const { data } = await api.get<AccountingAccount[]>('/accounts')",
+      "classification": "accounting_catalog_or_report",
+      "decision": "Árbol, selector contable o reporte completo; medir con catálogo oficial y validar exportación/totales."
+    },
+    {
+      "file": "frontend/src/pages/accounting/JournalEntriesPage.tsx",
+      "line": 127,
+      "expression": "(await api.get<AccountingAccount[]>('/accounts/flat', { signal })).data })",
+      "classification": "accounting_catalog_or_report",
+      "decision": "Árbol, selector contable o reporte completo; medir con catálogo oficial y validar exportación/totales."
+    },
+    {
+      "file": "frontend/src/pages/accounting/TrialBalancePage.tsx",
+      "line": 18,
+      "expression": "const { data } = await api.get<TrialBalanceItem[]>('/accounts/trial-balance')",
+      "classification": "accounting_catalog_or_report",
+      "decision": "Árbol, selector contable o reporte completo; medir con catálogo oficial y validar exportación/totales."
+    },
+    {
+      "file": "frontend/src/pages/admin/AuditLogsPage.tsx",
+      "line": 43,
+      "expression": "(await api.get<string[]>('/audit-logs/actions', { signal })).data })",
+      "classification": "physical_or_reference_catalog",
+      "decision": "Catálogo de habitaciones/tipos/descuentos/categorías/impresoras o acciones; medir cardinalidad oficial, documentar límite y paginar si lo exige."
+    },
+    {
+      "file": "frontend/src/pages/discounts/DiscountsPage.tsx",
+      "line": 32,
+      "expression": "const { data } = await api.get<Discount[]>('/discounts')",
+      "classification": "physical_or_reference_catalog",
+      "decision": "Catálogo de habitaciones/tipos/descuentos/categorías/impresoras o acciones; medir cardinalidad oficial, documentar límite y paginar si lo exige."
+    },
+    {
+      "file": "frontend/src/pages/inventory/InventoryPage.tsx",
+      "line": 65,
+      "expression": "(await api.get<Category[]>('/inventory/categories', { signal })).data })",
+      "classification": "physical_or_reference_catalog",
+      "decision": "Catálogo de habitaciones/tipos/descuentos/categorías/impresoras o acciones; medir cardinalidad oficial, documentar límite y paginar si lo exige."
+    },
+    {
+      "file": "frontend/src/pages/invoices/InvoicesPage.tsx",
+      "line": 177,
+      "expression": "const { data } = await api.get<Payment[]>('/payments', { params: { invoiceId } })",
+      "classification": "invoice_scoped_financial_auxiliary",
+      "decision": "Conjunto completo de un documento usado para saldo y líneas reversibles; migrar solo con agregado/backend equivalente probado."
+    },
+    {
+      "file": "frontend/src/pages/invoices/InvoicesPage.tsx",
+      "line": 284,
+      "expression": "const invoiceResponse = await api.get<Invoice[]>('/invoices/search', { params: { originalInvoiceId: selectedInvoice.id } })",
+      "classification": "invoice_scoped_financial_auxiliary",
+      "decision": "Conjunto completo de un documento usado para saldo y líneas reversibles; migrar solo con agregado/backend equivalente probado."
+    },
+    {
+      "file": "frontend/src/pages/reservations/CheckInPage.tsx",
+      "line": 112,
+      "expression": "api.get<Room[]>('/rooms/available', { params: { checkIn: checkIn.checkInDate, checkOut: checkIn.checkOutDate } }).then(({ data }) => setAvailableRooms(data))",
+      "classification": "physical_or_reference_catalog",
+      "decision": "Catálogo de habitaciones/tipos/descuentos/categorías/impresoras o acciones; medir cardinalidad oficial, documentar límite y paginar si lo exige."
+    },
+    {
+      "file": "frontend/src/pages/reservations/CheckInPage.tsx",
+      "line": 117,
+      "expression": "api.get<Discount[]>('/discounts').then(({ data }) => {",
+      "classification": "physical_or_reference_catalog",
+      "decision": "Catálogo de habitaciones/tipos/descuentos/categorías/impresoras o acciones; medir cardinalidad oficial, documentar límite y paginar si lo exige."
+    },
+    {
+      "file": "frontend/src/pages/reservations/CheckOutPage.tsx",
+      "line": 104,
+      "expression": "void api.get<Discount[]>('/discounts', { signal: controller.signal }).then(({ data }) => {",
+      "classification": "physical_or_reference_catalog",
+      "decision": "Catálogo de habitaciones/tipos/descuentos/categorías/impresoras o acciones; medir cardinalidad oficial, documentar límite y paginar si lo exige."
+    },
+    {
+      "file": "frontend/src/pages/rooms/FloorMapPage.tsx",
+      "line": 30,
+      "expression": "const r = await api.get<Room[]>('/rooms')",
+      "classification": "physical_or_reference_catalog",
+      "decision": "Catálogo de habitaciones/tipos/descuentos/categorías/impresoras o acciones; medir cardinalidad oficial, documentar límite y paginar si lo exige."
+    },
+    {
+      "file": "frontend/src/pages/rooms/RoomTypesPage.tsx",
+      "line": 32,
+      "expression": "const { data } = await api.get<RoomType[]>('/room-types')",
+      "classification": "physical_or_reference_catalog",
+      "decision": "Catálogo de habitaciones/tipos/descuentos/categorías/impresoras o acciones; medir cardinalidad oficial, documentar límite y paginar si lo exige."
+    },
+    {
+      "file": "frontend/src/pages/rooms/RoomsPage.tsx",
+      "line": 34,
+      "expression": "api.get<Room[]>('/rooms'),",
+      "classification": "physical_or_reference_catalog",
+      "decision": "Catálogo de habitaciones/tipos/descuentos/categorías/impresoras o acciones; medir cardinalidad oficial, documentar límite y paginar si lo exige."
+    },
+    {
+      "file": "frontend/src/pages/rooms/RoomsPage.tsx",
+      "line": 35,
+      "expression": "api.get<RoomType[]>('/room-types'),",
+      "classification": "physical_or_reference_catalog",
+      "decision": "Catálogo de habitaciones/tipos/descuentos/categorías/impresoras o acciones; medir cardinalidad oficial, documentar límite y paginar si lo exige."
+    },
+    {
+      "file": "frontend/src/pages/settings/SettingsPage.tsx",
+      "line": 144,
+      "expression": "void api.get<string[]>('/print/printers')",
+      "classification": "physical_or_reference_catalog",
+      "decision": "Catálogo de habitaciones/tipos/descuentos/categorías/impresoras o acciones; medir cardinalidad oficial, documentar límite y paginar si lo exige."
+    },
+    {
+      "file": "frontend/src/pages/settings/SettingsPage.tsx",
+      "line": 502,
+      "expression": "<Button size=\"sm\" variant=\"outline\" onClick={() => api.get<string[]>('/print/printers').then(({ data }) => setPrinters(data)).catch(() => {})}>Recargar</Button>",
+      "classification": "physical_or_reference_catalog",
+      "decision": "Catálogo de habitaciones/tipos/descuentos/categorías/impresoras o acciones; medir cardinalidad oficial, documentar límite y paginar si lo exige."
+    },
+    {
+      "file": "frontend/src/pages/users/UsersPage.tsx",
+      "line": 74,
+      "expression": "api.get<User[]>('/users'),",
+      "classification": "pending_admin_pagination",
+      "decision": "Paginar administración de usuarios/roles y probar límites antes de cerrar P02-04."
+    },
+    {
+      "file": "frontend/src/pages/users/UsersPage.tsx",
+      "line": 75,
+      "expression": "api.get<Role[]>('/roles'),",
+      "classification": "pending_admin_pagination",
+      "decision": "Paginar administración de usuarios/roles y probar límites antes de cerrar P02-04."
+    }
+  ],
+  "next_priorities": [
+    "P02-06: permisos, motivos y aprobaciones sensibles",
+    "P02-04: usuarios/roles, límites de catálogos y evidencia de volumen",
+    "P02-09: matriz formal API/DAT/SEC",
+    "P02-07: separación de cuentas/secretos; rotación en Windows",
+    "P02-10: revisión técnica independiente"
+  ],
+  "known_existing_p03_issue": "Desglose de detalle de folio: descuentos, cálculo backend y redondeo compartido.",
+  "windows_and_printing": "Aplazados por el usuario; recordatorio diario existente a las 10:00 America/Tegucigalpa."
+}

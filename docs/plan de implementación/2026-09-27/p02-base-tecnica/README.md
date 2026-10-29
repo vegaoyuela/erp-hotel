@@ -2,7 +2,7 @@
 
 **Inicio:** 27 de septiembre de 2026
 
-**Estado:** en ejecución; entregas P02-A a P02-H2B aprobadas por pruebas automáticas. Última ejecución: 29 de octubre de 2026.
+**Estado:** en ejecución; entregas P02-A a P02-H2C aprobadas por pruebas automáticas. Última ejecución: 29 de octubre de 2026.
 
 Este registro divide P02 en entregas comprobables. No se declara G2 mientras queden controladores con lógica de negocio, repositorios que confirman cambios por su cuenta o contratos sin prueba.
 
@@ -31,8 +31,8 @@ La versión anterior calculaba el hash con ticks de 100 ns antes de guardar un `
 | P02-01 | Completada | Finanzas, factura/notas, reservas, check-in/out, folios, caja, compras, inventario y respaldo delegan sus mutaciones a servicios. |
 | P02-02 | Completada | Persistencia explícita con `IUnitOfWork`, cero guardados/transacciones en repositorios y pruebas de aislamiento, rollback y regresión HTTP. |
 | P02-03 | Completada en código | Contratos inyectables de reloj, cálculo, correlativo, auditoría, impresión y respaldo; sustitución/rollback y transporte simulado probados. Prueba física pendiente en Windows. |
-| P02-04 | Parcial (P02-H2B) | Catorce colecciones paginadas, agregados globales y resultados operativos/financieros tipados; faltan selectores y otros esquemas explícitos de éxito. |
-| P02-05 | Parcial (P02-H2B) | Contrato real validado en QA; se sumaron doce tipos de caja, liquidaciones, diario y respaldos a los módulos ya migrados. Quedan contratos manuales y selectores. |
+| P02-04 | Parcial (P02-H2C) | Selectores paginados y cero éxitos 200/201 sin esquema; quedan usuarios/roles y validar límites de catálogos/reportes del inventario. |
+| P02-05 | Completada en código y QA | Tipos compartidos derivados de OpenAPI; comparación automática contra API real, snapshot y tipos generados. Revisión independiente en P02-10. |
 | P02-06 | Parcial previo | Existe matriz de permisos y prueba reflectiva; faltan motivos/aprobaciones por monto y revalidar todas las lecturas sensibles. |
 | P02-07 | Parcial previo | Existen roles PostgreSQL y migración separada; la rotación de secretos se ejecutará durante instalación Windows. |
 | P02-08 | Completada | Verificador, exportador, UI, compatibilidad histórica y pruebas. |
@@ -97,6 +97,10 @@ Se paginaron cajas, movimientos de caja, liquidaciones, cobros elegibles, asient
 
 ## Criterio para la siguiente entrega
 
-P02-H2C continuará con selectores de check-in/out, autorizaciones y cajas auxiliares, respuestas de éxito explícitas y contratos manuales restantes. G2 sigue abierta hasta cubrir los pendientes de la tabla y obtener la revisión independiente.
+P02-H2C queda documentada en la entrega siguiente. El siguiente bloque cubre permisos/motivos/aprobaciones (P02-06), paginación administrativa y límites restantes (P02-04), y matriz formal API/DAT/SEC (P02-09). G2 sigue abierta hasta cubrir los pendientes de la tabla y obtener la revisión independiente.
 
 La evidencia de QA y compatibilidad se conserva en el [expediente general](../evidencia/README.md#p02--base-técnica-primera-entrega).
+
+## Entrega P02-H2C — selectores y contratos (29 de octubre de 2026)
+
+Se paginaron los selectores de check-in/out, autorizaciones y cajas auxiliares. La selección persiste entre búsquedas/páginas y navegar no envía formularios. OpenAPI tiene cero respuestas 200/201 sin esquema y ocho descargas binarias. Las 28 interfaces compartidas utilizadas que quedaban pasan a tipos derivados; se retira una sin consumidores. Pasan 109 unitarias, 5 integraciones, 5 validaciones del expediente y ocho capturas del navegador. El [detalle H2C](p02-h2c-selectores-contratos.md) contiene el anexo de uso, los 19 arrays restantes clasificados, QA y pendientes. P02-05 queda completada en código/QA; P02-04 sigue parcial.

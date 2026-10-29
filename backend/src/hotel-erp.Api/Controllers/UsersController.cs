@@ -56,6 +56,7 @@ namespace hotel_erp.Api.Controllers
         }
 
         [HttpPost]
+        [ProducesResponseType(typeof(UserDto), StatusCodes.Status201Created)]
         public async Task<ActionResult<UserDto>> Create([FromBody] CreateUserRequest request)
         {
             var existingUser = await _userRepository.GetByUsernameAsync(request.Username);
@@ -169,6 +170,7 @@ namespace hotel_erp.Api.Controllers
         }
 
         [HttpPost("{id}/reset-password")]
+        [ProducesResponseType(typeof(MessageResponseDto), StatusCodes.Status200OK)]
         public async Task<ActionResult> ResetPassword(Guid id, [FromBody] AdminResetPasswordRequest request)
         {
             var user = await _userRepository.GetByIdAsync(id);
@@ -189,6 +191,7 @@ namespace hotel_erp.Api.Controllers
         }
 
         [HttpDelete("{id}")]
+        [ProducesResponseType(typeof(MessageResponseDto), StatusCodes.Status200OK)]
         public async Task<ActionResult> Delete(Guid id)
         {
             var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -222,6 +225,7 @@ namespace hotel_erp.Api.Controllers
         }
 
         [HttpPost("{userId}/roles/{roleId}")]
+        [ProducesResponseType(typeof(MessageResponseDto), StatusCodes.Status200OK)]
         public async Task<ActionResult> AssignRole(Guid userId, Guid roleId)
         {
             var user = await _userRepository.GetByIdAsync(userId);

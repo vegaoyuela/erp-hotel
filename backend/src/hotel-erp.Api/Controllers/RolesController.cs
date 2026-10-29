@@ -56,6 +56,7 @@ namespace hotel_erp.Api.Controllers
         }
 
         [HttpPost]
+        [ProducesResponseType(typeof(RoleDto), StatusCodes.Status201Created)]
         public async Task<ActionResult<RoleDto>> Create([FromBody] CreateRoleRequest request)
         {
             var existing = await _roleRepository.GetByNameAsync(request.Name);
@@ -83,6 +84,7 @@ namespace hotel_erp.Api.Controllers
         }
 
         [HttpPut("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<ActionResult> Update(Guid id, [FromBody] UpdateRoleRequest request)
         {
             await using var transaction = await _context.Database.BeginTransactionAsync(HttpContext.RequestAborted);
@@ -125,6 +127,7 @@ namespace hotel_erp.Api.Controllers
         }
 
         [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<ActionResult> Delete(Guid id)
         {
             await using var transaction = await _context.Database.BeginTransactionAsync(HttpContext.RequestAborted);

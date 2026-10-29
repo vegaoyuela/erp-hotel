@@ -1,0 +1,22 @@
+{
+  "status": "passed",
+  "synthetic_database": true,
+  "contains_secret_values": false,
+  "flows": {
+    "guest_search_page_empty_and_reset": true,
+    "checkout_deep_link_outside_first_page": true,
+    "authorization_and_cash_selection_retained_across_pages_and_search": true,
+    "authorization_invoice_link_and_legacy_source_supported": true,
+    "form_pagination_and_search_enter_do_not_submit": true,
+    "guest_search_error_and_retry": true
+  },
+  "mobile_document_overflow": {
+    "check-in": false,
+    "check-out": false,
+    "autorizaciones": false,
+    "nota-credito-selector": false
+  },
+  "javascript_errors": 0,
+  "business_mutations": 0,
+  "screenshots": 8
+}

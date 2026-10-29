@@ -55,6 +55,7 @@ namespace hotel_erp.Api.Controllers
 
         [HttpPost]
         [Authorize(Policy = PermissionNames.ManageReservations)]
+        [ProducesResponseType(typeof(GuestDto), StatusCodes.Status201Created)]
         public async Task<ActionResult<GuestDto>> Create([FromBody] CreateGuestRequest request)
         {
             if (!string.IsNullOrEmpty(request.DocumentNumber))
@@ -100,6 +101,7 @@ namespace hotel_erp.Api.Controllers
 
         [HttpPut("{id}")]
         [Authorize(Policy = PermissionNames.ManageReservations)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<ActionResult> Update(Guid id, [FromBody] UpdateGuestRequest request)
         {
             var entity = await _repo.GetByIdAsync(id);
@@ -158,6 +160,7 @@ namespace hotel_erp.Api.Controllers
 
         [HttpPatch("{id}/classification")]
         [Authorize(Policy = PermissionNames.ManageReservations)]
+        [ProducesResponseType(typeof(GuestClassificationDto), StatusCodes.Status200OK)]
         public async Task<ActionResult> UpdateClassification(Guid id, [FromBody] UpdateClassificationRequest request)
         {
             var guest = await _repo.GetByIdAsync(id);
@@ -170,6 +173,7 @@ namespace hotel_erp.Api.Controllers
 
         [HttpDelete("{id}")]
         [Authorize(Policy = PermissionNames.ManageReservations)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<ActionResult> Delete(Guid id)
         {
             var reservations = await _reservationRepo.GetByGuestAsync(id);

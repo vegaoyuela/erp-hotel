@@ -1,0 +1,10 @@
+{
+  "syntheticDatabase": true,
+  "unifiedAuthorizations": 65,
+  "activeAuthorizations": 62,
+  "activeLegacyCais": 31,
+  "creditAuthorizations": 16,
+  "eligibleCashRegisters": 31,
+  "successfulResponsesWithoutSchema": 0,
+  "binaryResponses": 8
+}

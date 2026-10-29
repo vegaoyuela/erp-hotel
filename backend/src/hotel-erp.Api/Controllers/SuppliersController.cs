@@ -41,6 +41,7 @@ namespace hotel_erp.Api.Controllers
         }
 
         [HttpPost]
+        [ProducesResponseType(typeof(SupplierDto), StatusCodes.Status201Created)]
         public async Task<ActionResult<SupplierDto>> Create([FromBody] CreateSupplierRequest request)
         {
             var supplier = new hotel_erp.Api.Database.Entities.Supplier
@@ -58,6 +59,7 @@ namespace hotel_erp.Api.Controllers
         }
 
         [HttpPut("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<ActionResult> Update(Guid id, [FromBody] UpdateSupplierRequest request)
         {
             var supplier = await _repo.GetByIdAsync(id);
@@ -77,6 +79,7 @@ namespace hotel_erp.Api.Controllers
         }
 
         [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<ActionResult> Delete(Guid id)
         {
             await _repo.DeleteAsync(id);

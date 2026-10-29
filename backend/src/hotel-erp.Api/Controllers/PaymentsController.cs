@@ -50,6 +50,7 @@ namespace hotel_erp.Api.Controllers
 
         [HttpPost]
         [Authorize(Policy = PermissionNames.ManageCash)]
+        [ProducesResponseType(typeof(PaymentDto), StatusCodes.Status201Created)]
         public async Task<ActionResult<PaymentDto>> Create(
             [FromBody] CreatePaymentRequest request,
             [FromHeader(Name = "Idempotency-Key")] string? idempotencyKey)

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.OpenApi;
+using System.Reflection;
 using hotel_erp.Api.Dtos.Common;
 
 namespace hotel_erp.Api.Infrastructure;
@@ -18,6 +19,18 @@ public sealed class ApiOpenApiTransformer : IOpenApiOperationTransformer
         var metadata = action.EndpointMetadata;
         var authorized = !metadata.OfType<IAllowAnonymous>().Any() && metadata.OfType<IAuthorizeData>().Any();
         operation.Responses ??= new OpenApiResponses();
+        var download = action.MethodInfo.GetCustomAttribute<ApiFileResponseAttribute>();
+        if (download is not null)
+        {
+            operation.Responses["200"] = new OpenApiResponse
+            {
+                Description = "Archivo descargable.",
+                Content = new Dictionary<string, OpenApiMediaType>
+                {
+                    [download.ContentType] = new() { Schema = new OpenApiSchema { Type = JsonSchemaType.String, Format = "binary" } }
+                }
+            };
+        }
         var problem = await context.GetOrCreateSchemaAsync(typeof(ApiErrorDto), null, cancellationToken);
         void Error(string status, string description, IOpenApiSchema schema)
         {

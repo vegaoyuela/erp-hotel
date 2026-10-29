@@ -134,6 +134,8 @@ public class ReservationsController(
 
     [HttpDelete("{id}")]
     [Authorize(Policy = PermissionNames.ManageReservations)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult> Delete(Guid id)
     {
         if (await repository.GetByIdAsync(id) is null)

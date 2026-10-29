@@ -1,3 +1,5 @@
+using hotel_erp.Api.Infrastructure;
+using hotel_erp.Api.Dtos.Common;
 using ClosedXML.Excel;
 using hotel_erp.Api.Authorization;
 using hotel_erp.Api.Services.Interfaces;
@@ -68,6 +70,7 @@ namespace hotel_erp.Api.Controllers
         }
 
         [HttpGet("tax-summary")]
+        [ProducesResponseType(typeof(TaxSummaryDto), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetTaxSummary([FromQuery] DateTime from, [FromQuery] DateTime to)
         {
             var invoices = await _invoiceRepo.GetByDateRangeAsync(from, to.AddDays(1));
@@ -202,6 +205,7 @@ namespace hotel_erp.Api.Controllers
         }
 
         [HttpGet("sar/sales-book")]
+        [ApiFileResponse("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")]
         public async Task<IActionResult> GetSalesBookXlsx([FromQuery] DateTime from, [FromQuery] DateTime to)
         {
             var invoices = await _invoiceRepo.GetByDateRangeAsync(from, to.AddDays(1));
@@ -288,6 +292,7 @@ namespace hotel_erp.Api.Controllers
         }
 
         [HttpGet("sar/purchases-book")]
+        [ApiFileResponse("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")]
         public async Task<IActionResult> GetPurchasesBookXlsx([FromQuery] DateTime from, [FromQuery] DateTime to)
         {
             var purchases = await _purchaseRepo.GetByDateRangeAsync(from, to.AddDays(1));

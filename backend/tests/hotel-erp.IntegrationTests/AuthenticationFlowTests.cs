@@ -602,6 +602,7 @@ public partial class AuthenticationFlowTests
         await AssertApiContractAndPaginationAsync(client, factory.Services, currentSession.AccessToken!);
         await AssertOperationsPaginationAsync(client, factory.Services, currentSession.AccessToken!);
         await AssertFinancePaginationAsync(client, factory.Services, currentSession.AccessToken!);
+        await AssertSelectorContractsAsync(client, factory.Services, currentSession.AccessToken!);
 
         using var retirementRequest = Authorized(HttpMethod.Post, "/api/settings/business/retire", currentSession.AccessToken!);
         retirementRequest.Content = JsonContent.Create(new

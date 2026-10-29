@@ -1,4 +1,8 @@
 import { useState, useEffect, useCallback } from 'react'
+import { useDebouncedValue, usePagedList } from '@/hooks/usePagedList'
+import { PagedSelect } from '@/components/ui/PagedSelect'
+import { Pagination } from '@/components/ui/Pagination'
+import type { AuthorizationOption, PrintPreview, Invoice } from '@/types'
 import { useSearchParams } from 'react-router-dom'
 import axios from 'axios'
 import api from '@/lib/axios'
@@ -6,7 +10,6 @@ import { getApiErrorMessage } from '@/lib/errors'
 import type {
   Reservation,
   Folio,
-  CAI,
   Discount,
   CashRegister,
 } from '@/types'
@@ -50,19 +53,15 @@ const clearInvoiceIntent = (reservationId: string) =>
 export default function CheckOutPage() {
   const [searchParams] = useSearchParams()
   const requestedReservationId = searchParams.get('reservationId')
-  const [checkIns, setCheckIns] = useState<Reservation[]>([])
   const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null)
   const [folio, setFolio] = useState<Folio | null>(null)
-  const [loadingList, setLoadingList] = useState(true)
   const [loadingFolio, setLoadingFolio] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
 
   // Billing and SAR authorizations
-  const [caiList, setCaiList] = useState<CAI[]>([])
   const [selectedCaiId, setSelectedCaiId] = useState<string>('')
   const [discounts, setDiscounts] = useState<Discount[]>([])
   const [selectedDiscountId, setSelectedDiscountId] = useState<string>('')
-  const [cashRegisters, setCashRegisters] = useState<CashRegister[]>([])
   const [selectedCashRegisterId, setSelectedCashRegisterId] = useState<string>('')
 
   // Extra Folio Item Form
@@ -92,38 +91,21 @@ export default function CheckOutPage() {
   const [actionLoading, setActionLoading] = useState(false)
   const [alertInfo, setAlertInfo] = useState<{ variant: 'error' | 'success' | 'info'; message: string } | null>(null)
 
-  // Load active checkins and auxiliary data
-  const loadCheckIns = useCallback(async () => {
-    setLoadingList(true)
-    try {
-      const [resRes, caiRes, discRes, cashRes] = await Promise.all([
-        api.get<Reservation[]>('/reservations', { params: { status: 'CheckIn' } }),
-        api.get<CAI[]>('/cai'),
-        api.get<Discount[]>('/discounts'),
-        api.get<CashRegister[]>('/cash-registers'),
-      ])
-      setCheckIns(resRes.data)
-      const activeCais = caiRes.data.filter((cai) => cai.status === 'Activo')
-      const percentageDiscounts = discRes.data.filter(
-        (discount) => discount.isActive && discount.discountType === 'Porcentaje'
-      )
-      const activeRegisters = cashRes.data.filter((register) => register.isActive && register.isOpen)
-      setCaiList(activeCais)
-      setSelectedCaiId((current) => activeCais.some((cai) => cai.id === current) ? current : activeCais[0]?.id ?? '')
-      setDiscounts(percentageDiscounts)
-      setCashRegisters(activeRegisters)
-      setSelectedCashRegisterId((current) => activeRegisters.some((register) => register.id === current) ? current : activeRegisters[0]?.id ?? '')
-    } catch {
-      setAlertInfo({ variant: 'error', message: 'Error al consultar huéspedes con Check-In activo.' })
-    } finally {
-      setLoadingList(false)
-    }
-  }, [])
-
+  const [reservationPage, setReservationPage] = useState(1)
+  const debouncedSearch = useDebouncedValue(searchTerm)
+  const reservationQuery = usePagedList<Reservation>('/reservations/paged', {
+    status: 'CheckIn', search: debouncedSearch || undefined, page: reservationPage, pageSize: 10,
+  })
+  const checkIns = reservationQuery.items
+  const loadingList = reservationQuery.loading
+  const loadCheckIns = () => reservationQuery.load()
   useEffect(() => {
-    const timer = window.setTimeout(() => void loadCheckIns(), 0)
-    return () => window.clearTimeout(timer)
-  }, [loadCheckIns])
+    const controller = new AbortController()
+    void api.get<Discount[]>('/discounts', { signal: controller.signal }).then(({ data }) => {
+      setDiscounts(data.filter(discount => discount.isActive && discount.discountType === 'Porcentaje'))
+    }).catch(error => { if (!axios.isCancel(error)) setAlertInfo({ variant: 'error', message: 'No se pudieron consultar los descuentos.' }) })
+    return () => controller.abort()
+  }, [])
 
   // When a reservation is selected, fetch its folio
   const handleSelectReservation = useCallback(async (reservation: Reservation) => {
@@ -155,17 +137,18 @@ export default function CheckOutPage() {
   }, [])
 
   useEffect(() => {
-    if (!requestedReservationId || selectedReservation || checkIns.length === 0) return
-    const timer = window.setTimeout(() => {
-      const requestedReservation = checkIns.find(reservation => reservation.id === requestedReservationId)
-      if (requestedReservation) {
-        void handleSelectReservation(requestedReservation)
-      } else if (!loadingList) {
+    if (!requestedReservationId) return
+    let cancelled = false
+    void api.get<Reservation>(`/reservations/${requestedReservationId}`).then(({ data }) => {
+      if (cancelled) return
+      if (data.status !== 'CheckIn') {
         setAlertInfo({ variant: 'error', message: 'La reservación seleccionada ya no tiene un Check-In activo.' })
+        return
       }
-    }, 0)
-    return () => window.clearTimeout(timer)
-  }, [checkIns, handleSelectReservation, loadingList, requestedReservationId, selectedReservation])
+      void handleSelectReservation(data)
+    }).catch(() => { if (!cancelled) setAlertInfo({ variant: 'error', message: 'No se pudo cargar la reservación solicitada.' }) })
+    return () => { cancelled = true }
+  }, [requestedReservationId, handleSelectReservation])
 
   // Add extra charge to folio
   const handleAddFolioCharge = async (e: React.FormEvent) => {
@@ -274,13 +257,13 @@ export default function CheckOutPage() {
         isTouristTaxExempt: taxpayerType === 'Exonerado' && isTouristTaxExempt,
       }
 
-      const invoiceRes = await api.post('/invoices', invoicePayload, {
+      const invoiceRes = await api.post<Invoice>('/invoices', invoicePayload, {
         headers: { 'Idempotency-Key': invoiceIntentId },
       })
       const createdInvoice = invoiceRes.data
 
       try {
-        const previewRes = await api.get(`/print/invoice/${createdInvoice.id}/preview`)
+        const previewRes = await api.get<PrintPreview>(`/print/invoice/${createdInvoice.id}/preview`)
         setPrintPreview(previewRes.data.text)
         setPrintLogo(previewRes.data.logoBase64 || null)
       } catch (e) {
@@ -321,11 +304,7 @@ export default function CheckOutPage() {
     }
   }
 
-  const filteredCheckIns = checkIns.filter(
-    (c) =>
-      c.guestName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      c.roomNumber.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  const filteredCheckIns = checkIns
 
   return (
     <div className="space-y-6">
@@ -359,7 +338,7 @@ export default function CheckOutPage() {
               <div className="flex items-center justify-between">
                 <h3 className="font-semibold text-sm text-foreground">Huéspedes en Hospedaje</h3>
                 <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-[#C69C4B]/15 text-[#C69C4B]">
-                  {checkIns.length} activos
+                  {reservationQuery.totalItems} {searchTerm ? 'encontrados' : 'activos'}
                 </span>
               </div>
               <div className="relative">
@@ -367,7 +346,7 @@ export default function CheckOutPage() {
                 <Input
                   placeholder="Buscar huésped o habitación..."
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  maxLength={100} aria-label="Buscar hospedajes" onChange={(e) => { setSearchTerm(e.target.value); setReservationPage(1) }}
                   className="pl-8 text-xs h-8"
                 />
               </div>
@@ -412,7 +391,10 @@ export default function CheckOutPage() {
                 </div>
               )}
             </div>
+            <Pagination currentPage={reservationQuery.page} totalPages={reservationQuery.totalPages} totalItems={reservationQuery.totalItems} pageSize={10}
+              disabled={loadingList} onPageChange={setReservationPage} />
           </div>
+          {reservationQuery.error && <InlineAlert variant="error" message="No se pudo consultar hospedajes. Usa Actualizar Lista para reintentar." />}
         </div>
 
         {/* Right column: Folio Breakdown, Payment, & Invoicing */}
@@ -618,18 +600,7 @@ export default function CheckOutPage() {
                   </h3>
 
                   <div>
-                    <label className="text-xs text-muted-foreground">Autorización Fiscal CAI *</label>
-                    <select
-                      value={selectedCaiId}
-                      onChange={(e) => setSelectedCaiId(e.target.value)}
-                      className="w-full border border-input rounded-md px-2.5 py-1.5 text-xs bg-background mt-1"
-                    >
-                      {caiList.map((c) => (
-                        <option key={c.id} value={c.id}>
-                          {c.caiNumber} (Vence: {c.dueDate})
-                        </option>
-                      ))}
-                    </select>
+                    <PagedSelect<AuthorizationOption> label="Autorización de factura" path="/document-authorizations/options/paged" params={{ source: 'cai', activeOnly: 'true' }} value={selectedCaiId} onChange={setSelectedCaiId} getLabel={row => row.caiNumber} disabled={actionLoading} />
                   </div>
 
                   <div>
@@ -745,17 +716,7 @@ export default function CheckOutPage() {
                     {paymentMethod === 'Efectivo' && (
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-3 bg-muted/20 rounded-lg border border-border/80">
                         <div className="sm:col-span-2">
-                          <label className="text-[11px] font-semibold text-muted-foreground">Caja abierta *</label>
-                          <select
-                            value={selectedCashRegisterId}
-                            onChange={(e) => setSelectedCashRegisterId(e.target.value)}
-                            className="w-full border border-input rounded-md px-2.5 py-1.5 text-xs bg-background mt-1"
-                          >
-                            <option value="">Seleccione una caja</option>
-                            {cashRegisters.map((register) => (
-                              <option key={register.id} value={register.id}>{register.name}</option>
-                            ))}
-                          </select>
+                          <PagedSelect<CashRegister> label="Caja para el cobro" path="/cash-registers/paged" params={{ openOnly: 'true' }} value={selectedCashRegisterId} onChange={setSelectedCashRegisterId} getLabel={row => `${row.name} (L ${row.currentBalance.toFixed(2)})`} disabled={actionLoading} />
                         </div>
                         <div>
                           <label className="text-[11px] font-semibold text-muted-foreground">Efectivo Recibido (L)</label>

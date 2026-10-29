@@ -47,6 +47,7 @@ namespace hotel_erp.Api.Controllers
 
         [HttpPost]
         [Authorize(Policy = PermissionNames.ManageTaxes)]
+        [ProducesResponseType(typeof(CAIDto), StatusCodes.Status201Created)]
         public async Task<ActionResult<CAIDto>> Create([FromBody] CreateCAIRequest request)
         {
             var existing = await _repo.GetByCAINumberAsync(request.CAINumber);
@@ -73,6 +74,7 @@ namespace hotel_erp.Api.Controllers
 
         [HttpDelete("{id}")]
         [Authorize(Policy = PermissionNames.ManageTaxes)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<ActionResult> Delete(Guid id)
         {
             await _repo.DeleteAsync(id);

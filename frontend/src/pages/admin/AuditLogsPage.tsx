@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { usePagedList, useDebouncedValue } from '@/hooks/usePagedList'
 import type { ApiAuditLog as AuditLog } from '@/types/api'
+import type { AuditIntegrity as IntegrityResult } from '@/types'
 import api from '@/lib/axios'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -21,14 +22,6 @@ import {
   Download,
 } from 'lucide-react'
 
-interface IntegrityResult {
-  isValid: boolean
-  totalRecordsVerified: number
-  verifiedAt: string
-  errorMessage?: string | null
-  errorCode?: string | null
-  brokenLogId?: string | null
-}
 
 export default function AuditLogsPage() {
   const [verifying, setVerifying] = useState(false)

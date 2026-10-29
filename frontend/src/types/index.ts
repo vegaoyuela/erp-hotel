@@ -2,58 +2,17 @@ import type { components } from './api.generated'
 
 import type { ApiResponse as Wire } from './api'
 
-export interface User {
-  id: string
-  username: string
-  email: string
-  firstName: string
-  lastName: string
-  isActive: boolean
-  mustChangePassword: boolean
-  roles: string[]
-  permissions: string[]
-}
+export type User = Wire<components['schemas']['UserDto']>
 
-export interface AuthResponse {
-  success: boolean
-  message?: string
-  accessToken?: string
-  expiresAt?: string
-  user?: User
-}
+export type AuthResponse = Wire<components['schemas']['AuthResponse']>
 
-export interface LoginRequest {
-  username: string
-  password: string
-}
+export type LoginRequest = components['schemas']['LoginRequest']
 
-export interface RegisterRequest {
-  username: string
-  password: string
-  email: string
-  firstName: string
-  lastName: string
-}
+export type RegisterRequest = components['schemas']['RegisterRequest']
 
-export interface RoomType {
-  id: string
-  name: string
-  description?: string
-  pricePerNight: number
-  capacity: number
-}
+export type RoomType = Wire<components['schemas']['RoomTypeDto']>
 
-export interface Room {
-  id: string
-  roomNumber: string
-  floor: number
-  roomTypeId: string
-  roomTypeName: string
-  status: string
-  observations?: string
-  pricePerNight: number
-  capacity: number
-}
+export type Room = Wire<components['schemas']['RoomDto']>
 
 export type Reservation = Wire<components['schemas']['ReservationDto']>
 
@@ -67,17 +26,7 @@ export type Product = Wire<components['schemas']['ProductDto']>
 
 export type InventoryMovement = Wire<components['schemas']['InventoryMovementDto']>
 
-export interface CAI {
-  id: string
-  caiNumber: string
-  issueDate: string
-  dueDate: string
-  initialRange: string
-  finalRange: string
-  currentCorrelative: string
-  status: string
-  isExpiringSoon: boolean
-}
+export type CAI = Wire<components['schemas']['CAIDto']>
 
 export type Invoice = Wire<components['schemas']['InvoiceDto']>
 
@@ -86,61 +35,13 @@ export type InvoiceItem = Omit<InvoiceItemResponse, 'id' | 'originalInvoiceItemI
 
 export type CashRegister = Wire<components['schemas']['CashRegisterDto']>
 
-export interface PaymentApplication {
-  id: string
-  invoiceId: string
-  correlativeNumber: string
-  amount: number
-}
+export type PaymentApplication = Wire<components['schemas']['PaymentApplicationDto']>
 
-export interface RefundApplication {
-  id: string
-  creditNoteId: string
-  creditNoteCorrelativeNumber: string
-  amount: number
-}
+export type RefundApplication = Wire<components['schemas']['RefundApplicationDto']>
 
-export interface Refund {
-  id: string
-  refundNumber: string
-  paymentId: string
-  paymentNumber: string
-  recordedByUserId: string
-  recordedByUserName: string
-  method: 'Efectivo' | 'Tarjeta' | 'Transferencia'
-  currency: 'HNL'
-  amount: number
-  externalReference?: string | null
-  reason: string
-  refundDate: string
-  status: 'Confirmado' | 'Anulado'
-  cashRegisterId?: string | null
-  cashRegisterName?: string | null
-  accountingEntryId?: string | null
-  applications: RefundApplication[]
-}
+export type Refund = Wire<components['schemas']['RefundDto']>
 
-export interface Payment {
-  id: string
-  paymentNumber: string
-  recordedByUserId: string
-  recordedByUserName: string
-  method: 'Efectivo' | 'Tarjeta' | 'Transferencia'
-  currency: 'HNL'
-  amount: number
-  cashReceived?: number | null
-  cashChange?: number | null
-  externalReference?: string | null
-  paymentDate: string
-  status: 'Confirmado' | 'Anulado' | 'ParcialmenteReembolsado' | 'Reembolsado'
-  cashRegisterId?: string | null
-  cashRegisterName?: string | null
-  accountingEntryId?: string | null
-  refundedAmount: number
-  cardSettledAmount: number
-  applications: PaymentApplication[]
-  refunds: Refund[]
-}
+export type Payment = Wire<components['schemas']['PaymentDto']>
 
 export type EligibleCardPayment = Wire<components['schemas']['EligibleCardPaymentDto']>
 
@@ -150,186 +51,38 @@ export type CardSettlement = Wire<components['schemas']['CardSettlementDto']>
 
 export type CashMovement = Wire<components['schemas']['CashMovementDto']>
 
-export interface DocumentAuthorization {
-  id: string
-  documentType: string
-  caiNumber: string
-  issueDate: string
-  dueDate: string
-  initialRange: string
-  finalRange: string
-  currentCorrelative: string
-  status: string
-  isExpiringSoon: boolean
-  hasAttachment: boolean
-}
+export type DocumentAuthorization = Wire<components['schemas']['DocumentAuthorizationDto']>
 
-export interface BusinessSettings {
-  businessName: string
-  rtn: string
-  address: string
-  phone: string
-  email: string
-  logoBase64?: string
-  footer: string
-  isvRate: number
-  touristTaxRate: number
-  fiscalProfileStatus: 'Borrador' | 'Aprobado' | 'Retirado'
-  fiscalProfileVersion: number
-  fiscalValidFrom?: string
-  fiscalValidUntil?: string
-  fiscalApprovedAt?: string
-  fiscalApprovedByUserId?: string
-  fiscalApprovalNote?: string
-  fiscalRetiredAt?: string
-  fiscalRetiredByUserId?: string
-  fiscalRetirementReason?: string
-  fiscalDecisionManifestSha256?: string
-  fiscalEvidenceReference?: string
-  printPrinterName?: string
-  printWidth: number
-  printLogoHeight: number
-  printFontSize: string
-  printLineSpacing: number
-  showLogo: boolean
-  showHeader: boolean
-  showFiscal: boolean
-  showGuest: boolean
-  showItems: boolean
-  showTotals: boolean
-  showPayment: boolean
-  showFooter: boolean
-  headerAlign: string
-  separatorChar: string
-  marginLeft: number
-}
+export type BusinessSettings = Wire<components['schemas']['BusinessSettingsDto']>
 
-export interface FiscalProfileRevision {
-  version: number
-  status: 'Aprobado' | 'Retirado'
-  validFrom: string
-  validUntil?: string
-  decisionManifestSha256: string
-  evidenceReference: string
-  snapshotSha256: string
-  approvedAt: string
-  approvedByUserId: string
-  approvalNote: string
-  retiredAt?: string
-  retiredByUserId?: string
-  retirementReason?: string
-}
+export type FiscalProfileRevision = Wire<components['schemas']['FiscalProfileRevisionDto']>
 
-export interface InvoicePrintData {
-  header: { logo: string; hotel: string; rtn: string; direccion: string; telefono: string }
-  tipo: string
-  factura: { cai: string; correlativo: string; rango: string; fecha: string; fechaLimite: string }
-  cliente: { nombre: string; rtn: string; checkIn?: string; checkOut?: string }
-  items: { desc: string; cant: number; precio: number; total: number }[]
-  totales: { subtotal: number; isv: number; tasaTuristico: number; descuentos?: number; total: number }
-  pago: { metodo: string; efectivoRecibido?: number; cambio?: number; letras: string }
-  footer: string
-}
 
-export interface AccountingAccount {
-  id: string
-  accountNumber: string
-  accountName: string
-  accountType: string
-  parentAccountId?: string
-  isActive: boolean
-  balance: number
-  children: AccountingAccount[]
-}
+export type AccountingAccount = Wire<components['schemas']['AccountingAccountDto']>
 
 export type AccountingEntry = Wire<components['schemas']['AccountingEntryDto']>
 
 export type EntryItem = Wire<components['schemas']['EntryItemDto']>
 
-export interface DashboardStat {
-  title: string
-  value: string
-  trend?: string
-}
+export type DashboardStat = Wire<components['schemas']['DashboardStatDto']>
 
-export interface DashboardAlert {
-  title: string
-  description: string
-  severity: string
-}
+export type DashboardAlert = Wire<components['schemas']['DashboardAlertDto']>
 
-export interface DashboardInvoice {
-  correlativeNumber: string
-  customerName: string
-  totalAmount: number
-  status: string
-  invoiceDate: string
-}
+export type DashboardInvoice = Wire<components['schemas']['DashboardInvoiceDto']>
 
-export interface DashboardReservation {
-  guestName: string
-  roomNumber: string
-  status: string
-  checkInDate: string
-  checkOutDate: string
-}
+export type DashboardReservation = Wire<components['schemas']['DashboardReservationDto']>
 
-export interface DashboardCash {
-  registerName: string
-  balance: number
-}
+export type DashboardCash = Wire<components['schemas']['DashboardCashDto']>
 
-export interface DashboardSummary {
-  stats: DashboardStat[]
-  alerts: DashboardAlert[]
-  recentInvoices: DashboardInvoice[]
-  upcomingReservations: DashboardReservation[]
-  cash?: DashboardCash | null
-  occupiedRooms: number
-  freeRooms: number
-  pendingCheckIns: number
-  pendingCheckOuts: number
-}
+export type DashboardSummary = Wire<components['schemas']['DashboardSummaryDto']>
 
-export interface TrialBalanceItem {
-  accountId: string
-  accountNumber: string
-  accountName: string
-  accountType: string
-  previousBalance: number
-  debit: number
-  credit: number
-  balance: number
-}
+export type TrialBalanceItem = Wire<components['schemas']['TrialBalanceItem']>
 
-export interface AccountMovement {
-  date: string
-  description: string
-  debit: number
-  credit: number
-  balance: number
-  referenceType: string
-}
+export type AccountMovement = Wire<components['schemas']['AccountMovementDto']>
 
-export interface CreateAccountRequest {
-  accountNumber: string
-  accountName: string
-  accountType: string
-  parentAccountId?: string
-}
+export type CreateAccountRequest = components['schemas']['CreateAccountRequest']
 
-export interface Discount {
-  id: string
-  name: string
-  description?: string
-  discountType: string
-  value: number
-  isActive: boolean
-  applicableTo?: string
-  requiresDocument: boolean
-  minAge?: number
-  priority: number
-}
+export type Discount = Wire<components['schemas']['DiscountDto']>
 
 export type FolioItem = Wire<components['schemas']['FolioItemDto']>
 
@@ -337,29 +90,11 @@ export type Folio = Wire<components['schemas']['FolioDto']>
 
 export type BackupLog = Wire<components['schemas']['BackupLogDto']>
 
-export interface Role {
-  id: string
-  name: string
-  description?: string
-  permissions?: string[]
-}
+export type Role = Wire<components['schemas']['RoleDto']>
 
-export interface CreateUserRequest {
-  username: string
-  password: string
-  email: string
-  firstName: string
-  lastName: string
-  roles?: string[]
-}
+export type CreateUserRequest = components['schemas']['CreateUserRequest']
 
-export interface UpdateUserRequest {
-  firstName?: string
-  lastName?: string
-  email?: string
-  isActive?: boolean
-  roles?: string[]
-}
+export type UpdateUserRequest = components['schemas']['UpdateUserRequest']
 
 export type FolioList = Wire<components['schemas']['FolioListDto']>
 export type InventorySummary = Wire<components['schemas']['InventorySummaryDto']>
@@ -371,3 +106,12 @@ export type AccountingEntryList = Wire<components['schemas']['AccountingEntryLis
 export type JournalSummary = Wire<components['schemas']['JournalSummaryDto']>
 
 export type EligibleCardSummary = Wire<components['schemas']['EligibleCardSummaryDto']>
+
+export type AuthorizationOption = Wire<components['schemas']['AuthorizationOptionDto']>
+
+export type GuestStats = Wire<components['schemas']['GuestStatsDto']>
+
+export type CheckInResult = Wire<components['schemas']['CheckInResult']>
+
+export type PrintPreview = Wire<components['schemas']['PrintPreviewDto']>
+export type AuditIntegrity = Wire<components['schemas']['AuditIntegrityResult']>

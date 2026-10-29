@@ -80,6 +80,7 @@ public class InvoicesController(
 
     [HttpPost]
     [Authorize(Policy = PermissionNames.CreateInvoices)]
+    [ProducesResponseType(typeof(InvoiceDto), StatusCodes.Status201Created)]
     public async Task<ActionResult<InvoiceDto>> Create(
         [FromBody] CreateInvoiceRequest request,
         [FromHeader(Name = "Idempotency-Key")] string? idempotencyKey)
@@ -98,6 +99,8 @@ public class InvoicesController(
 
     [HttpPost("{id}/cancel")]
     [Authorize(Policy = PermissionNames.CreateInvoices)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult> Cancel(Guid id)
     {
         var invoice = await repository.GetByIdAsync(id);
@@ -109,6 +112,7 @@ public class InvoicesController(
 
     [HttpPost("{id}/credit-note")]
     [Authorize(Policy = PermissionNames.CreateInvoices)]
+    [ProducesResponseType(typeof(InvoiceDto), StatusCodes.Status201Created)]
     public async Task<ActionResult<InvoiceDto>> CreateCreditNote(
         Guid id,
         [FromBody] CreateCreditNoteRequest request,
@@ -129,6 +133,7 @@ public class InvoicesController(
 
     [HttpPost("{id}/debit-note")]
     [Authorize(Policy = PermissionNames.CreateInvoices)]
+    [ProducesResponseType(typeof(InvoiceDto), StatusCodes.Status201Created)]
     public async Task<ActionResult<InvoiceDto>> CreateDebitNote(
         Guid id,
         [FromBody] CreateDebitNoteRequest request,

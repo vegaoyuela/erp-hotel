@@ -362,7 +362,8 @@ app.UseAuthorization();
 app.MapControllers();
 
 // Health check
-app.MapGet("/health", (IHotelClock clock) => Results.Ok(new { status = "healthy", timestamp = clock.UtcNow }))
+app.MapGet("/health", (IHotelClock clock) => Results.Ok(new hotel_erp.Api.Dtos.Common.HealthResponseDto("healthy", clock.UtcNow)))
+    .Produces<hotel_erp.Api.Dtos.Common.HealthResponseDto>().WithName("Health_Get")
     .AllowAnonymous();
 
 if (!app.Environment.IsDevelopment() && !string.IsNullOrWhiteSpace(app.Environment.WebRootPath) && Directory.Exists(app.Environment.WebRootPath))

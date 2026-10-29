@@ -41,6 +41,7 @@ public class PurchaseInvoicesController(
             await repository.GetByDateRangeAsync(start, end)));
 
     [HttpPost]
+    [ProducesResponseType(typeof(PurchaseInvoiceDto), StatusCodes.Status201Created)]
     public async Task<ActionResult<PurchaseInvoiceDto>> Create([FromBody] CreatePurchaseInvoiceRequest request)
     {
         var result = await purchaseService.CreateAsync(CurrentUserId(), request, HttpContext.RequestAborted);
@@ -52,6 +53,7 @@ public class PurchaseInvoicesController(
     }
 
     [HttpPut("{id}/pay")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<ActionResult> MarkAsPaid(Guid id)
     {
         var result = await purchaseService.MarkAsPaidAsync(id, CurrentUserId(), HttpContext.RequestAborted);
@@ -59,6 +61,7 @@ public class PurchaseInvoicesController(
     }
 
     [HttpDelete("{id}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<ActionResult> Delete(Guid id)
     {
         var result = await purchaseService.DeleteAsync(id, CurrentUserId(), HttpContext.RequestAborted);

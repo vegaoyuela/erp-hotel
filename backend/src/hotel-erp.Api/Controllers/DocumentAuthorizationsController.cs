@@ -1,3 +1,4 @@
+using hotel_erp.Api.Infrastructure;
 using AutoMapper;
 using hotel_erp.Api.Authorization;
 using hotel_erp.Api.Dtos.Common;
@@ -19,13 +20,17 @@ namespace hotel_erp.Api.Controllers
         private readonly AuthorizationAttachmentStore _attachmentStore;
 
         private readonly IUnitOfWork _unitOfWork;
+        private readonly HotelListQueryService _lists;
+        private readonly IHotelClock _clock;
 
         public DocumentAuthorizationsController(
             IDocumentAuthorizationRepository repo,
             IMapper mapper,
-            AuthorizationAttachmentStore attachmentStore, IUnitOfWork unitOfWork)
+            AuthorizationAttachmentStore attachmentStore, IUnitOfWork unitOfWork, HotelListQueryService lists, IHotelClock clock)
         {
             _unitOfWork = unitOfWork;
+            _lists = lists;
+            _clock = clock;
             _repo = repo;
             _mapper = mapper;
             _attachmentStore = attachmentStore;
@@ -34,6 +39,10 @@ namespace hotel_erp.Api.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<DocumentAuthorizationDto>>> GetAll()
             => Ok(_mapper.Map<IEnumerable<DocumentAuthorizationDto>>(await _repo.GetAllAsync()));
+
+        [HttpGet("options/paged")]
+        public async Task<ActionResult<PagedResult<AuthorizationOptionDto>>> GetOptionsPage([FromQuery] AuthorizationPageQuery query)
+            => Ok(await _lists.AuthorizationsAsync(query, _clock.Today, HttpContext.RequestAborted));
 
         [HttpGet("active/{documentType}")]
         public async Task<ActionResult<DocumentAuthorizationDto>> GetActive(string documentType)
@@ -56,6 +65,7 @@ namespace hotel_erp.Api.Controllers
 
         [HttpPost]
         [Authorize(Policy = PermissionNames.ManageTaxes)]
+        [ProducesResponseType(typeof(DocumentAuthorizationDto), StatusCodes.Status201Created)]
         public async Task<ActionResult<DocumentAuthorizationDto>> Create([FromBody] CreateDocumentAuthorizationRequest request)
         {
             if (!Enum.TryParse<InvoiceDocumentType>(request.DocumentType, out var type)
@@ -84,6 +94,7 @@ namespace hotel_erp.Api.Controllers
 
         [HttpDelete("{id}")]
         [Authorize(Policy = PermissionNames.ManageTaxes)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<ActionResult> Delete(Guid id)
         {
             await _repo.DeleteAsync(id);
@@ -94,6 +105,7 @@ namespace hotel_erp.Api.Controllers
         [HttpPost("with-file")]
         [Authorize(Policy = PermissionNames.ManageTaxes)]
         [Consumes("multipart/form-data")]
+        [ProducesResponseType(typeof(DocumentAuthorizationDto), StatusCodes.Status201Created)]
         public async Task<ActionResult<DocumentAuthorizationDto>> CreateWithFile(
             [FromForm] CreateDocumentAuthorizationRequest request,
             IFormFile? file,
@@ -153,6 +165,7 @@ namespace hotel_erp.Api.Controllers
 
         [HttpGet("{id}/file")]
         [Authorize(Policy = PermissionNames.ManageTaxes)]
+        [ApiFileResponse("application/pdf")]
         public async Task<ActionResult> GetFile(Guid id)
         {
             var authorization = await _repo.GetByIdAsync(id);

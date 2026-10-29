@@ -53,6 +53,7 @@ namespace hotel_erp.Api.Controllers
 
         [HttpPost]
         [Authorize(Policy = PermissionNames.ManageReservations)]
+        [ProducesResponseType(typeof(CustomerDto), StatusCodes.Status201Created)]
         public async Task<ActionResult<CustomerDto>> Create([FromBody] CreateCustomerRequest request)
         {
             if (!string.IsNullOrEmpty(request.RTN))
@@ -88,6 +89,7 @@ namespace hotel_erp.Api.Controllers
 
         [HttpPut("{id}")]
         [Authorize(Policy = PermissionNames.ManageReservations)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<ActionResult> Update(Guid id, [FromBody] UpdateCustomerRequest request)
         {
             var entity = await _repo.GetByIdAsync(id);
@@ -115,6 +117,7 @@ namespace hotel_erp.Api.Controllers
 
         [HttpDelete("{id}")]
         [Authorize(Policy = PermissionNames.ManageReservations)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<ActionResult> Delete(Guid id)
         {
             var invoices = await _invoiceRepo.GetByCustomerAsync(id);

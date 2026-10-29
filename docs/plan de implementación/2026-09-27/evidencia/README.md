@@ -219,3 +219,22 @@ Seis colecciones paginadas, totales globales SQL y selección de cobros entre p�
 | [p02h2b-qa-resumen.json](p02h2b-qa-resumen.json) | Resumen y hashes de código, contrato, pruebas y evidencia. |
 
 El [detalle H2B](../p02-base-tecnica/p02-h2b-finanzas-respaldos.md) conserva permisos, límites y H2C. Windows e impresión siguen pendientes por decisión del usuario; el recordatorio diario permanece activo.
+
+### P02-H2C — selectores y contratos (29 de octubre de 2026)
+
+Selección paginada para operación/fiscal/caja, contrato completo de éxitos y tipos compartidos generados. P02-05 completada en código/QA; P02-04 sigue parcial por administración y límites de conjuntos restantes.
+
+| Archivo | Resultado |
+|---|---|
+| [p02h2c-qa.log](p02h2c-qa.log) | QA final completa: 109 unitarias, 5 integraciones PostgreSQL, 5 validaciones del expediente, auditorías npm sin alertas, contrato, lint y build. |
+| [p02h2c-qa-inicial.log](p02h2c-qa-inicial.log) | Ejecución previa: backend aprobado; imports frontend sin uso corregidos antes de la QA final. |
+| [p02h2c-ui-qa.log](p02h2c-ui-qa.log) | Comprobación adicional frontend/contrato; la QA final incluye el último ajuste compacto. |
+| [p02h2c-modelo-ef.log](p02h2c-modelo-ef.log) | Sin migración adicional. |
+| [p02h2c-base-qa.json](p02h2c-base-qa.json) | Base original preservada: 42 tablas, 345 filas, 11 migraciones y cero bases temporales. |
+| [p02h2c-selectores.json](p02h2c-selectores.json) | 65 autorizaciones sintéticas, filtros de vigencia/tipo/fuente/caja, cero éxitos sin esquema y ocho binarios. |
+| [p02h2c-inventario-contratos.json](p02h2c-inventario-contratos.json) | Respuestas completas, 28 interfaces migradas y 19 arrays restantes clasificados. |
+| [p02h2c-impeccable.json](p02h2c-impeccable.json) | Detector sobre nueve archivos UI: cero hallazgos. |
+| [ui-p02h2c/resultado.json](ui-p02h2c/resultado.json) | Seis flujos, ocho capturas, cero errores JavaScript y cero mutaciones de negocio durante QA UI. |
+| [p02h2c-qa-resumen.json](p02h2c-qa-resumen.json) | Resumen y hashes de fuentes, contrato, pruebas y evidencia. |
+
+El [detalle H2C](../p02-base-tecnica/p02-h2c-selectores-contratos.md) conserva el anexo de navegación y límites. Continúan seguridad, matriz formal, revisión independiente, Windows e impresión; las pruebas no equivalen a aprobación SAR.

@@ -604,7 +604,7 @@ export default function InventoryPage() {
               </select>
               {lookupQuery.loading && <p className="mt-1 text-xs text-muted-foreground" role="status">Buscando productos…</p>}
               {!lookupQuery.loading && lookupQuery.totalItems === 0 && <p className="mt-1 text-xs text-muted-foreground">No hay productos con esa búsqueda.</p>}
-              <Pagination currentPage={lookupQuery.page} totalPages={lookupQuery.totalPages} totalItems={lookupQuery.totalItems} pageSize={10}
+              <Pagination compact currentPage={lookupQuery.page} totalPages={lookupQuery.totalPages} totalItems={lookupQuery.totalItems} pageSize={10}
                 disabled={lookupQuery.loading} onPageChange={setProductLookupPage} />
             </div>
 

@@ -40,6 +40,7 @@ namespace hotel_erp.Api.Controllers
 
         [HttpPost]
         [Authorize(Policy = PermissionNames.ManageSettings)]
+        [ProducesResponseType(typeof(DiscountDto), StatusCodes.Status201Created)]
         public async Task<ActionResult<DiscountDto>> Create([FromBody] CreateDiscountRequest request)
         {
             var entity = new Discount
@@ -61,6 +62,7 @@ namespace hotel_erp.Api.Controllers
 
         [HttpPut("{id}")]
         [Authorize(Policy = PermissionNames.ManageSettings)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<ActionResult> Update(Guid id, [FromBody] UpdateDiscountRequest request)
         {
             var entity = await _repo.GetByIdAsync(id);
@@ -83,6 +85,7 @@ namespace hotel_erp.Api.Controllers
 
         [HttpDelete("{id}")]
         [Authorize(Policy = PermissionNames.ManageSettings)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<ActionResult> Delete(Guid id)
         {
             await _repo.DeleteAsync(id);

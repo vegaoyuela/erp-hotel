@@ -8,9 +8,11 @@
 
 La implementación comenzó el 27 de septiembre de 2026. El trabajo ejecutable de P00 está completado y documentado en [la evidencia de línea base](evidencia/README.md): respaldo y restauración de la base sintética, inventario, manifiesto, limpieza del repositorio y QA completa aprobada. En P01 ya están implementados el expediente externo validable, N01–N06 automatizadas y el historial inmutable de aprobaciones fiscales. G0 permanece abierta hasta recibir la base y los adjuntos oficiales; G1 permanece abierta hasta que gerente y contador resuelvan DEC-01–DEC-15 y firmen el expediente real.
 
-El 29 de octubre de 2026 se completó el alcance [P02-H2A](p02-base-tecnica/p02-h2a-operacion-inventario.md): paginación de operación/inventario, contratos tipados y QA con capturas. P02 sigue abierta por contratos, selectores y seguridad pendientes. A petición del usuario, Windows 11 e impresión física se retoman próximamente; tienen recordatorio diario a las 10:00 de Honduras hasta completar ambas.
+El 29 de octubre de 2026 se completó el alcance [P02-H2A](p02-base-tecnica/p02-h2a-operacion-inventario.md): paginación de operación/inventario, contratos tipados y QA con capturas. P02 sigue abierta por los pendientes que se detallan en la lista maestra. A petición del usuario, Windows 11 e impresión física se retoman próximamente; tienen recordatorio diario a las 10:00 de Honduras hasta completar ambas.
 
-La entrega [P02-H2B](p02-base-tecnica/p02-h2b-finanzas-respaldos.md), del 29 de octubre, completa las seis consultas financieras/de respaldo previstas y verifica una liquidación sintética con cobros seleccionados entre páginas. El siguiente bloque H2C cubre selectores y contratos restantes; G2 continúa abierta.
+La entrega [P02-H2B](p02-base-tecnica/p02-h2b-finanzas-respaldos.md), del 29 de octubre, completa las seis consultas financieras/de respaldo previstas y verifica una liquidación sintética con cobros seleccionados entre páginas. Al cierre de H2B, H2C quedaba previsto para selectores y contratos; su resultado se registra a continuación.
+
+La entrega [P02-H2C](p02-base-tecnica/p02-h2c-selectores-contratos.md) completa los selectores principales y los tipos compartidos derivados del contrato; todos los éxitos 200/201 tienen esquema. QA completa y ocho capturas aprobadas. P02-05 queda completada en código/QA; siguen pendientes seguridad, paginación administrativa/límites restantes, matriz formal y revisión independiente. G2 permanece abierta.
 
 ## Resultado esperado
 

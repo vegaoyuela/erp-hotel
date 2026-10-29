@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-r
 import { Button } from './button'
 
 interface PaginationProps {
+  compact?: boolean
   disabled?: boolean
   currentPage: number
   totalPages: number
@@ -22,6 +23,7 @@ export function Pagination({
   onPageSizeChange,
   pageSizeOptions = [10, 15, 25, 50, 100],
   disabled = false,
+  compact = false,
 }: PaginationProps) {
   if (totalItems === 0) return null
 
@@ -45,7 +47,7 @@ export function Pagination({
   }
 
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-3.5 py-3 border-t border-border bg-card/60 text-xs text-muted-foreground select-none">
+    <div className={`flex ${compact ? 'flex-col' : 'flex-col sm:flex-row'} items-center justify-between gap-3 px-3.5 py-3 border-t border-border bg-card/60 text-xs text-muted-foreground select-none`}>
       <div className="flex items-center gap-2">
         <span aria-live="polite">
           Mostrando <strong className="text-foreground font-semibold">{startItem}</strong> -{' '}
@@ -74,6 +76,7 @@ export function Pagination({
 
       <div className="flex items-center gap-1">
         <Button
+          type="button"
           size="sm"
           variant="outline"
           onClick={() => onPageChange(1)}
@@ -84,6 +87,7 @@ export function Pagination({
           <ChevronsLeft size={14} />
         </Button>
         <Button
+          type="button"
           size="sm"
           variant="outline"
           onClick={() => onPageChange(currentPage - 1)}
@@ -95,9 +99,10 @@ export function Pagination({
         </Button>
 
         <div className="flex items-center gap-1 px-1">
-          {getPageNumbers().map((page, idx) =>
+          {(compact ? [currentPage] : getPageNumbers()).map((page, idx) =>
             typeof page === 'number' ? (
               <Button
+          type="button"
                 key={idx}
                 disabled={disabled}
                 aria-current={currentPage === page ? 'page' : undefined}
@@ -119,6 +124,7 @@ export function Pagination({
         </div>
 
         <Button
+          type="button"
           size="sm"
           variant="outline"
           onClick={() => onPageChange(currentPage + 1)}
@@ -129,6 +135,7 @@ export function Pagination({
           <ChevronRight size={14} />
         </Button>
         <Button
+          type="button"
           size="sm"
           variant="outline"
           onClick={() => onPageChange(totalPages)}

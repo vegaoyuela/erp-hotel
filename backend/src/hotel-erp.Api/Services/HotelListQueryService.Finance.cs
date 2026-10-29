@@ -8,9 +8,13 @@ namespace hotel_erp.Api.Services;
 
 public sealed partial class HotelListQueryService
 {
-    public async Task<PagedResult<CashRegisterDto>> CashRegistersAsync(SearchPageQuery request, CancellationToken token)
+    public async Task<PagedResult<CashRegisterDto>> CashRegistersAsync(CashRegisterPageQuery request, CancellationToken token)
     {
         var query = context.CashRegisters.AsNoTracking();
+        if (request.OpenOnly)
+            query = query.Where(register => register.IsActive && register.CashMovements
+                .OrderByDescending(movement => movement.CreatedAt).ThenByDescending(movement => movement.Id)
+                .Select(movement => movement.MovementType != CashMovementType.Cierre).FirstOrDefault());
         if (!string.IsNullOrWhiteSpace(request.Search))
         {
             var term = request.Search.Trim().ToLower();

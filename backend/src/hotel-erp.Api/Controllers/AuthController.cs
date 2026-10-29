@@ -101,6 +101,7 @@ namespace hotel_erp.Api.Controllers
 
         [Authorize]
         [HttpPost("logout")]
+        [ProducesResponseType(typeof(MessageResponseDto), StatusCodes.Status200OK)]
         public async Task<ActionResult> Logout()
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -121,6 +122,7 @@ namespace hotel_erp.Api.Controllers
         [Authorize]
         [HttpPost("change-password")]
         [EnableRateLimiting(AuthenticationRateLimitPolicyNames.ChangePassword)]
+        [ProducesResponseType(typeof(MessageResponseDto), StatusCodes.Status200OK)]
         public async Task<ActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -152,6 +154,7 @@ namespace hotel_erp.Api.Controllers
 
         [HttpGet("me")]
         [Authorize]
+        [ProducesResponseType(typeof(CurrentUserDto), StatusCodes.Status200OK)]
         public ActionResult GetCurrentUser()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);

@@ -17,6 +17,9 @@ const PAPER_PRESETS = [
 const defaults: BusinessSettings = {
   businessName: '', rtn: '', address: '', phone: '', email: '', footer: '',
   isvRate: 0, touristTaxRate: 0, fiscalProfileStatus: 'Borrador', fiscalProfileVersion: 1,
+  logoBase64: null, fiscalValidFrom: null, fiscalValidUntil: null, fiscalApprovedAt: null, fiscalApprovedByUserId: null,
+  fiscalApprovalNote: null, fiscalRetiredAt: null, fiscalRetiredByUserId: null, fiscalRetirementReason: null,
+  fiscalDecisionManifestSha256: null, fiscalEvidenceReference: null,
   printPrinterName: '',
   printWidth: 46, printLogoHeight: 40, printFontSize: 'condensed', printLineSpacing: 1,
   showLogo: true, showHeader: true, showFiscal: false, showGuest: true,

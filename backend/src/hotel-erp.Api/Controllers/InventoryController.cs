@@ -51,6 +51,7 @@ public class InventoryController(
     }
 
     [HttpPut("categories/{id}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<ActionResult> UpdateCategory(Guid id, [FromBody] UpdateCategoryRequest request)
     {
         var result = await inventoryService.UpdateCategoryAsync(
@@ -62,6 +63,7 @@ public class InventoryController(
     }
 
     [HttpDelete("categories/{id}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<ActionResult> DeleteCategory(Guid id)
     {
         var result = await inventoryService.DeleteCategoryAsync(id, CurrentUserId(), HttpContext.RequestAborted);
@@ -123,6 +125,7 @@ public class InventoryController(
     }
 
     [HttpPut("products/{id}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<ActionResult> UpdateProduct(Guid id, [FromBody] UpdateProductRequest request)
     {
         var result = await inventoryService.UpdateProductAsync(
@@ -134,6 +137,7 @@ public class InventoryController(
     }
 
     [HttpDelete("products/{id}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<ActionResult> DeleteProduct(Guid id)
     {
         var result = await inventoryService.DeleteProductAsync(id, CurrentUserId(), HttpContext.RequestAborted);

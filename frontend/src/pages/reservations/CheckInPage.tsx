@@ -2,16 +2,15 @@ import { useState, useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import api from '@/lib/axios'
 import { getApiErrorMessage } from '@/lib/errors'
-import type { Guest, Reservation, Room } from '@/types'
+import type { Guest, Reservation, Room, Discount, GuestStats, CheckInResult } from '@/types'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { InlineAlert } from '@/components/ui/InlineAlert'
 import { AlertCircle, BarChart3, Star } from 'lucide-react'
+import { usePagedList } from '@/hooks/usePagedList'
+import { Pagination } from '@/components/ui/Pagination'
 import { useTaxRates } from '@/hooks/useTaxRates'
 
-interface Discount { id: string; name: string; description?: string; discountType: string; value: number; isActive: boolean; requiresDocument?: boolean; minAge?: number }
-interface GuestStats { totalVisits: number; classification: string; lastVisit?: string; isFrequent: boolean }
-interface CheckInResult { folioId: string; total: number }
 
 function calculateAge(dob: string | null) {
   if (!dob) return 0;
@@ -45,7 +44,10 @@ export default function CheckInPage() {
   const [availableRooms, setAvailableRooms] = useState<Room[]>([])
   const [guestForm, setGuestForm] = useState(defaultForm)
   const [searchTerm, setSearchTerm] = useState('')
-  const [foundGuests, setFoundGuests] = useState<Guest[]>([])
+  const [appliedSearch, setAppliedSearch] = useState('')
+  const [guestPage, setGuestPage] = useState(1)
+  const guestQuery = usePagedList<Guest>('/guests/paged', { search: appliedSearch, page: guestPage, pageSize: 10 }, { enabled: !!appliedSearch && step === 1 })
+  const foundGuests = guestQuery.items
   const [selectedGuest, setSelectedGuest] = useState<Guest | null>(null)
   const [guestStats, setGuestStats] = useState<GuestStats | null>(null)
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null)
@@ -117,10 +119,10 @@ export default function CheckInPage() {
     })
   }, [])
 
-  const searchGuests = async () => {
-    if (!searchTerm) return
-    const { data } = await api.get<Guest[]>('/guests', { params: { search: searchTerm } })
-    setFoundGuests(data)
+  const searchGuests = () => {
+    setGuestPage(1)
+    setAppliedSearch(searchTerm.trim())
+    if (appliedSearch === searchTerm.trim() && appliedSearch) void guestQuery.load()
   }
 
   const selectGuest = async (guest: Guest) => {
@@ -145,7 +147,7 @@ export default function CheckInPage() {
     try {
       const { data } = await api.post<Guest>('/guests', sanitizeForm(guestForm))
       setSelectedGuest(data)
-      setGuestStats({ totalVisits: 0, classification: 'Normal', isFrequent: false })
+      setGuestStats({ totalVisits: 0, classification: 'Normal', isFrequent: false, lastVisit: null })
       setStep(3)
     } catch (error: unknown) {
       setAlertInfo({ variant: 'error', message: getApiErrorMessage(error, 'No se pudo crear el huésped') })
@@ -323,7 +325,7 @@ export default function CheckInPage() {
       {step === 1 && (
         <div className="space-y-4">
           <div className="flex gap-2">
-            <Input aria-label="Buscar huésped" placeholder="Buscar huésped por nombre o DNI…" value={searchTerm} onChange={event => setSearchTerm(event.target.value)} />
+            <Input maxLength={100} aria-label="Buscar huésped" placeholder="Buscar huésped por nombre o DNI…" value={searchTerm} onChange={event => setSearchTerm(event.target.value)} />
             <Button variant="outline" onClick={searchGuests}>Buscar</Button>
           </div>
           {foundGuests.length > 0 && (
@@ -336,6 +338,11 @@ export default function CheckInPage() {
               ))}
             </div>
           )}
+          {guestQuery.loading && <p role="status" className="text-sm text-muted-foreground">Buscando huéspedes…</p>}
+          {guestQuery.error && <InlineAlert variant="error" message="No se pudo consultar huéspedes. Usa Buscar para reintentar." />}
+          {appliedSearch && !guestQuery.loading && !guestQuery.error && foundGuests.length === 0 && <p className="text-sm text-muted-foreground">No hay huéspedes con esa búsqueda.</p>}
+          <Pagination currentPage={guestQuery.page} totalPages={guestQuery.totalPages} totalItems={guestQuery.totalItems} pageSize={10}
+            disabled={guestQuery.loading} onPageChange={setGuestPage} />
           <div className="border-t border-border pt-4">
             <h3 className="font-medium mb-3">Crear un huésped</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

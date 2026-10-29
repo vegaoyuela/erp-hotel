@@ -1,11 +1,12 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useCallback } from 'react'
+import { PagedSelect } from '@/components/ui/PagedSelect'
 import { usePagedList } from '@/hooks/usePagedList'
 import { useSearchParams } from 'react-router-dom'
 import axios from 'axios'
 import api from '@/lib/axios'
 import { getApiErrorMessage } from '@/lib/errors'
 import { useAuthStore } from '@/store/authStore'
-import type { Invoice, CAI, DocumentAuthorization, CashRegister, Payment } from '@/types'
+import type { Invoice, AuthorizationOption, CashRegister, Payment, PrintPreview } from '@/types'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { InlineAlert } from '@/components/ui/InlineAlert'
@@ -94,12 +95,6 @@ export default function InvoicesPage() {
   const [dni, setDni] = useState('')
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
-  const [authList, setAuthList] = useState<{
-    id: string
-    source: 'cai' | 'docauth'
-    documentType: 'Factura' | 'NotaCredito' | 'NotaDebito'
-    label: string
-  }[]>([])
   const [selectedAuth] = useState(searchParams.get('filter') ?? '')
   const [docTypeFilter, setDocTypeFilter] = useState('Todos')
 
@@ -133,7 +128,6 @@ export default function InvoicesPage() {
   const [paymentAmount, setPaymentAmount] = useState('')
   const [cashReceived, setCashReceived] = useState('')
   const [paymentReference, setPaymentReference] = useState('')
-  const [cashRegisters, setCashRegisters] = useState<CashRegister[]>([])
   const [selectedCashRegisterId, setSelectedCashRegisterId] = useState('')
   const [paymentActionLoading, setPaymentActionLoading] = useState(false)
 
@@ -146,7 +140,7 @@ export default function InvoicesPage() {
   const [refundLimit, setRefundLimit] = useState(0)
   const [refundReason, setRefundReason] = useState('')
   const [refundReference, setRefundReference] = useState('')
-  const [refundCashRegisters, setRefundCashRegisters] = useState<CashRegister[]>([])
+  const [selectedRefundRegister, setSelectedRefundRegister] = useState<CashRegister | null>(null)
   const [selectedRefundCashRegisterId, setSelectedRefundCashRegisterId] = useState('')
   const [refundSetupLoading, setRefundSetupLoading] = useState(false)
   const [refundActionLoading, setRefundActionLoading] = useState(false)
@@ -163,7 +157,7 @@ export default function InvoicesPage() {
       start: appliedFilters.start || undefined,
       end: appliedFilters.end || undefined,
       caiId: source === 'cai' ? authorizationId : undefined,
-      documentAuthorizationId: source === 'docauth' ? authorizationId : undefined,
+      documentAuthorizationId: source === 'docauth' || source === 'document' ? authorizationId : undefined,
       documentType: docTypeFilter === 'Todos' ? undefined : docTypeFilter,
     })
   const applyFilters = () => {
@@ -172,40 +166,6 @@ export default function InvoicesPage() {
     setCurrentPage(1)
     if (unchanged) void load()
   }
-
-  const loadAuthList = useCallback(async () => {
-    try {
-      const [caiRes, docAuthRes] = await Promise.all([
-        api.get<CAI[]>('/cai'),
-        api.get<DocumentAuthorization[]>('/document-authorizations'),
-      ])
-      const list = [
-        ...caiRes.data.map((c) => ({
-          id: c.id,
-          source: 'cai' as const,
-          documentType: 'Factura' as const,
-          label: `${c.caiNumber} (Factura general)`,
-        })),
-        ...docAuthRes.data
-          .filter((d) => ['Factura', 'NotaCredito', 'NotaDebito'].includes(d.documentType))
-          .map((d) => ({
-          id: d.id,
-          source: 'docauth' as const,
-          documentType: d.documentType as 'Factura' | 'NotaCredito' | 'NotaDebito',
-          label: `${d.caiNumber} (${d.documentType})`,
-          })),
-      ]
-      setAuthList(list)
-      setCreditAuthorizationId(
-        list.find((item) => item.source === 'docauth' && item.documentType === 'NotaCredito')?.id ?? ''
-      )
-      setDebitAuthorizationId(
-        list.find((item) => item.source === 'docauth' && item.documentType === 'NotaDebito')?.id ?? ''
-      )
-    } catch {
-      setAlertInfo({ variant: 'error', message: 'Error al cargar el listado de autorizaciones fiscales.' })
-    }
-  }, [])
 
   const loadPayments = useCallback(async (invoiceId: string) => {
     if (!canManageCash) {
@@ -224,17 +184,12 @@ export default function InvoicesPage() {
     }
   }, [canManageCash])
 
-  useEffect(() => {
-    const timer = window.setTimeout(() => void loadAuthList(), 0)
-    return () => window.clearTimeout(timer)
-  }, [loadAuthList])
-
   const viewPrint = async (inv: Invoice) => {
     setSelectedInvoiceId(inv.id)
     setSelectedInvoice(inv)
     void loadPayments(inv.id)
     try {
-      const { data } = await api.get<{ text: string; logoBase64: string; printLogoHeight?: number }>(
+      const { data } = await api.get<PrintPreview>(
         `/print/invoice/${inv.id}/preview`
       )
       setInvoicePreview(data.text)
@@ -247,25 +202,14 @@ export default function InvoicesPage() {
     }
   }
 
-  const openPaymentModal = async () => {
+  const openPaymentModal = () => {
     if (!selectedInvoice || selectedInvoice.balanceDue <= 0) return
     setPaymentMethod('Efectivo')
     setPaymentAmount(selectedInvoice.balanceDue.toFixed(2))
     setCashReceived(selectedInvoice.balanceDue.toFixed(2))
     setPaymentReference('')
-    setCashRegisters([])
     setSelectedCashRegisterId('')
     setShowPaymentModal(true)
-    try {
-      const { data } = await api.get<CashRegister[]>('/cash-registers')
-      const openRegisters = data.filter((register) => register.isActive && register.isOpen)
-      setCashRegisters(openRegisters)
-      setSelectedCashRegisterId(openRegisters[0]?.id ?? '')
-    } catch (error: unknown) {
-      setCashRegisters([])
-      setSelectedCashRegisterId('')
-      setAlertInfo({ variant: 'error', message: getApiErrorMessage(error, 'No se pudieron consultar las cajas abiertas.') })
-    }
   }
 
   const handlePaymentSubmit = async (event: React.FormEvent) => {
@@ -331,18 +275,13 @@ export default function InvoicesPage() {
     setRefundLimit(0)
     setRefundReason('')
     setRefundReference('')
-    setRefundCashRegisters([])
+    setSelectedRefundRegister(null)
     setSelectedRefundCashRegisterId('')
     setShowRefundModal(true)
     setRefundSetupLoading(true)
 
     try {
-      const [invoiceResponse, cashResponse] = await Promise.all([
-        api.get<Invoice[]>('/invoices/search', { params: { originalInvoiceId: selectedInvoice.id } }),
-        payment.method === 'Efectivo'
-          ? api.get<CashRegister[]>('/cash-registers')
-          : Promise.resolve({ data: [] as CashRegister[] }),
-      ])
+      const invoiceResponse = await api.get<Invoice[]>('/invoices/search', { params: { originalInvoiceId: selectedInvoice.id } })
       const notes = invoiceResponse.data.filter((invoice) =>
         invoice.documentType === 'NotaCredito' && invoice.originalInvoiceId === selectedInvoice.id)
       const noteIds = new Set(notes.map((note) => note.id))
@@ -390,13 +329,11 @@ export default function InvoicesPage() {
         return
       }
 
-      const openRegisters = cashResponse.data.filter((register) => register.isActive && register.isOpen)
       setRefundCreditNotes(options)
       setSelectedRefundCreditNoteId(options[0].id)
       setRefundLimit(options[0].availableAmount)
       setRefundAmount(options[0].availableAmount.toFixed(2))
-      setRefundCashRegisters(openRegisters)
-      setSelectedRefundCashRegisterId(openRegisters[0]?.id ?? '')
+      setSelectedRefundCashRegisterId('')
     } catch (error: unknown) {
       setShowRefundModal(false)
       setAlertInfo({
@@ -423,7 +360,7 @@ export default function InvoicesPage() {
       return
     }
     if (refundPayment.method === 'Efectivo') {
-      const selectedRegister = refundCashRegisters.find((register) => register.id === selectedRefundCashRegisterId)
+      const selectedRegister = selectedRefundRegister?.id === selectedRefundCashRegisterId ? selectedRefundRegister : null
       if (!selectedRegister || selectedRegister.currentBalance < amount) {
         setAlertInfo({ variant: 'error', message: 'Seleccione una caja abierta con saldo suficiente.' })
         return
@@ -803,7 +740,6 @@ export default function InvoicesPage() {
                       <Button
                         size="sm"
                         variant="outline"
-                        disabled={!creditAuthorizationId}
                         onClick={() => {
                           setCreditItems(
                             selectedInvoice.items.map((it, idx) => ({
@@ -823,17 +759,16 @@ export default function InvoicesPage() {
                           setShowCreditModal(true)
                         }}
                         className="text-xs h-7 text-amber-600 dark:text-amber-400 gap-1 border-amber-500/30"
-                        title={creditAuthorizationId ? 'Emitir Nota de Crédito por devolución o anulación' : 'Falta autorización activa para Nota de Crédito'}
+                        title="Elegir autorización y preparar Nota de Crédito"
                       >
                         <FileMinus size={12} /> N. Crédito
                       </Button>
                       <Button
                         size="sm"
                         variant="outline"
-                        disabled={!debitAuthorizationId}
                         onClick={() => setShowDebitModal(true)}
                         className="text-xs h-7 text-blue-600 dark:text-blue-400 gap-1 border-blue-500/30"
-                        title={debitAuthorizationId ? 'Emitir Nota de Débito por recargo' : 'Falta autorización activa para Nota de Débito'}
+                        title="Elegir autorización y preparar Nota de Débito"
                       >
                         <FilePlus size={12} /> N. Débito
                       </Button>
@@ -976,7 +911,7 @@ export default function InvoicesPage() {
           aria-labelledby="payment-dialog-title"
         >
           <div
-            className="bg-card border border-border rounded-xl p-6 w-full max-w-lg shadow-2xl space-y-4 animate-in zoom-in-95"
+            className="bg-card border border-border rounded-xl p-6 w-full max-w-lg max-h-[calc(100dvh-2rem)] overflow-y-auto shadow-2xl space-y-4 animate-in zoom-in-95"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="flex items-center justify-between border-b border-border pb-3">
@@ -1054,19 +989,7 @@ export default function InvoicesPage() {
               {paymentMethod === 'Efectivo' ? (
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label htmlFor="payment-register" className="font-semibold text-muted-foreground">Caja abierta</label>
-                    <select
-                      id="payment-register"
-                      required
-                      value={selectedCashRegisterId}
-                      onChange={(event) => setSelectedCashRegisterId(event.target.value)}
-                      className="w-full border border-input rounded-md px-2.5 h-9 text-xs bg-background mt-1"
-                    >
-                      <option value="">{cashRegisters.length === 0 ? 'No hay cajas abiertas' : 'Seleccione una caja'}</option>
-                      {cashRegisters.map((register) => (
-                        <option key={register.id} value={register.id}>{register.name} · L {register.currentBalance.toFixed(2)}</option>
-                      ))}
-                    </select>
+                    <PagedSelect<CashRegister> label="Caja para el cobro" path="/cash-registers/paged" params={{ openOnly: 'true' }} value={selectedCashRegisterId} onChange={setSelectedCashRegisterId} getLabel={row => `${row.name} (L ${row.currentBalance.toFixed(2)})`} />
                   </div>
                   <div>
                     <label htmlFor="cash-received" className="font-semibold text-muted-foreground">Efectivo recibido (L)</label>
@@ -1134,7 +1057,7 @@ export default function InvoicesPage() {
           aria-labelledby="refund-dialog-title"
         >
           <div
-            className="bg-card border border-border rounded-xl p-6 w-full max-w-lg shadow-2xl space-y-4 animate-in zoom-in-95"
+            className="bg-card border border-border rounded-xl p-6 w-full max-w-lg max-h-[calc(100dvh-2rem)] overflow-y-auto shadow-2xl space-y-4 animate-in zoom-in-95"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="flex items-center justify-between border-b border-border pb-3">
@@ -1225,19 +1148,7 @@ export default function InvoicesPage() {
 
                 {refundPayment.method === 'Efectivo' ? (
                   <div>
-                    <label htmlFor="refund-register" className="font-semibold text-muted-foreground">Caja abierta con saldo suficiente</label>
-                    <select
-                      id="refund-register"
-                      required
-                      value={selectedRefundCashRegisterId}
-                      onChange={(event) => setSelectedRefundCashRegisterId(event.target.value)}
-                      className="w-full border border-input rounded-md px-2.5 h-9 text-xs bg-background mt-1"
-                    >
-                      <option value="">{refundCashRegisters.length === 0 ? 'No hay cajas abiertas' : 'Seleccione una caja'}</option>
-                      {refundCashRegisters.map((register) => (
-                        <option key={register.id} value={register.id}>{register.name} · L {register.currentBalance.toFixed(2)}</option>
-                      ))}
-                    </select>
+                    <PagedSelect<CashRegister> label="Caja para el reembolso" path="/cash-registers/paged" params={{ openOnly: 'true' }} value={selectedRefundCashRegisterId} onChange={(id, row) => { setSelectedRefundCashRegisterId(id); setSelectedRefundRegister(row) }} getLabel={row => `${row.name} (L ${row.currentBalance.toFixed(2)})`} />
                   </div>
                 ) : (
                   <div>
@@ -1297,7 +1208,7 @@ export default function InvoicesPage() {
           onClick={() => setShowCreditModal(false)}
         >
           <div
-            className="bg-card border border-border rounded-xl p-6 w-full max-w-lg shadow-2xl space-y-4 animate-in zoom-in-95"
+            className="bg-card border border-border rounded-xl p-6 w-full max-w-lg max-h-[calc(100dvh-2rem)] overflow-y-auto shadow-2xl space-y-4 animate-in zoom-in-95"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between border-b border-border pb-3">
@@ -1373,19 +1284,7 @@ export default function InvoicesPage() {
               </div>
 
               <div>
-                <label className="font-semibold text-muted-foreground">Autorización de Nota de Crédito</label>
-                <select
-                  value={creditAuthorizationId}
-                  onChange={(e) => setCreditAuthorizationId(e.target.value)}
-                  className="w-full border border-input rounded-md px-2.5 py-1.5 text-xs bg-background mt-1"
-                >
-                  {!creditAuthorizationId && <option value="">Sin autorización activa</option>}
-                  {authList.filter((item) => item.source === 'docauth' && item.documentType === 'NotaCredito').map((a) => (
-                    <option key={a.id} value={a.id}>
-                      {a.label}
-                    </option>
-                  ))}
-                </select>
+                <PagedSelect<AuthorizationOption> label="Autorización de Nota de Crédito" path="/document-authorizations/options/paged" params={{ source: 'docauth', documentType: 'NotaCredito', activeOnly: 'true' }} value={creditAuthorizationId} onChange={setCreditAuthorizationId} getLabel={row => row.caiNumber} />
               </div>
 
               <div className="flex justify-end gap-2 pt-3 border-t border-border">
@@ -1409,7 +1308,7 @@ export default function InvoicesPage() {
           onClick={() => setShowDebitModal(false)}
         >
           <div
-            className="bg-card border border-border rounded-xl p-6 w-full max-w-lg shadow-2xl space-y-4 animate-in zoom-in-95"
+            className="bg-card border border-border rounded-xl p-6 w-full max-w-lg max-h-[calc(100dvh-2rem)] overflow-y-auto shadow-2xl space-y-4 animate-in zoom-in-95"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between border-b border-border pb-3">
@@ -1458,19 +1357,7 @@ export default function InvoicesPage() {
                   />
                 </div>
                 <div>
-                  <label className="font-semibold text-muted-foreground">Autorización de Nota de Débito</label>
-                  <select
-                    value={debitAuthorizationId}
-                    onChange={(e) => setDebitAuthorizationId(e.target.value)}
-                    className="w-full border border-input rounded-md px-2.5 py-1.5 text-xs bg-background mt-1"
-                  >
-                    {!debitAuthorizationId && <option value="">Sin autorización activa</option>}
-                    {authList.filter((item) => item.source === 'docauth' && item.documentType === 'NotaDebito').map((a) => (
-                      <option key={a.id} value={a.id}>
-                        {a.label}
-                      </option>
-                    ))}
-                  </select>
+                  <PagedSelect<AuthorizationOption> label="Autorización de Nota de Débito" path="/document-authorizations/options/paged" params={{ source: 'docauth', documentType: 'NotaDebito', activeOnly: 'true' }} value={debitAuthorizationId} onChange={setDebitAuthorizationId} getLabel={row => row.caiNumber} />
                 </div>
               </div>
 

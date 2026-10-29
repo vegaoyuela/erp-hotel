@@ -63,6 +63,7 @@ namespace hotel_erp.Api.Controllers
         }
 
         [HttpPost]
+        [ProducesResponseType(typeof(AccountingAccountDto), StatusCodes.Status201Created)]
         public async Task<ActionResult<AccountingAccountDto>> Create([FromBody] CreateAccountRequest request)
         {
             if (await _repo.AccountNumberExistsAsync(request.AccountNumber))
@@ -87,6 +88,7 @@ namespace hotel_erp.Api.Controllers
         }
 
         [HttpPut("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<ActionResult> Update(Guid id, [FromBody] UpdateAccountRequest request)
         {
             var account = await _repo.GetAccountByIdAsync(id);
@@ -111,6 +113,7 @@ namespace hotel_erp.Api.Controllers
         }
 
         [HttpDelete("{id}")]
+        [ProducesResponseType(typeof(MessageResponseDto), StatusCodes.Status200OK)]
         public async Task<ActionResult> Deactivate(Guid id)
         {
             var account = await _repo.GetAccountByIdAsync(id);

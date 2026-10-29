@@ -32,6 +32,7 @@ namespace hotel_erp.Api.Controllers
 
         [HttpPost]
         [Authorize(Policy = PermissionNames.ManageTaxes)]
+        [ProducesResponseType(typeof(TaxConfigurationDto), StatusCodes.Status201Created)]
         public async Task<ActionResult<TaxConfigurationDto>> Create([FromBody] CreateTaxConfigurationRequest request)
         {
             var existing = await _context.TaxConfigurations.FirstOrDefaultAsync(t => t.Name == request.Name);
@@ -51,6 +52,7 @@ namespace hotel_erp.Api.Controllers
 
         [HttpPut("{id}")]
         [Authorize(Policy = PermissionNames.ManageTaxes)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<ActionResult> Update(Guid id, [FromBody] CreateTaxConfigurationRequest request)
         {
             var tax = await _context.TaxConfigurations.FindAsync(id);
@@ -66,6 +68,7 @@ namespace hotel_erp.Api.Controllers
 
         [HttpDelete("{id}")]
         [Authorize(Policy = PermissionNames.ManageTaxes)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<ActionResult> Delete(Guid id)
         {
             var tax = await _context.TaxConfigurations.FindAsync(id);

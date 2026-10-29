@@ -75,3 +75,11 @@ H2B debe cubrir caja, liquidaciones, asientos, respaldos, selectores y contratos
 Completadas las seis colecciones financieras/de respaldo previstas: cajas, movimientos, liquidaciones, cobros elegibles, asientos y logs. Los saldos y totales globales son independientes de la página y el navegador conservó dos cobros entre páginas para registrar un lote sintético real. Se migraron doce tipos y se comprobaron las políticas de los cuatro roles. El [detalle H2B](p02-base-tecnica/p02-h2b-finanzas-respaldos.md) contiene contrato, pruebas y ocho capturas.
 
 H2C debe revisar selectores de check-in/out, autorizaciones/cajas auxiliares, 29 lecturas de arrays y 53 respuestas 200/201 sin esquema; cada caso requiere clasificación. Persisten los contratos manuales restantes, seguridad, matriz formal e independencia de G2, además del cálculo de folio ya registrado en P03. Windows e impresión mantienen su aplazamiento y recordatorio diario.
+
+### Avance P02-H2C — selectores y contratos (29 de octubre de 2026)
+
+Se completaron los selectores principales de check-in/out, autorizaciones y cajas; la selección persiste entre páginas y búsquedas. Se clasificaron las 53 respuestas sin esquema de H2B: el contrato final tiene cero éxitos 200/201 sin esquema y ocho descargas binarias. Se migraron 28 interfaces compartidas utilizadas y se retiró una sin consumidores. P02-05 queda completada en código y QA. Véase [detalle H2C](p02-base-tecnica/p02-h2c-selectores-contratos.md).
+
+P02-04 permanece parcial: las 19 lecturas de arrays restantes están [clasificadas](evidencia/p02h2c-inventario-contratos.json); usuarios/roles requieren paginación administrativa y los catálogos/reportes requieren validar volumen/límites. Los auxiliares de una factura deben conservar su completitud hasta disponer de agregados equivalentes. El siguiente bloque cubre P02-06 (permisos, motivos y aprobaciones), esas tareas residuales y la matriz API/DAT/SEC de P02-09. P02-07/P02-10 siguen pendientes en su alcance documentado.
+
+No cambia el defecto P03 de desglose de folio, G0/G1, decisiones reales del gerente/contador ni aprobación productiva/fiscal. Windows 11, Docker Desktop, QA PowerShell e impresión física siguen aplazados con el recordatorio diario existente a las 10:00 de Honduras.

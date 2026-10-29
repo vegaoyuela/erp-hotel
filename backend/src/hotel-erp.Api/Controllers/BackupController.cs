@@ -1,3 +1,4 @@
+using hotel_erp.Api.Infrastructure;
 using hotel_erp.Api.Database;
 using hotel_erp.Api.Dtos.Common;
 using System.ComponentModel.DataAnnotations;
@@ -26,6 +27,7 @@ namespace hotel_erp.Api.Controllers
         }
 
         [HttpPost("manual")]
+        [ApiFileResponse("application/octet-stream")]
         public async Task<IActionResult> CreateManualBackup()
         {
             var last = await _backupService.RunLocalBackupAsync(HttpContext.RequestAborted);

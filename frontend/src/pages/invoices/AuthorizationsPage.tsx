@@ -1,26 +1,14 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { z } from 'zod'
 import api from '@/lib/axios'
 import { getApiErrorMessage } from '@/lib/errors'
-import type { CAI, DocumentAuthorization } from '@/types'
+import type { AuthorizationOption as UnifiedAuth } from '@/types'
+import { useDebouncedValue, usePagedList } from '@/hooks/usePagedList'
+import { Pagination } from '@/components/ui/Pagination'
+import { InlineAlert } from '@/components/ui/InlineAlert'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-
-interface UnifiedAuth {
-  id: string
-  source: 'cai' | 'document'
-  documentType: string
-  caiNumber: string
-  issueDate: string
-  dueDate: string
-  initialRange: string
-  finalRange: string
-  currentCorrelative: string
-  status: string
-  isExpiringSoon: boolean
-  hasAttachment?: boolean
-}
 
 const docTypes = ['Factura (general)', 'Factura', 'NotaCredito', 'NotaDebito']
 
@@ -50,7 +38,9 @@ const emptyForm: FormData = {
 
 export default function AuthorizationsPage() {
   const navigate = useNavigate()
-  const [items, setItems] = useState<UnifiedAuth[]>([])
+  const [search, setSearch] = useState('')
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pageSize, setPageSize] = useState(15)
   const [showForm, setShowForm] = useState(false)
   const [file, setFile] = useState<File | null>(null)
   const [error, setError] = useState('')
@@ -59,22 +49,9 @@ export default function AuthorizationsPage() {
   const [errors, setErrors] = useState<FormErrors>({})
   const fileRef = useRef<HTMLInputElement>(null)
 
-  const load = useCallback(async () => {
-    const [caiRes, docAuthRes] = await Promise.all([
-      api.get<CAI[]>('/cai'),
-      api.get<DocumentAuthorization[]>('/document-authorizations')
-    ])
-    const unified: UnifiedAuth[] = [
-      ...caiRes.data.map(c => ({ ...c, source: 'cai' as const, documentType: 'Factura (general)' })),
-      ...docAuthRes.data.map(d => ({ ...d, source: 'document' as const, documentType: d.documentType })),
-    ]
-    setItems(unified)
-  }, [])
-
-  useEffect(() => {
-    const timer = window.setTimeout(() => void load(), 0)
-    return () => window.clearTimeout(timer)
-  }, [load])
+  const debouncedSearch = useDebouncedValue(search)
+  const { items, loading, error: listError, load, page, totalItems, totalPages } = usePagedList<UnifiedAuth>(
+    '/document-authorizations/options/paged', { page: currentPage, pageSize, search: debouncedSearch || undefined })
 
   const onSubmit = async (data: FormData) => {
     setError('')
@@ -233,8 +210,14 @@ export default function AuthorizationsPage() {
         </div>
       )}
 
+      <div className="flex flex-wrap gap-2">
+        <Input aria-label="Buscar autorizaciones" maxLength={100} placeholder="Buscar por CAI..." value={search} onChange={event => { setSearch(event.target.value); setCurrentPage(1) }} className="sm:max-w-md" />
+        <Button variant="outline" disabled={loading} onClick={() => void load()}>Actualizar</Button>
+      </div>
+      {listError && <InlineAlert variant="error" message="No se pudo consultar las autorizaciones. Usa Actualizar para reintentar." />}
       <div className="border border-border rounded-lg overflow-hidden">
-        <table className="w-full text-sm">
+        <div className="overflow-x-auto">
+        <table className="w-full min-w-[1100px] text-sm">
           <thead className="bg-muted"><tr>
             <th className="text-left p-3">Tipo Doc.</th>
             <th className="text-left p-3">CAI</th>
@@ -247,10 +230,10 @@ export default function AuthorizationsPage() {
             <th className="text-left p-3"></th>
           </tr></thead>
           <tbody>
-            {items.map(item => (
+            {!loading && items.map(item => (
               <tr key={`${item.source}-${item.id}`} className={`border-t border-border ${item.isExpiringSoon ? 'bg-red-50 dark:bg-red-900/20' : ''}`}>
                 <td className="p-3">
-                  <span className="text-xs font-medium bg-primary/10 px-2 py-0.5 rounded">{item.documentType}</span>
+                  <span className="text-xs font-medium bg-primary/10 px-2 py-0.5 rounded">{item.source === 'cai' ? 'Factura (general)' : item.documentType}</span>
                 </td>
                 <td className="p-3 font-mono font-bold">{item.caiNumber}</td>
                 <td className="p-3 text-xs text-muted-foreground">{item.initialRange} → {item.finalRange}</td>
@@ -265,7 +248,7 @@ export default function AuthorizationsPage() {
                 </td>
                 <td className="p-3">
                   <div className="flex gap-1">
-                    {item.source === 'document' && item.hasAttachment &&
+                    {item.source === 'docauth' && item.hasAttachment &&
                       <Button size="sm" variant="outline" onClick={() => void viewFile(item)}>Ver PDF</Button>
                     }
                     <Button size="sm" variant="outline" onClick={() => navigate(`/invoices?filter=${item.source}:${item.id}`)}>Ver Facturas</Button>
@@ -276,9 +259,13 @@ export default function AuthorizationsPage() {
                 </td>
               </tr>
             ))}
-            {items.length === 0 && <tr><td colSpan={9} className="p-6 text-center text-muted-foreground">No hay autorizaciones fiscales registradas</td></tr>}
+            {loading && <tr><td colSpan={9} className="p-6 text-center text-muted-foreground" role="status">Cargando autorizaciones…</td></tr>}
+            {!loading && !listError && items.length === 0 && <tr><td colSpan={9} className="p-6 text-center text-muted-foreground">No hay autorizaciones fiscales registradas</td></tr>}
           </tbody>
         </table>
+        </div>
+        <Pagination currentPage={page} totalPages={totalPages} totalItems={totalItems} pageSize={pageSize} disabled={loading}
+          onPageChange={setCurrentPage} onPageSizeChange={size => { setPageSize(size); setCurrentPage(1) }} />
       </div>
     </div>
   )
