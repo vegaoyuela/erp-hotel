@@ -2,7 +2,7 @@
 
 **Inicio:** 27 de septiembre de 2026
 
-**Estado:** en ejecución; entregas P02-A a P02-K aprobadas por pruebas automáticas. Última ejecución: 30 de octubre de 2026.
+**Estado:** en ejecución; entregas P02-A a P02-L aprobadas por pruebas automáticas. Última ejecución: 30 de octubre de 2026.
 
 Este registro divide P02 en entregas comprobables. No se declara G2 mientras queden controladores con lógica de negocio, repositorios que confirman cambios por su cuenta o contratos sin prueba.
 
@@ -33,10 +33,10 @@ La versión anterior calculaba el hash con ticks de 100 ns antes de guardar un `
 | P02-03 | Completada en código | Contratos inyectables de reloj, cálculo, correlativo, auditoría, impresión y respaldo; sustitución/rollback y transporte simulado probados. Prueba física pendiente en Windows. |
 | P02-04 | Parcial (P02-I) | Usuarios y opciones de roles paginados; quedan límites/volumen de catálogos/reportes y revisión de clientes de rutas completas heredadas. |
 | P02-05 | Completada en código y QA | Tipos compartidos derivados de OpenAPI; comparación automática contra API real, snapshot y tipos generados. Revisión independiente en P02-10. |
-| P02-06 | Parcial (P02-K) | Administración/sesiones y 27 métodos operativos coordinados. Restan 34 mutaciones directas, efectos externos y aprobaciones/motivos sensibles. |
+| P02-06 | Parcial (P02-L) | Administración/sesiones y 61 métodos operativos/de catálogos coordinados; guardado/auditoría de las 34 acciones nuevas probados. Restan efectos externos y aprobaciones/motivos sensibles. |
 | P02-07 | Parcial previo | Existen roles PostgreSQL y migración separada; la rotación de secretos se ejecutará durante instalación Windows. |
 | P02-08 | Completada | Verificador, exportador, UI, compatibilidad histórica y pruebas. |
-| P02-09 | Parcial (P02-K) | Matriz formal API/DAT/SEC registrada con cobertura y brechas; faltan los escenarios y entornos indicados en ella. |
+| P02-09 | Parcial (P02-L) | Matriz formal API/DAT/SEC registrada con cobertura y brechas; faltan los escenarios y entornos indicados en ella. |
 | P02-10 | Pendiente | Revisión técnica por una persona distinta del implementador. |
 
 ## Entrega P02-B — movimientos financieros
@@ -97,7 +97,7 @@ Se paginaron cajas, movimientos de caja, liquidaciones, cobros elegibles, asient
 
 ## Criterio para la siguiente entrega
 
-P02-H2C queda documentada en la entrega siguiente. P02-I registra las políticas, paginación administrativa y matriz formal. P02-J cubre administración de seguridad bajo concurrencia y auditoría/atomicidad. P02-K extiende la protección a 27 métodos de operación. El siguiente bloque debe coordinar las 34 mutaciones directas restantes y revisar los efectos externos, cerrar las demás brechas formales API/DAT/SEC y avanzar aprobaciones sensibles cuando existan decisiones del hotel; conserva los límites restantes de P02-04. G2 sigue abierta hasta cubrir los pendientes de la tabla y obtener la revisión independiente.
+P02-H2C queda documentada en la entrega siguiente. P02-I registra las políticas, paginación administrativa y matriz formal. P02-J cubre administración de seguridad bajo concurrencia y auditoría/atomicidad. P02-K extiende la protección a 27 métodos de operación. P02-L cubre las 34 mutaciones de catálogos/configuración. El siguiente bloque debe diseñar la admisión y resultado durable de los efectos externos, cerrar las demás brechas formales API/DAT/SEC y avanzar aprobaciones sensibles cuando existan decisiones del hotel; conserva los límites restantes de P02-04. G2 sigue abierta hasta cubrir los pendientes de la tabla y obtener la revisión independiente.
 
 La evidencia de QA y compatibilidad se conserva en el [expediente general](../evidencia/README.md#p02--base-técnica-primera-entrega).
 
@@ -116,3 +116,7 @@ Usuarios, roles y registro heredado delegan sus mutaciones a un servicio con tra
 ## Entrega P02-K — revocación operativa (30 de octubre de 2026)
 
 Nueve servicios conservan bloqueos compartidos de catálogo/usuario durante sus 27 mutaciones. La escritura revalida sesión/permisos después de esperar; una operación admitida termina antes de confirmar revocación o logout. Se prueban 54 denegaciones directas, tres HTTP en espera, un 403 HTTP con permiso retirado, orden entre movimientos/revocación/logout y cancelación sin cambios parciales. QA: 147 unitarias, 10 integraciones y 5 validaciones del expediente. El [detalle P02-K](p02-k-revocacion-operativa.md) y su inventario dejan pendientes 34 mutaciones de once controladores y cuatro acciones de efectos externos. P02-06/P02-09 y G2 siguen abiertas.
+
+## Entrega P02-L — catálogos y configuración (30 de octubre de 2026)
+
+Las 34 mutaciones pendientes pasan a once servicios con admisión versionada, bloqueo de catálogo y persistencia/auditoría conjunta. Se comprueban 68 denegaciones directas y 68 HTTP, 35 éxitos auditados y 71 fallos con restauración de base/archivos. La cancelación limpia el PDF nuevo; dos aprobaciones fiscales simultáneas producen 200/409 y un snapshot. QA: 170 unitarias, 13 integraciones y 5 validaciones del expediente. El [detalle P02-L](p02-l-catalogos-configuracion.md) deja cuatro acciones externas, lecturas, aprobaciones sensibles y demás brechas formales pendientes. P02-06/P02-09 y G2 siguen abiertas.

@@ -1,3 +1,4 @@
+using hotel_erp.Api.Infrastructure;
 using hotel_erp.Api.Dtos.Customer;
 using hotel_erp.Api.Services;
 using AutoMapper;
@@ -15,20 +16,18 @@ namespace hotel_erp.Api.Controllers
     [Authorize(Policy = HotelAccessPolicies.ReadGuests)]
     public class CustomersController : ControllerBase
     {
+        private readonly CustomerApplicationService _application;
         private readonly ICustomerRepository _repo;
-        private readonly IInvoiceRepository _invoiceRepo;
         private readonly IMapper _mapper;
 
-        private readonly IUnitOfWork _unitOfWork;
         private readonly HotelListQueryService _lists;
 
-        public CustomersController(ICustomerRepository repo, IInvoiceRepository invoiceRepo, IMapper mapper, IUnitOfWork unitOfWork, HotelListQueryService lists)
+        public CustomersController(ICustomerRepository repo, IMapper mapper, HotelListQueryService lists, CustomerApplicationService application)
         {
-            _unitOfWork = unitOfWork;
-            _lists = lists;
             _repo = repo;
-            _invoiceRepo = invoiceRepo;
             _mapper = mapper;
+            _lists = lists;
+            _application = application;
         }
 
         [HttpGet]
@@ -56,35 +55,7 @@ namespace hotel_erp.Api.Controllers
         [ProducesResponseType(typeof(CustomerDto), StatusCodes.Status201Created)]
         public async Task<ActionResult<CustomerDto>> Create([FromBody] CreateCustomerRequest request)
         {
-            if (!string.IsNullOrEmpty(request.RTN))
-            {
-                var existing = await _repo.GetByRTNAsync(request.RTN);
-                if (existing != null) return BadRequest("El RTN ya existe");
-            }
-
-            var taxpayerType = Enum.TryParse<TaxpayerType>(request.TaxpayerType, out var parsedType) ? parsedType : TaxpayerType.Gravado;
-            if (taxpayerType == TaxpayerType.Exonerado && (string.IsNullOrWhiteSpace(request.ExonerationOrderNumber) || string.IsNullOrWhiteSpace(request.SefinExonerationCertificateNumber)))
-                return BadRequest("Cliente exonerado requiere O.C. Exenta y Constancia SEFIN");
-
-            var entity = new hotel_erp.Api.Database.Entities.Customer
-            {
-                RTN = request.RTN,
-                Name = request.Name,
-                Address = request.Address,
-                Phone = request.Phone,
-                Email = request.Email,
-                TaxpayerType = taxpayerType,
-                ExonerationOrderNumber = request.ExonerationOrderNumber,
-                SefinExonerationCertificateNumber = request.SefinExonerationCertificateNumber,
-                SagRegistryNumber = request.SagRegistryNumber,
-                IsIsvExempt = request.IsIsvExempt,
-                IsTouristTaxExempt = request.IsTouristTaxExempt,
-                ExonerationValidFrom = request.ExonerationValidFrom,
-                ExonerationValidTo = request.ExonerationValidTo
-            };
-            await _repo.AddAsync(entity);
-            await _unitOfWork.SaveChangesAsync(HttpContext.RequestAborted);
-            return CreatedAtAction(nameof(GetById), new { id = entity.Id }, _mapper.Map<CustomerDto>(entity));
+            return this.CatalogResult(await _application.CreateAsync(SecurityActor.From(User), request, HttpContext.RequestAborted), nameof(GetById));
         }
 
         [HttpPut("{id}")]
@@ -92,27 +63,7 @@ namespace hotel_erp.Api.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<ActionResult> Update(Guid id, [FromBody] UpdateCustomerRequest request)
         {
-            var entity = await _repo.GetByIdAsync(id);
-            if (entity == null) return NotFound();
-
-            if (request.RTN != null) entity.RTN = request.RTN;
-            if (request.Name != null) entity.Name = request.Name;
-            if (request.Address != null) entity.Address = request.Address;
-            if (request.Phone != null) entity.Phone = request.Phone;
-            if (request.Email != null) entity.Email = request.Email;
-            if (request.TaxpayerType != null && Enum.TryParse<TaxpayerType>(request.TaxpayerType, out var taxpayerType)) entity.TaxpayerType = taxpayerType;
-            if (request.ExonerationOrderNumber != null) entity.ExonerationOrderNumber = request.ExonerationOrderNumber;
-            if (request.SefinExonerationCertificateNumber != null) entity.SefinExonerationCertificateNumber = request.SefinExonerationCertificateNumber;
-            if (request.SagRegistryNumber != null) entity.SagRegistryNumber = request.SagRegistryNumber;
-            if (request.IsIsvExempt.HasValue) entity.IsIsvExempt = request.IsIsvExempt.Value;
-            if (request.IsTouristTaxExempt.HasValue) entity.IsTouristTaxExempt = request.IsTouristTaxExempt.Value;
-            if (request.ExonerationValidFrom.HasValue) entity.ExonerationValidFrom = request.ExonerationValidFrom;
-            if (request.ExonerationValidTo.HasValue) entity.ExonerationValidTo = request.ExonerationValidTo;
-            if (entity.TaxpayerType == TaxpayerType.Exonerado && (string.IsNullOrWhiteSpace(entity.ExonerationOrderNumber) || string.IsNullOrWhiteSpace(entity.SefinExonerationCertificateNumber)))
-                return BadRequest("Cliente exonerado requiere O.C. Exenta y Constancia SEFIN");
-            await _repo.UpdateAsync(entity);
-            await _unitOfWork.SaveChangesAsync(HttpContext.RequestAborted);
-            return NoContent();
+            return this.CatalogResult(await _application.UpdateAsync(SecurityActor.From(User), id, request, HttpContext.RequestAborted));
         }
 
         [HttpDelete("{id}")]
@@ -120,13 +71,7 @@ namespace hotel_erp.Api.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<ActionResult> Delete(Guid id)
         {
-            var invoices = await _invoiceRepo.GetByCustomerAsync(id);
-            if (invoices.Any())
-                return BadRequest("No se puede eliminar el cliente porque tiene facturas emitidas (trazabilidad fiscal).");
-
-            await _repo.DeleteAsync(id);
-            await _unitOfWork.SaveChangesAsync(HttpContext.RequestAborted);
-            return NoContent();
+            return this.CatalogResult(await _application.DeleteAsync(SecurityActor.From(User), id, HttpContext.RequestAborted));
         }
     }
 }

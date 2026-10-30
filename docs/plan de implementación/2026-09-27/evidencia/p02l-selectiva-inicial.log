@@ -1,0 +1,16 @@
+  hotel-erp.Api -> /home/vm/Projects/erp-hotel/backend/src/hotel-erp.Api/bin/Debug/net10.0/hotel-erp.Api.dll
+  hotel-erp.IntegrationTests -> /home/vm/Projects/erp-hotel/backend/tests/hotel-erp.IntegrationTests/bin/Debug/net10.0/hotel-erp.IntegrationTests.dll
+Test run for /home/vm/Projects/erp-hotel/backend/tests/hotel-erp.IntegrationTests/bin/Debug/net10.0/hotel-erp.IntegrationTests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+[xUnit.net 00:00:29.52]     hotel_erp.IntegrationTests.AuthenticationFlowTests.CatalogMutations_All34ActionsPersistAuditAndRollbackAtEveryCheckpoint [FAIL]
+  Failed hotel_erp.IntegrationTests.AuthenticationFlowTests.CatalogMutations_All34ActionsPersistAuditAndRollbackAtEveryCheckpoint [29 s]
+  Error Message:
+   System.Collections.Generic.KeyNotFoundException : The given key was not present in the dictionary.
+  Stack Trace:
+     at System.Text.Json.JsonElement.GetProperty(String propertyName)
+   at hotel_erp.IntegrationTests.AuthenticationFlowTests.CatalogMutations_All34ActionsPersistAuditAndRollbackAtEveryCheckpoint() in /home/vm/Projects/erp-hotel/backend/tests/hotel-erp.IntegrationTests/AuthenticationFlowTests.CatalogAtomicity.cs:line 58
+   at hotel_erp.IntegrationTests.AuthenticationFlowTests.CatalogMutations_All34ActionsPersistAuditAndRollbackAtEveryCheckpoint() in /home/vm/Projects/erp-hotel/backend/tests/hotel-erp.IntegrationTests/AuthenticationFlowTests.CatalogAtomicity.cs:line 104
+   at hotel_erp.IntegrationTests.AuthenticationFlowTests.CatalogMutations_All34ActionsPersistAuditAndRollbackAtEveryCheckpoint() in /home/vm/Projects/erp-hotel/backend/tests/hotel-erp.IntegrationTests/AuthenticationFlowTests.CatalogAtomicity.cs:line 111
+--- End of stack trace from previous location ---
+
+Failed!  - Failed:     1, Passed:     2, Skipped:     0, Total:     3, Duration: 43 s - hotel-erp.IntegrationTests.dll (net10.0)

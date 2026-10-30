@@ -1,3 +1,5 @@
+using hotel_erp.Api.Infrastructure;
+using hotel_erp.Api.Services;
 using AutoMapper;
 using hotel_erp.Api.Authorization;
 using hotel_erp.Api.Dtos.Common;
@@ -12,16 +14,16 @@ namespace hotel_erp.Api.Controllers
     [Authorize(Policy = PermissionNames.ManageReservations)]
     public class RoomTypesController : ControllerBase
     {
+        private readonly RoomTypeApplicationService _application;
         private readonly IRoomTypeRepository _repo;
         private readonly IMapper _mapper;
 
-        private readonly IUnitOfWork _unitOfWork;
 
-        public RoomTypesController(IRoomTypeRepository repo, IMapper mapper, IUnitOfWork unitOfWork)
+        public RoomTypesController(IRoomTypeRepository repo, IMapper mapper, RoomTypeApplicationService application)
         {
-            _unitOfWork = unitOfWork;
             _repo = repo;
             _mapper = mapper;
+            _application = application;
         }
 
         [HttpGet]
@@ -41,19 +43,7 @@ namespace hotel_erp.Api.Controllers
         [ProducesResponseType(typeof(RoomTypeDto), StatusCodes.Status201Created)]
         public async Task<ActionResult<RoomTypeDto>> Create([FromBody] CreateRoomTypeRequest request)
         {
-            var existing = await _repo.GetByNameAsync(request.Name);
-            if (existing != null) return BadRequest("El tipo de habitación ya existe");
-
-            var entity = new hotel_erp.Api.Database.Entities.RoomType
-            {
-                Name = request.Name,
-                Description = request.Description,
-                PricePerNight = request.PricePerNight,
-                Capacity = request.Capacity
-            };
-            await _repo.AddAsync(entity);
-            await _unitOfWork.SaveChangesAsync(HttpContext.RequestAborted);
-            return CreatedAtAction(nameof(GetById), new { id = entity.Id }, _mapper.Map<RoomTypeDto>(entity));
+            return this.CatalogResult(await _application.CreateAsync(SecurityActor.From(User), request, HttpContext.RequestAborted), nameof(GetById));
         }
 
         [HttpPut("{id}")]
@@ -61,16 +51,7 @@ namespace hotel_erp.Api.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<ActionResult> Update(Guid id, [FromBody] UpdateRoomTypeRequest request)
         {
-            var entity = await _repo.GetByIdAsync(id);
-            if (entity == null) return NotFound();
-
-            if (request.Name != null) entity.Name = request.Name;
-            if (request.Description != null) entity.Description = request.Description;
-            if (request.PricePerNight.HasValue) entity.PricePerNight = request.PricePerNight.Value;
-            if (request.Capacity.HasValue) entity.Capacity = request.Capacity.Value;
-            await _repo.UpdateAsync(entity);
-            await _unitOfWork.SaveChangesAsync(HttpContext.RequestAborted);
-            return NoContent();
+            return this.CatalogResult(await _application.UpdateAsync(SecurityActor.From(User), id, request, HttpContext.RequestAborted));
         }
 
         [HttpDelete("{id}")]
@@ -78,9 +59,7 @@ namespace hotel_erp.Api.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<ActionResult> Delete(Guid id)
         {
-            await _repo.DeleteAsync(id);
-            await _unitOfWork.SaveChangesAsync(HttpContext.RequestAborted);
-            return NoContent();
+            return this.CatalogResult(await _application.DeleteAsync(SecurityActor.From(User), id, HttpContext.RequestAborted));
         }
     }
 }

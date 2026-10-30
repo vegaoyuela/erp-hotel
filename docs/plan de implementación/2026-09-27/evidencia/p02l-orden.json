@@ -1,0 +1,15 @@
+{
+  "syntheticDatabase": true,
+  "passed": true,
+  "settingsMutationBeforeRevocation": true,
+  "uploadedAuthorizationBeforeOwnLogout": true,
+  "canceledUploadRemovesUncommittedFileAndReleasesLocks": true,
+  "successfulFilesPreserved": 1,
+  "concurrentProfileApprovals": [
+    200,
+    409
+  ],
+  "immutableProfileSnapshots": 1,
+  "approvalAuditEvents": 1,
+  "auditChainValid": true
+}

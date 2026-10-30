@@ -1,3 +1,5 @@
+using hotel_erp.Api.Infrastructure;
+using hotel_erp.Api.Services;
 using AutoMapper;
 using hotel_erp.Api.Authorization;
 using hotel_erp.Api.Dtos.Common;
@@ -13,16 +15,16 @@ namespace hotel_erp.Api.Controllers
     [Authorize(Policy = HotelAccessPolicies.ReadFiscalOptions)]
     public class CAIController : ControllerBase
     {
+        private readonly CaiApplicationService _application;
         private readonly ICAIRepository _repo;
         private readonly IMapper _mapper;
 
-        private readonly IUnitOfWork _unitOfWork;
 
-        public CAIController(ICAIRepository repo, IMapper mapper, IUnitOfWork unitOfWork)
+        public CAIController(ICAIRepository repo, IMapper mapper, CaiApplicationService application)
         {
-            _unitOfWork = unitOfWork;
             _repo = repo;
             _mapper = mapper;
+            _application = application;
         }
 
         [HttpGet]
@@ -50,26 +52,7 @@ namespace hotel_erp.Api.Controllers
         [ProducesResponseType(typeof(CAIDto), StatusCodes.Status201Created)]
         public async Task<ActionResult<CAIDto>> Create([FromBody] CreateCAIRequest request)
         {
-            var existing = await _repo.GetByCAINumberAsync(request.CAINumber);
-            if (existing != null) return BadRequest("El número de CAI ya existe");
-
-            var activeCai = await _repo.GetActiveCAIAsync();
-            if (activeCai != null) return BadRequest("Ya existe un CAI activo. Desactívelo antes de crear uno nuevo.");
-
-            var cai = new CAI
-            {
-                CAINumber = request.CAINumber,
-                IssueDate = request.IssueDate,
-                DueDate = request.DueDate,
-                InitialRange = request.InitialRange,
-                FinalRange = request.FinalRange,
-                CurrentCorrelative = request.InitialRange,
-                Status = CAIStatus.Activo
-            };
-
-            await _repo.AddAsync(cai);
-            await _unitOfWork.SaveChangesAsync(HttpContext.RequestAborted);
-            return CreatedAtAction(nameof(GetById), new { id = cai.Id }, _mapper.Map<CAIDto>(cai));
+            return this.CatalogResult(await _application.CreateAsync(SecurityActor.From(User), request, HttpContext.RequestAborted), nameof(GetById));
         }
 
         [HttpDelete("{id}")]
@@ -77,9 +60,7 @@ namespace hotel_erp.Api.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<ActionResult> Delete(Guid id)
         {
-            await _repo.DeleteAsync(id);
-            await _unitOfWork.SaveChangesAsync(HttpContext.RequestAborted);
-            return NoContent();
+            return this.CatalogResult(await _application.DeleteAsync(SecurityActor.From(User), id, HttpContext.RequestAborted));
         }
     }
 }

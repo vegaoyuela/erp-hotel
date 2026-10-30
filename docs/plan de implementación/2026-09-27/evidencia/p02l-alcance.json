@@ -1,0 +1,346 @@
+{
+  "date_honduras": "2026-10-30",
+  "block": "P02-L",
+  "baseline_commit": "a513f1a",
+  "covered_catalog_mutations": 34,
+  "new_application_services": 11,
+  "total_operational_and_catalog_methods_guarded": 61,
+  "covered_methods": [
+    {
+      "controller": "CustomersController",
+      "service": "CustomerApplicationService",
+      "method": "CreateAsync",
+      "permission": "ManageReservations",
+      "verb": "POST",
+      "relativeRoute": ""
+    },
+    {
+      "controller": "CustomersController",
+      "service": "CustomerApplicationService",
+      "method": "UpdateAsync",
+      "permission": "ManageReservations",
+      "verb": "PUT",
+      "relativeRoute": "{id}"
+    },
+    {
+      "controller": "CustomersController",
+      "service": "CustomerApplicationService",
+      "method": "DeleteAsync",
+      "permission": "ManageReservations",
+      "verb": "DELETE",
+      "relativeRoute": "{id}"
+    },
+    {
+      "controller": "GuestsController",
+      "service": "GuestApplicationService",
+      "method": "CreateAsync",
+      "permission": "ManageReservations",
+      "verb": "POST",
+      "relativeRoute": ""
+    },
+    {
+      "controller": "GuestsController",
+      "service": "GuestApplicationService",
+      "method": "UpdateAsync",
+      "permission": "ManageReservations",
+      "verb": "PUT",
+      "relativeRoute": "{id}"
+    },
+    {
+      "controller": "GuestsController",
+      "service": "GuestApplicationService",
+      "method": "UpdateClassificationAsync",
+      "permission": "ManageReservations",
+      "verb": "PATCH",
+      "relativeRoute": "{id}/classification"
+    },
+    {
+      "controller": "GuestsController",
+      "service": "GuestApplicationService",
+      "method": "DeleteAsync",
+      "permission": "ManageReservations",
+      "verb": "DELETE",
+      "relativeRoute": "{id}"
+    },
+    {
+      "controller": "RoomsController",
+      "service": "RoomApplicationService",
+      "method": "CreateAsync",
+      "permission": "ManageReservations",
+      "verb": "POST",
+      "relativeRoute": ""
+    },
+    {
+      "controller": "RoomsController",
+      "service": "RoomApplicationService",
+      "method": "UpdateAsync",
+      "permission": "ManageReservations",
+      "verb": "PUT",
+      "relativeRoute": "{id}"
+    },
+    {
+      "controller": "RoomsController",
+      "service": "RoomApplicationService",
+      "method": "DeleteAsync",
+      "permission": "ManageReservations",
+      "verb": "DELETE",
+      "relativeRoute": "{id}"
+    },
+    {
+      "controller": "RoomTypesController",
+      "service": "RoomTypeApplicationService",
+      "method": "CreateAsync",
+      "permission": "ManageReservations",
+      "verb": "POST",
+      "relativeRoute": ""
+    },
+    {
+      "controller": "RoomTypesController",
+      "service": "RoomTypeApplicationService",
+      "method": "UpdateAsync",
+      "permission": "ManageReservations",
+      "verb": "PUT",
+      "relativeRoute": "{id}"
+    },
+    {
+      "controller": "RoomTypesController",
+      "service": "RoomTypeApplicationService",
+      "method": "DeleteAsync",
+      "permission": "ManageReservations",
+      "verb": "DELETE",
+      "relativeRoute": "{id}"
+    },
+    {
+      "controller": "DiscountsController",
+      "service": "DiscountApplicationService",
+      "method": "CreateAsync",
+      "permission": "ManageSettings",
+      "verb": "POST",
+      "relativeRoute": ""
+    },
+    {
+      "controller": "DiscountsController",
+      "service": "DiscountApplicationService",
+      "method": "UpdateAsync",
+      "permission": "ManageSettings",
+      "verb": "PUT",
+      "relativeRoute": "{id}"
+    },
+    {
+      "controller": "DiscountsController",
+      "service": "DiscountApplicationService",
+      "method": "DeleteAsync",
+      "permission": "ManageSettings",
+      "verb": "DELETE",
+      "relativeRoute": "{id}"
+    },
+    {
+      "controller": "SuppliersController",
+      "service": "SupplierApplicationService",
+      "method": "CreateAsync",
+      "permission": "ManageAccounting",
+      "verb": "POST",
+      "relativeRoute": ""
+    },
+    {
+      "controller": "SuppliersController",
+      "service": "SupplierApplicationService",
+      "method": "UpdateAsync",
+      "permission": "ManageAccounting",
+      "verb": "PUT",
+      "relativeRoute": "{id}"
+    },
+    {
+      "controller": "SuppliersController",
+      "service": "SupplierApplicationService",
+      "method": "DeleteAsync",
+      "permission": "ManageAccounting",
+      "verb": "DELETE",
+      "relativeRoute": "{id}"
+    },
+    {
+      "controller": "CAIController",
+      "service": "CaiApplicationService",
+      "method": "CreateAsync",
+      "permission": "ManageTaxes",
+      "verb": "POST",
+      "relativeRoute": ""
+    },
+    {
+      "controller": "CAIController",
+      "service": "CaiApplicationService",
+      "method": "DeleteAsync",
+      "permission": "ManageTaxes",
+      "verb": "DELETE",
+      "relativeRoute": "{id}"
+    },
+    {
+      "controller": "DocumentAuthorizationsController",
+      "service": "DocumentAuthorizationApplicationService",
+      "method": "CreateAsync",
+      "permission": "ManageTaxes",
+      "verb": "POST",
+      "relativeRoute": ""
+    },
+    {
+      "controller": "DocumentAuthorizationsController",
+      "service": "DocumentAuthorizationApplicationService",
+      "method": "DeleteAsync",
+      "permission": "ManageTaxes",
+      "verb": "DELETE",
+      "relativeRoute": "{id}"
+    },
+    {
+      "controller": "DocumentAuthorizationsController",
+      "service": "DocumentAuthorizationApplicationService",
+      "method": "CreateWithFileAsync",
+      "permission": "ManageTaxes",
+      "verb": "POST",
+      "relativeRoute": "with-file"
+    },
+    {
+      "controller": "TaxConfigurationsController",
+      "service": "TaxConfigurationApplicationService",
+      "method": "CreateAsync",
+      "permission": "ManageTaxes",
+      "verb": "POST",
+      "relativeRoute": ""
+    },
+    {
+      "controller": "TaxConfigurationsController",
+      "service": "TaxConfigurationApplicationService",
+      "method": "UpdateAsync",
+      "permission": "ManageTaxes",
+      "verb": "PUT",
+      "relativeRoute": "{id}"
+    },
+    {
+      "controller": "TaxConfigurationsController",
+      "service": "TaxConfigurationApplicationService",
+      "method": "DeleteAsync",
+      "permission": "ManageTaxes",
+      "verb": "DELETE",
+      "relativeRoute": "{id}"
+    },
+    {
+      "controller": "SettingsController",
+      "service": "BusinessSettingsApplicationService",
+      "method": "UpdateAsync",
+      "permission": "ManageSettings",
+      "verb": "PUT",
+      "relativeRoute": "business"
+    },
+    {
+      "controller": "SettingsController",
+      "service": "BusinessSettingsApplicationService",
+      "method": "ApproveFiscalProfileAsync",
+      "permission": "ManageTaxes",
+      "verb": "POST",
+      "relativeRoute": "business/approve"
+    },
+    {
+      "controller": "SettingsController",
+      "service": "BusinessSettingsApplicationService",
+      "method": "RetireFiscalProfileAsync",
+      "permission": "ManageTaxes",
+      "verb": "POST",
+      "relativeRoute": "business/retire"
+    },
+    {
+      "controller": "AccountingController",
+      "service": "AccountingCatalogApplicationService",
+      "method": "CreateAsync",
+      "permission": "ManageAccounting",
+      "verb": "POST",
+      "relativeRoute": ""
+    },
+    {
+      "controller": "AccountingController",
+      "service": "AccountingCatalogApplicationService",
+      "method": "UpdateAsync",
+      "permission": "ManageAccounting",
+      "verb": "PUT",
+      "relativeRoute": "{id}"
+    },
+    {
+      "controller": "AccountingController",
+      "service": "AccountingCatalogApplicationService",
+      "method": "DeactivateAsync",
+      "permission": "ManageAccounting",
+      "verb": "DELETE",
+      "relativeRoute": "{id}"
+    },
+    {
+      "controller": "AccountingController",
+      "service": "AccountingCatalogApplicationService",
+      "method": "CreateJournalEntryAsync",
+      "permission": "ManageAccounting",
+      "verb": "POST",
+      "relativeRoute": "journal-entries"
+    }
+  ],
+  "previous_core_scope": {
+    "services": 9,
+    "methods": 27,
+    "delivery": "P02-K"
+  },
+  "catalog_resource_locks": [
+    "hotel-catalog:Customers",
+    "hotel-catalog:Guests",
+    "hotel-catalog:Rooms",
+    "hotel-catalog:RoomTypes",
+    "hotel-catalog:Discounts",
+    "hotel-catalog:CAI",
+    "hotel-catalog:DocumentAuthorizations",
+    "hotel-catalog:TaxConfigurations",
+    "hotel-catalog:Settings",
+    "hotel-catalog:Accounting",
+    "hotel-catalog:Suppliers"
+  ],
+  "remaining_direct_catalog_mutations": 0,
+  "remaining_external_effect_actions": [
+    {
+      "file": "backend/src/hotel-erp.Api/Controllers/BackupController.cs",
+      "actions": [
+        {
+          "action": "CreateManualBackup",
+          "verb": "POST",
+          "relativeRoute": "manual"
+        }
+      ],
+      "status": "pending external effects protocol; Windows printing deferred"
+    },
+    {
+      "file": "backend/src/hotel-erp.Api/Controllers/PrintController.cs",
+      "actions": [
+        {
+          "action": "PrintTest",
+          "verb": "POST",
+          "relativeRoute": "test-print"
+        },
+        {
+          "action": "GetTestRuler",
+          "verb": "POST",
+          "relativeRoute": "test-ruler"
+        },
+        {
+          "action": "PrintInvoice",
+          "verb": "POST",
+          "relativeRoute": "invoice/{id}"
+        }
+      ],
+      "status": "pending external effects protocol; Windows printing deferred"
+    }
+  ],
+  "external_effect_action_count": 4,
+  "read_endpoint_revocation_coordination": "not covered",
+  "no_op_deletes": "existing 204 behavior preserved; no changed entities means no new business-change audit",
+  "attachment_compensation": {
+    "before_commit_attempt": "remove the newly staged file on failure or cancellation",
+    "after_commit_attempt_with_unknown_outcome": "retain PDF to avoid deleting a possibly committed reference; reconciliation/crash recovery remains pending"
+  },
+  "new_catalog_audit_payload": "entity and schema property names; no guest/fiscal field values copied; existing settings approval/retirement audit metadata retained",
+  "migrations_added": 0,
+  "dependencies_added": 0,
+  "public_contract_changes": false
+}

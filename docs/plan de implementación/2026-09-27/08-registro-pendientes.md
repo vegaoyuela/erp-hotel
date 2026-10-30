@@ -109,3 +109,11 @@ Los 27 métodos de nueve servicios hoteleros/financieros/inventario revalidan la
 P02-06/P02-09 y G2 continúan abiertas; siguen las aprobaciones sensibles que dependen del hotel, límites/volumen y clientes heredados, roles/secretos definitivos y revisión independiente. G0/G1 y P03-folio no cambian. Windows 11, Docker Desktop, QA PowerShell e impresión física conservan el aplazamiento solicitado y el recordatorio diario existente a las 10:00 de Honduras.
 
 P07 conserva la advertencia previa de ESLint en `App.tsx:92` (`sessionKey` en `useMemo`): revisar preservando el aislamiento de caché por identidad/permisos. Lint final tiene cero errores; no se modificó la UI en P02-K.
+
+### Avance P02-L — catálogos y configuración (30 de octubre de 2026)
+
+Quedan cubiertas las **34 mutaciones directas** enumeradas en P02-K. Once servicios revalidan al actor y conservan bloqueos hasta confirmar negocio y auditoría. Se prueban 68 denegaciones directas y 68 HTTP, 35 casos exitosos y 71 rollbacks, PDF/cancelación y doble aprobación fiscal con un único snapshot. QA final: 170 unitarias, 13 integraciones PostgreSQL y 5 validaciones del expediente. No hay migración ni cambio de contrato. El [detalle P02-L](p02-base-tecnica/p02-l-catalogos-configuracion.md) y su [inventario](evidencia/p02l-alcance.json) documentan alcance y límites.
+
+**Siguiente bloque:** admisión y resultado durable de respaldo manual y tres acciones de impresión, contemplando resultados inciertos/reintentos; no ejecutar instalaciones o impresión física automáticamente. Recuperación/reconciliación de archivos ante caída durante commit corresponde a P09. Las lecturas no adquieren estos bloqueos y mantienen revisión pendiente. Continúan API/DAT/SEC, aprobaciones segregadas que requieren decisiones del hotel, límites/volumen y clientes heredados, roles/secretos definitivos, revisión independiente y el desglose de folio de P03. G0/G1/G2 no se cierran con la evidencia sintética.
+
+Windows 11, Docker Desktop, QA PowerShell e impresión física permanecen aplazados a petición del usuario. Se conserva el recordatorio existente; esta entrega no programa instalaciones ni pruebas físicas.

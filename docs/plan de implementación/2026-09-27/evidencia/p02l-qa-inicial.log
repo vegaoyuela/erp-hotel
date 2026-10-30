@@ -1,0 +1,31 @@
+[QA] 11 archivos de repositorio: sin persistencia ni transacciones implícitas
+[QA] Restaurando backend
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+[QA] Compilando backend
+  hotel-erp.Api -> /home/vm/Projects/erp-hotel/backend/src/hotel-erp.Api/bin/Debug/net10.0/hotel-erp.Api.dll
+  hotel-erp.IntegrationTests -> /home/vm/Projects/erp-hotel/backend/tests/hotel-erp.IntegrationTests/bin/Debug/net10.0/hotel-erp.IntegrationTests.dll
+  hotel-erp.UnitTests -> /home/vm/Projects/erp-hotel/backend/tests/hotel-erp.UnitTests/bin/Debug/net10.0/hotel-erp.UnitTests.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:05.58
+[QA] Ejecutando pruebas unitarias
+  hotel-erp.Api -> /home/vm/Projects/erp-hotel/backend/src/hotel-erp.Api/bin/Debug/net10.0/hotel-erp.Api.dll
+  hotel-erp.UnitTests -> /home/vm/Projects/erp-hotel/backend/tests/hotel-erp.UnitTests/bin/Debug/net10.0/hotel-erp.UnitTests.dll
+Test run for /home/vm/Projects/erp-hotel/backend/tests/hotel-erp.UnitTests/bin/Debug/net10.0/hotel-erp.UnitTests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+[xUnit.net 00:00:00.59]     hotel_erp.UnitTests.ApplicationServiceArchitectureTests.Consumer_RequiresReplaceableContract(consumer: typeof(hotel_erp.Api.Controllers.SettingsController), contract: typeof(hotel_erp.Api.Services.Interfaces.IAuditService)) [FAIL]
+  Failed hotel_erp.UnitTests.ApplicationServiceArchitectureTests.Consumer_RequiresReplaceableContract(consumer: typeof(hotel_erp.Api.Controllers.SettingsController), contract: typeof(hotel_erp.Api.Services.Interfaces.IAuditService)) [5 ms]
+  Error Message:
+   Assert.Contains() Failure: Item not found in set
+Set:       [typeof(hotel_erp.Api.Services.Interfaces.IBusinessSettingsRepository), typeof(AutoMapper.IMapper), typeof(hotel_erp.Api.Database.ApplicationDbContext), typeof(hotel_erp.Api.Services.BusinessSettingsApplicationService)]
+Not found: typeof(hotel_erp.Api.Services.Interfaces.IAuditService)
+  Stack Trace:
+     at hotel_erp.UnitTests.ApplicationServiceArchitectureTests.Consumer_RequiresReplaceableContract(Type consumer, Type contract) in /home/vm/Projects/erp-hotel/backend/tests/hotel-erp.UnitTests/ApplicationServiceArchitectureTests.cs:line 157
+   at InvokeStub_ApplicationServiceArchitectureTests.Consumer_RequiresReplaceableContract(Object, Span`1)
+   at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+
+Failed!  - Failed:     1, Passed:   168, Skipped:     0, Total:   169, Duration: 165 ms - hotel-erp.UnitTests.dll (net10.0)

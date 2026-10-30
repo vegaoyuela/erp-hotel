@@ -1,0 +1,615 @@
+{
+  "syntheticDatabase": true,
+  "passed": true,
+  "distinctHttpActions": 34,
+  "successfulCases": [
+    {
+      "operation": "Customers.Create",
+      "status": 201,
+      "auditCommittedTogether": true
+    },
+    {
+      "operation": "Customers.Update",
+      "status": 204,
+      "auditCommittedTogether": true
+    },
+    {
+      "operation": "Customers.Delete",
+      "status": 204,
+      "auditCommittedTogether": true
+    },
+    {
+      "operation": "Guests.Create",
+      "status": 201,
+      "auditCommittedTogether": true
+    },
+    {
+      "operation": "Guests.Update",
+      "status": 204,
+      "auditCommittedTogether": true
+    },
+    {
+      "operation": "Guests.UpdateClassification",
+      "status": 200,
+      "auditCommittedTogether": true
+    },
+    {
+      "operation": "Guests.Delete",
+      "status": 204,
+      "auditCommittedTogether": true
+    },
+    {
+      "operation": "Rooms.Create",
+      "status": 201,
+      "auditCommittedTogether": true
+    },
+    {
+      "operation": "Rooms.Update",
+      "status": 204,
+      "auditCommittedTogether": true
+    },
+    {
+      "operation": "Rooms.Delete",
+      "status": 204,
+      "auditCommittedTogether": true
+    },
+    {
+      "operation": "RoomTypes.Create",
+      "status": 201,
+      "auditCommittedTogether": true
+    },
+    {
+      "operation": "RoomTypes.Update",
+      "status": 204,
+      "auditCommittedTogether": true
+    },
+    {
+      "operation": "RoomTypes.Delete",
+      "status": 204,
+      "auditCommittedTogether": true
+    },
+    {
+      "operation": "Discounts.Create",
+      "status": 201,
+      "auditCommittedTogether": true
+    },
+    {
+      "operation": "Discounts.Update",
+      "status": 204,
+      "auditCommittedTogether": true
+    },
+    {
+      "operation": "Discounts.Delete",
+      "status": 204,
+      "auditCommittedTogether": true
+    },
+    {
+      "operation": "Suppliers.Create",
+      "status": 201,
+      "auditCommittedTogether": true
+    },
+    {
+      "operation": "Suppliers.Update",
+      "status": 204,
+      "auditCommittedTogether": true
+    },
+    {
+      "operation": "Suppliers.Delete",
+      "status": 204,
+      "auditCommittedTogether": true
+    },
+    {
+      "operation": "CAI.Create",
+      "status": 201,
+      "auditCommittedTogether": true
+    },
+    {
+      "operation": "CAI.Delete",
+      "status": 204,
+      "auditCommittedTogether": true
+    },
+    {
+      "operation": "DocumentAuthorizations.Create",
+      "status": 201,
+      "auditCommittedTogether": true
+    },
+    {
+      "operation": "DocumentAuthorizations.Delete",
+      "status": 204,
+      "auditCommittedTogether": true
+    },
+    {
+      "operation": "DocumentAuthorizations.CreateWithFile",
+      "status": 201,
+      "auditCommittedTogether": true
+    },
+    {
+      "operation": "TaxConfigurations.Create",
+      "status": 201,
+      "auditCommittedTogether": true
+    },
+    {
+      "operation": "TaxConfigurations.Update",
+      "status": 204,
+      "auditCommittedTogether": true
+    },
+    {
+      "operation": "TaxConfigurations.Delete",
+      "status": 204,
+      "auditCommittedTogether": true
+    },
+    {
+      "operation": "Settings.Update",
+      "status": 200,
+      "auditCommittedTogether": true
+    },
+    {
+      "operation": "Settings.ApproveFiscalProfile",
+      "status": 200,
+      "auditCommittedTogether": true
+    },
+    {
+      "operation": "Settings.RetireFiscalProfile",
+      "status": 200,
+      "auditCommittedTogether": true
+    },
+    {
+      "operation": "Accounting.Create",
+      "status": 201,
+      "auditCommittedTogether": true
+    },
+    {
+      "operation": "Accounting.Update",
+      "status": 204,
+      "auditCommittedTogether": true
+    },
+    {
+      "operation": "Accounting.Deactivate",
+      "status": 200,
+      "auditCommittedTogether": true
+    },
+    {
+      "operation": "Accounting.CreateJournalEntry",
+      "status": 201,
+      "auditCommittedTogether": true
+    },
+    {
+      "operation": "Accounting.DeactivateWithHistory",
+      "status": 200,
+      "auditCommittedTogether": true
+    }
+  ],
+  "rollbackCases": [
+    {
+      "operation": "Customers.Create",
+      "checkpoint": "catalog:after-persistence",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "Customers.Create",
+      "checkpoint": "catalog:after-audit",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "Customers.Update",
+      "checkpoint": "catalog:after-persistence",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "Customers.Update",
+      "checkpoint": "catalog:after-audit",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "Customers.Delete",
+      "checkpoint": "catalog:after-persistence",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "Customers.Delete",
+      "checkpoint": "catalog:after-audit",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "Guests.Create",
+      "checkpoint": "catalog:after-persistence",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "Guests.Create",
+      "checkpoint": "catalog:after-audit",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "Guests.Update",
+      "checkpoint": "catalog:after-persistence",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "Guests.Update",
+      "checkpoint": "catalog:after-audit",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "Guests.UpdateClassification",
+      "checkpoint": "catalog:after-persistence",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "Guests.UpdateClassification",
+      "checkpoint": "catalog:after-audit",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "Guests.Delete",
+      "checkpoint": "catalog:after-persistence",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "Guests.Delete",
+      "checkpoint": "catalog:after-audit",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "Rooms.Create",
+      "checkpoint": "catalog:after-persistence",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "Rooms.Create",
+      "checkpoint": "catalog:after-audit",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "Rooms.Update",
+      "checkpoint": "catalog:after-persistence",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "Rooms.Update",
+      "checkpoint": "catalog:after-audit",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "Rooms.Delete",
+      "checkpoint": "catalog:after-persistence",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "Rooms.Delete",
+      "checkpoint": "catalog:after-audit",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "RoomTypes.Create",
+      "checkpoint": "catalog:after-persistence",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "RoomTypes.Create",
+      "checkpoint": "catalog:after-audit",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "RoomTypes.Update",
+      "checkpoint": "catalog:after-persistence",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "RoomTypes.Update",
+      "checkpoint": "catalog:after-audit",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "RoomTypes.Delete",
+      "checkpoint": "catalog:after-persistence",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "RoomTypes.Delete",
+      "checkpoint": "catalog:after-audit",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "Discounts.Create",
+      "checkpoint": "catalog:after-persistence",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "Discounts.Create",
+      "checkpoint": "catalog:after-audit",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "Discounts.Update",
+      "checkpoint": "catalog:after-persistence",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "Discounts.Update",
+      "checkpoint": "catalog:after-audit",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "Discounts.Delete",
+      "checkpoint": "catalog:after-persistence",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "Discounts.Delete",
+      "checkpoint": "catalog:after-audit",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "Suppliers.Create",
+      "checkpoint": "catalog:after-persistence",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "Suppliers.Create",
+      "checkpoint": "catalog:after-audit",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "Suppliers.Update",
+      "checkpoint": "catalog:after-persistence",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "Suppliers.Update",
+      "checkpoint": "catalog:after-audit",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "Suppliers.Delete",
+      "checkpoint": "catalog:after-persistence",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "Suppliers.Delete",
+      "checkpoint": "catalog:after-audit",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "CAI.Create",
+      "checkpoint": "catalog:after-persistence",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "CAI.Create",
+      "checkpoint": "catalog:after-audit",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "CAI.Delete",
+      "checkpoint": "catalog:after-persistence",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "CAI.Delete",
+      "checkpoint": "catalog:after-audit",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "DocumentAuthorizations.Create",
+      "checkpoint": "catalog:after-persistence",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "DocumentAuthorizations.Create",
+      "checkpoint": "catalog:after-audit",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "DocumentAuthorizations.Delete",
+      "checkpoint": "catalog:after-persistence",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "DocumentAuthorizations.Delete",
+      "checkpoint": "catalog:after-audit",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "DocumentAuthorizations.CreateWithFile",
+      "checkpoint": "catalog:after-persistence",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "DocumentAuthorizations.CreateWithFile",
+      "checkpoint": "catalog:after-audit",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "DocumentAuthorizations.CreateWithFile",
+      "checkpoint": "catalog:after-attachment",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "TaxConfigurations.Create",
+      "checkpoint": "catalog:after-persistence",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "TaxConfigurations.Create",
+      "checkpoint": "catalog:after-audit",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "TaxConfigurations.Update",
+      "checkpoint": "catalog:after-persistence",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "TaxConfigurations.Update",
+      "checkpoint": "catalog:after-audit",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "TaxConfigurations.Delete",
+      "checkpoint": "catalog:after-persistence",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "TaxConfigurations.Delete",
+      "checkpoint": "catalog:after-audit",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "Settings.Update",
+      "checkpoint": "catalog:after-persistence",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "Settings.Update",
+      "checkpoint": "catalog:after-audit",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "Settings.ApproveFiscalProfile",
+      "checkpoint": "catalog:after-persistence",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "Settings.ApproveFiscalProfile",
+      "checkpoint": "catalog:after-audit",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "Settings.RetireFiscalProfile",
+      "checkpoint": "catalog:after-persistence",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "Settings.RetireFiscalProfile",
+      "checkpoint": "catalog:after-audit",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "Accounting.Create",
+      "checkpoint": "catalog:after-persistence",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "Accounting.Create",
+      "checkpoint": "catalog:after-audit",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "Accounting.Update",
+      "checkpoint": "catalog:after-persistence",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "Accounting.Update",
+      "checkpoint": "catalog:after-audit",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "Accounting.Deactivate",
+      "checkpoint": "catalog:after-persistence",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "Accounting.Deactivate",
+      "checkpoint": "catalog:after-audit",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "Accounting.CreateJournalEntry",
+      "checkpoint": "catalog:after-persistence",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "Accounting.CreateJournalEntry",
+      "checkpoint": "catalog:after-audit",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "Accounting.DeactivateWithHistory",
+      "checkpoint": "catalog:after-persistence",
+      "databaseRestored": true,
+      "filesRestored": true
+    },
+    {
+      "operation": "Accounting.DeactivateWithHistory",
+      "checkpoint": "catalog:after-audit",
+      "databaseRestored": true,
+      "filesRestored": true
+    }
+  ],
+  "successfulAttachments": 1,
+  "uncoordinatedCommitterCallsRejected": 2,
+  "privateValuesExcludedFromAudit": true,
+  "historicalAccountPreserved": true,
+  "auditChainValid": true
+}

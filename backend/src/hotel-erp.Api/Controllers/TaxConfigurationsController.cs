@@ -1,3 +1,5 @@
+using hotel_erp.Api.Infrastructure;
+using hotel_erp.Api.Services;
 using AutoMapper;
 using hotel_erp.Api.Authorization;
 using hotel_erp.Api.Dtos.Common;
@@ -14,13 +16,15 @@ namespace hotel_erp.Api.Controllers
     [Authorize(Policy = HotelAccessPolicies.ReadTaxRates)]
     public class TaxConfigurationsController : ControllerBase
     {
+        private readonly TaxConfigurationApplicationService _application;
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
 
-        public TaxConfigurationsController(ApplicationDbContext context, IMapper mapper)
+        public TaxConfigurationsController(ApplicationDbContext context, IMapper mapper, TaxConfigurationApplicationService application)
         {
             _context = context;
             _mapper = mapper;
+            _application = application;
         }
 
         [HttpGet]
@@ -35,19 +39,7 @@ namespace hotel_erp.Api.Controllers
         [ProducesResponseType(typeof(TaxConfigurationDto), StatusCodes.Status201Created)]
         public async Task<ActionResult<TaxConfigurationDto>> Create([FromBody] CreateTaxConfigurationRequest request)
         {
-            var existing = await _context.TaxConfigurations.FirstOrDefaultAsync(t => t.Name == request.Name);
-            if (existing != null) return BadRequest("Ya existe una configuración fiscal con ese nombre");
-
-            var tax = new TaxConfiguration
-            {
-                Name = request.Name,
-                Rate = request.Rate,
-                IsActive = request.IsActive,
-                ApplicableTo = request.ApplicableTo
-            };
-            await _context.TaxConfigurations.AddAsync(tax);
-            await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetAll), new { id = tax.Id }, _mapper.Map<TaxConfigurationDto>(tax));
+            return this.CatalogResult(await _application.CreateAsync(SecurityActor.From(User), request, HttpContext.RequestAborted), nameof(GetAll));
         }
 
         [HttpPut("{id}")]
@@ -55,15 +47,7 @@ namespace hotel_erp.Api.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<ActionResult> Update(Guid id, [FromBody] CreateTaxConfigurationRequest request)
         {
-            var tax = await _context.TaxConfigurations.FindAsync(id);
-            if (tax == null) return NotFound();
-
-            tax.Name = request.Name;
-            tax.Rate = request.Rate;
-            tax.IsActive = request.IsActive;
-            tax.ApplicableTo = request.ApplicableTo;
-            await _context.SaveChangesAsync();
-            return NoContent();
+            return this.CatalogResult(await _application.UpdateAsync(SecurityActor.From(User), id, request, HttpContext.RequestAborted));
         }
 
         [HttpDelete("{id}")]
@@ -71,12 +55,7 @@ namespace hotel_erp.Api.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<ActionResult> Delete(Guid id)
         {
-            var tax = await _context.TaxConfigurations.FindAsync(id);
-            if (tax == null) return NotFound();
-
-            tax.IsDeleted = true;
-            await _context.SaveChangesAsync();
-            return NoContent();
+            return this.CatalogResult(await _application.DeleteAsync(SecurityActor.From(User), id, HttpContext.RequestAborted));
         }
     }
 }

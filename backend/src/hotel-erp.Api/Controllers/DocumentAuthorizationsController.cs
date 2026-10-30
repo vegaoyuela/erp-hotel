@@ -15,25 +15,22 @@ namespace hotel_erp.Api.Controllers
     [Authorize(Policy = HotelAccessPolicies.ReadFiscalOptions)]
     public class DocumentAuthorizationsController : ControllerBase
     {
+        private readonly DocumentAuthorizationApplicationService _application;
         private readonly IDocumentAuthorizationRepository _repo;
         private readonly IMapper _mapper;
         private readonly AuthorizationAttachmentStore _attachmentStore;
 
-        private readonly IUnitOfWork _unitOfWork;
         private readonly HotelListQueryService _lists;
         private readonly IHotelClock _clock;
 
-        public DocumentAuthorizationsController(
-            IDocumentAuthorizationRepository repo,
-            IMapper mapper,
-            AuthorizationAttachmentStore attachmentStore, IUnitOfWork unitOfWork, HotelListQueryService lists, IHotelClock clock)
+        public DocumentAuthorizationsController(IDocumentAuthorizationRepository repo, IMapper mapper, AuthorizationAttachmentStore attachmentStore, HotelListQueryService lists, IHotelClock clock, DocumentAuthorizationApplicationService application)
         {
-            _unitOfWork = unitOfWork;
-            _lists = lists;
-            _clock = clock;
             _repo = repo;
             _mapper = mapper;
             _attachmentStore = attachmentStore;
+            _lists = lists;
+            _clock = clock;
+            _application = application;
         }
 
         [HttpGet]
@@ -68,28 +65,7 @@ namespace hotel_erp.Api.Controllers
         [ProducesResponseType(typeof(DocumentAuthorizationDto), StatusCodes.Status201Created)]
         public async Task<ActionResult<DocumentAuthorizationDto>> Create([FromBody] CreateDocumentAuthorizationRequest request)
         {
-            if (!Enum.TryParse<InvoiceDocumentType>(request.DocumentType, out var type)
-                || type is not (InvoiceDocumentType.Factura or InvoiceDocumentType.NotaCredito or InvoiceDocumentType.NotaDebito))
-                return BadRequest("Tipo de documento fiscal inválido");
-
-            var existing = await _repo.GetByCAIAsync(type, request.CAINumber);
-            if (existing != null) return BadRequest("Ya existe esa autorización para el tipo de documento indicado");
-
-            var authorization = new DocumentAuthorization
-            {
-                DocumentType = type,
-                CAINumber = request.CAINumber,
-                IssueDate = request.IssueDate,
-                DueDate = request.DueDate,
-                InitialRange = request.InitialRange,
-                FinalRange = request.FinalRange,
-                CurrentCorrelative = request.InitialRange,
-                Status = CAIStatus.Activo
-            };
-
-            await _repo.AddAsync(authorization);
-            await _unitOfWork.SaveChangesAsync(HttpContext.RequestAborted);
-            return CreatedAtAction(nameof(GetById), new { id = authorization.Id }, _mapper.Map<DocumentAuthorizationDto>(authorization));
+            return this.CatalogResult(await _application.CreateAsync(SecurityActor.From(User), request, HttpContext.RequestAborted), nameof(GetById));
         }
 
         [HttpDelete("{id}")]
@@ -97,9 +73,7 @@ namespace hotel_erp.Api.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<ActionResult> Delete(Guid id)
         {
-            await _repo.DeleteAsync(id);
-            await _unitOfWork.SaveChangesAsync(HttpContext.RequestAborted);
-            return NoContent();
+            return this.CatalogResult(await _application.DeleteAsync(SecurityActor.From(User), id, HttpContext.RequestAborted));
         }
 
         [HttpPost("with-file")]
@@ -111,56 +85,7 @@ namespace hotel_erp.Api.Controllers
             IFormFile? file,
             CancellationToken cancellationToken)
         {
-            if (!Enum.TryParse<InvoiceDocumentType>(request.DocumentType, out var type)
-                || type is not (InvoiceDocumentType.Factura or InvoiceDocumentType.NotaCredito or InvoiceDocumentType.NotaDebito))
-                return BadRequest("Tipo de documento fiscal inválido");
-
-            var existing = await _repo.GetByCAIAsync(type, request.CAINumber);
-            if (existing != null) return BadRequest("Ya existe esa autorización para el tipo de documento indicado");
-
-            var authorization = new DocumentAuthorization
-            {
-                Id = Guid.NewGuid(),
-                DocumentType = type,
-                CAINumber = request.CAINumber,
-                IssueDate = request.IssueDate,
-                DueDate = request.DueDate,
-                InitialRange = request.InitialRange,
-                FinalRange = request.FinalRange,
-                CurrentCorrelative = request.InitialRange,
-                Status = CAIStatus.Activo
-            };
-
-            if (file is not null)
-            {
-                try
-                {
-                    authorization.AttachmentPath = await _attachmentStore.SavePdfAsync(
-                        authorization.Id,
-                        file,
-                        cancellationToken);
-                }
-                catch (AttachmentValidationException exception)
-                {
-                    return Problem(
-                        type: "https://httpstatuses.com/400",
-                        title: "Adjunto rechazado",
-                        statusCode: StatusCodes.Status400BadRequest,
-                        detail: exception.Message);
-                }
-            }
-
-            try
-            {
-                await _repo.AddAsync(authorization);
-                await _unitOfWork.SaveChangesAsync(HttpContext.RequestAborted);
-            }
-            catch
-            {
-                _attachmentStore.DeleteIfExists(authorization.AttachmentPath);
-                throw;
-            }
-            return CreatedAtAction(nameof(GetById), new { id = authorization.Id }, _mapper.Map<DocumentAuthorizationDto>(authorization));
+            return this.CatalogResult(await _application.CreateWithFileAsync(SecurityActor.From(User), request, file, cancellationToken), nameof(GetById));
         }
 
         [HttpGet("{id}/file")]

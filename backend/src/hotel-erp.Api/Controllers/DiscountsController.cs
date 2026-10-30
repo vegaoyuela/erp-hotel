@@ -1,3 +1,5 @@
+using hotel_erp.Api.Infrastructure;
+using hotel_erp.Api.Services;
 using hotel_erp.Api.Dtos.Discount;
 using AutoMapper;
 using hotel_erp.Api.Authorization;
@@ -14,16 +16,16 @@ namespace hotel_erp.Api.Controllers
     [Authorize(Policy = HotelAccessPolicies.ReadDiscounts)]
     public class DiscountsController : ControllerBase
     {
+        private readonly DiscountApplicationService _application;
         private readonly IDiscountRepository _repo;
         private readonly IMapper _mapper;
 
-        private readonly IUnitOfWork _unitOfWork;
 
-        public DiscountsController(IDiscountRepository repo, IMapper mapper, IUnitOfWork unitOfWork)
+        public DiscountsController(IDiscountRepository repo, IMapper mapper, DiscountApplicationService application)
         {
-            _unitOfWork = unitOfWork;
             _repo = repo;
             _mapper = mapper;
+            _application = application;
         }
 
         [HttpGet]
@@ -43,21 +45,7 @@ namespace hotel_erp.Api.Controllers
         [ProducesResponseType(typeof(DiscountDto), StatusCodes.Status201Created)]
         public async Task<ActionResult<DiscountDto>> Create([FromBody] CreateDiscountRequest request)
         {
-            var entity = new Discount
-            {
-                Name = request.Name,
-                Description = request.Description,
-                DiscountType = Enum.Parse<DiscountType>(request.DiscountType),
-                Value = request.Value,
-                IsActive = request.IsActive,
-                ApplicableTo = request.ApplicableTo,
-                RequiresDocument = request.RequiresDocument,
-                MinAge = request.MinAge,
-                Priority = request.Priority
-            };
-            await _repo.AddAsync(entity);
-            await _unitOfWork.SaveChangesAsync(HttpContext.RequestAborted);
-            return CreatedAtAction(nameof(GetById), new { id = entity.Id }, _mapper.Map<DiscountDto>(entity));
+            return this.CatalogResult(await _application.CreateAsync(SecurityActor.From(User), request, HttpContext.RequestAborted), nameof(GetById));
         }
 
         [HttpPut("{id}")]
@@ -65,22 +53,7 @@ namespace hotel_erp.Api.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<ActionResult> Update(Guid id, [FromBody] UpdateDiscountRequest request)
         {
-            var entity = await _repo.GetByIdAsync(id);
-            if (entity == null) return NotFound();
-
-            if (request.Name != null) entity.Name = request.Name;
-            if (request.Description != null) entity.Description = request.Description;
-            if (request.DiscountType != null) entity.DiscountType = Enum.Parse<DiscountType>(request.DiscountType);
-            if (request.Value.HasValue) entity.Value = request.Value.Value;
-            if (request.IsActive.HasValue) entity.IsActive = request.IsActive.Value;
-            if (request.ApplicableTo != null) entity.ApplicableTo = request.ApplicableTo;
-            if (request.RequiresDocument.HasValue) entity.RequiresDocument = request.RequiresDocument.Value;
-            if (request.MinAge.HasValue) entity.MinAge = request.MinAge.Value;
-            if (request.Priority.HasValue) entity.Priority = request.Priority.Value;
-
-            await _repo.UpdateAsync(entity);
-            await _unitOfWork.SaveChangesAsync(HttpContext.RequestAborted);
-            return NoContent();
+            return this.CatalogResult(await _application.UpdateAsync(SecurityActor.From(User), id, request, HttpContext.RequestAborted));
         }
 
         [HttpDelete("{id}")]
@@ -88,9 +61,7 @@ namespace hotel_erp.Api.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<ActionResult> Delete(Guid id)
         {
-            await _repo.DeleteAsync(id);
-            await _unitOfWork.SaveChangesAsync(HttpContext.RequestAborted);
-            return NoContent();
+            return this.CatalogResult(await _application.DeleteAsync(SecurityActor.From(User), id, HttpContext.RequestAborted));
         }
     }
 }

@@ -1,3 +1,4 @@
+using hotel_erp.Api.Infrastructure;
 using AutoMapper;
 using hotel_erp.Api.Authorization;
 using hotel_erp.Api.Database.Entities;
@@ -15,18 +16,18 @@ namespace hotel_erp.Api.Controllers
     [Authorize(Policy = PermissionNames.ManageAccounting)]
     public class AccountsController : ControllerBase
     {
+        private readonly AccountingCatalogApplicationService _application;
         private readonly IAccountingRepository _repo;
         private readonly IMapper _mapper;
 
-        private readonly IUnitOfWork _unitOfWork;
         private readonly HotelListQueryService _lists;
 
-        public AccountsController(IAccountingRepository repo, IMapper mapper, IUnitOfWork unitOfWork, HotelListQueryService lists)
+        public AccountsController(IAccountingRepository repo, IMapper mapper, HotelListQueryService lists, AccountingCatalogApplicationService application)
         {
-            _unitOfWork = unitOfWork;
-            _lists = lists;
             _repo = repo;
             _mapper = mapper;
+            _lists = lists;
+            _application = application;
         }
 
         [HttpGet]
@@ -66,71 +67,21 @@ namespace hotel_erp.Api.Controllers
         [ProducesResponseType(typeof(AccountingAccountDto), StatusCodes.Status201Created)]
         public async Task<ActionResult<AccountingAccountDto>> Create([FromBody] CreateAccountRequest request)
         {
-            if (await _repo.AccountNumberExistsAsync(request.AccountNumber))
-                return BadRequest("El número de cuenta ya existe");
-
-            if (!Enum.TryParse<AccountType>(request.AccountType, out var accountType))
-                return BadRequest("Tipo de cuenta inválido. Use: Activo, Pasivo, Patrimonio, Ingreso, Gasto");
-
-            var account = new AccountingAccount
-            {
-                AccountNumber = request.AccountNumber,
-                AccountName = request.AccountName,
-                AccountType = accountType,
-                ParentAccountId = request.ParentAccountId,
-                IsActive = true
-            };
-
-            await _repo.AddAccountAsync(account);
-            await _unitOfWork.SaveChangesAsync(HttpContext.RequestAborted);
-            var dto = _mapper.Map<AccountingAccountDto>(account);
-            return CreatedAtAction(nameof(GetById), new { id = account.Id }, dto);
+            return this.CatalogResult(await _application.CreateAsync(SecurityActor.From(User), request, HttpContext.RequestAborted), nameof(GetById));
         }
 
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<ActionResult> Update(Guid id, [FromBody] UpdateAccountRequest request)
         {
-            var account = await _repo.GetAccountByIdAsync(id);
-            if (account == null) return NotFound();
-
-            if (request.AccountName != null)
-                account.AccountName = request.AccountName;
-
-            if (request.AccountType != null)
-            {
-                if (!Enum.TryParse<AccountType>(request.AccountType, out var accountType))
-                    return BadRequest("Tipo de cuenta inválido");
-                account.AccountType = accountType;
-            }
-
-            if (request.IsActive.HasValue)
-                account.IsActive = request.IsActive.Value;
-
-            await _repo.UpdateAccountAsync(account);
-            await _unitOfWork.SaveChangesAsync(HttpContext.RequestAborted);
-            return NoContent();
+            return this.CatalogResult(await _application.UpdateAsync(SecurityActor.From(User), id, request, HttpContext.RequestAborted));
         }
 
         [HttpDelete("{id}")]
         [ProducesResponseType(typeof(MessageResponseDto), StatusCodes.Status200OK)]
         public async Task<ActionResult> Deactivate(Guid id)
         {
-            var account = await _repo.GetAccountByIdAsync(id);
-            if (account == null) return NotFound();
-
-            var movements = await _repo.GetAccountMovementsAsync(id);
-            if (movements.Any())
-            {
-                account.IsActive = false;
-                await _repo.UpdateAccountAsync(account);
-                await _unitOfWork.SaveChangesAsync(HttpContext.RequestAborted);
-                return Ok(new { message = "Cuenta desactivada (tiene movimientos)" });
-            }
-
-            await _repo.DeleteAccountAsync(account);
-            await _unitOfWork.SaveChangesAsync(HttpContext.RequestAborted);
-            return Ok(new { message = "Cuenta eliminada" });
+            return this.CatalogResult(await _application.DeactivateAsync(SecurityActor.From(User), id, HttpContext.RequestAborted));
         }
 
         [HttpGet("journal-entries")]
@@ -162,55 +113,7 @@ namespace hotel_erp.Api.Controllers
         [ProducesResponseType(typeof(AccountingEntryDto), StatusCodes.Status201Created)]
         public async Task<ActionResult<AccountingEntryDto>> CreateJournalEntry([FromBody] CreateAccountingEntryRequest request)
         {
-            if (request.Items == null || request.Items.Count < 2)
-                return BadRequest(new { message = "Un asiento contable requiere al menos 2 cuentas (partida doble)" });
-
-            var totalDebit = request.Items.Sum(i => i.Debit);
-            var totalCredit = request.Items.Sum(i => i.Credit);
-
-            if (totalDebit <= 0 || totalCredit <= 0)
-                return BadRequest(new { message = "Los importes del asiento deben ser mayores a cero" });
-
-            if (Math.Round(totalDebit, 2) != Math.Round(totalCredit, 2))
-                return BadRequest(new { message = $"El asiento está descuadrado. Débitos: L {totalDebit:N2} vs Créditos: L {totalCredit:N2}" });
-
-            var accounts = await _repo.GetAllAccountsAsync();
-            var accountDict = accounts.ToDictionary(a => a.Id);
-
-            var entryType = Enum.TryParse<EntryType>(request.EntryType, true, out var parsedType)
-                ? parsedType
-                : EntryType.Diario;
-
-            var entry = new AccountingEntry
-            {
-                TransactionDate = request.TransactionDate,
-                Description = request.Description.Trim(),
-                EntryType = entryType,
-                ReferenceId = null,
-            };
-
-            foreach (var item in request.Items)
-            {
-                if (!accountDict.ContainsKey(item.AccountId))
-                    return BadRequest(new { message = $"La cuenta contable {item.AccountId} no existe" });
-
-                if (item.Debit > 0 && item.Credit > 0)
-                    return BadRequest(new { message = "Una línea contable no puede tener débito y crédito simultáneamente" });
-
-                entry.EntryItems.Add(new EntryItem
-                {
-                    AccountId = item.AccountId,
-                    Debit = item.Debit,
-                    Credit = item.Credit,
-                    Description = item.Description?.Trim()
-                });
-            }
-
-            await _repo.AddEntryAsync(entry);
-            await _unitOfWork.SaveChangesAsync(HttpContext.RequestAborted);
-
-            var createdEntry = await _repo.GetEntryByIdAsync(entry.Id);
-            return CreatedAtAction(nameof(GetJournalEntry), new { id = entry.Id }, _mapper.Map<AccountingEntryDto>(createdEntry ?? entry));
+            return this.CatalogResult(await _application.CreateJournalEntryAsync(SecurityActor.From(User), request, HttpContext.RequestAborted), nameof(GetJournalEntry));
         }
 
 

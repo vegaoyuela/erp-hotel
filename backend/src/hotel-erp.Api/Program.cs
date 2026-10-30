@@ -126,6 +126,18 @@ builder.Services.AddScoped<IDatabaseBackupService, DatabaseBackupService>();
 builder.Services.AddHostedService<BackupHostedService>();
 
 builder.Services.AddScoped<OperationalMutationGuard>();
+builder.Services.AddScoped<CatalogMutationCommitter>();
+builder.Services.AddScoped<CustomerApplicationService>();
+builder.Services.AddScoped<GuestApplicationService>();
+builder.Services.AddScoped<RoomApplicationService>();
+builder.Services.AddScoped<RoomTypeApplicationService>();
+builder.Services.AddScoped<DiscountApplicationService>();
+builder.Services.AddScoped<SupplierApplicationService>();
+builder.Services.AddScoped<CaiApplicationService>();
+builder.Services.AddScoped<DocumentAuthorizationApplicationService>();
+builder.Services.AddScoped<TaxConfigurationApplicationService>();
+builder.Services.AddScoped<BusinessSettingsApplicationService>();
+builder.Services.AddScoped<AccountingCatalogApplicationService>();
 builder.Services.AddControllers(options =>
 {
     options.Filters.Add<ApiProblemDetailsFilter>();

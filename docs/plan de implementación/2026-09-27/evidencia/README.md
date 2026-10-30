@@ -298,3 +298,23 @@ El [detalle](../p02-base-tecnica/p02-j-administracion-atomica.md) y la [matriz f
 | [p02k-qa-resumen.json](p02k-qa-resumen.json) | Resumen, contrato sin cambios, límites y hashes. |
 
 El [detalle](../p02-base-tecnica/p02-k-revocacion-operativa.md) explica alcance, pruebas y uso. No se alteró la UI. P02-06/P02-09, revisión independiente y G2 permanecen abiertas. Windows e impresión continúan aplazados con su recordatorio existente.
+
+### P02-L — catálogos y configuración (30 de octubre de 2026)
+
+34 acciones extraídas a once servicios con admisión, bloqueo de catálogo y auditoría dentro de la transacción exterior.
+
+| Archivo | Resultado |
+|---|---|
+| [p02l-qa.log](p02l-qa.log) | QA final: 170 unitarias, 13 integraciones, 5 validaciones del expediente, contrato real, dependencias, lint y build. Lint conserva una advertencia previa. |
+| [p02l-qa-inicial.log](p02l-qa-inicial.log) | Comprobación de arquitectura anterior al refactor; corregida para exigir auditoría en los nuevos consumidores. |
+| [p02l-selectiva-inicial.log](p02l-selectiva-inicial.log) | Dos integraciones aprobadas y fallo de test al buscar ID público en el DTO de configuración. |
+| [p02l-atomicidad-selectiva.log](p02l-atomicidad-selectiva.log) | Prueba de atomicidad corregida y aprobada; identifica el recurso mediante su ID interno. |
+| [p02l-revocacion.json](p02l-revocacion.json) | 68 denegaciones directas y 68 HTTP; 68 esperas observadas, negocio/archivos preservados. |
+| [p02l-atomicidad.json](p02l-atomicidad.json) | 35 éxitos auditados, 71 rollbacks y un PDF exitoso conservado. |
+| [p02l-orden.json](p02l-orden.json) | Configuración/revocación, PDF/logout, cancelación limpia y aprobación concurrente 200/409. |
+| [p02l-alcance.json](p02l-alcance.json) | Cero mutaciones directas de las 34 originales; cuatro acciones externas pendientes, lecturas y límite de commit incierto. |
+| [p02l-modelo-ef.log](p02l-modelo-ef.log) | Sin cambios pendientes del modelo. |
+| [p02l-base-qa.json](p02l-base-qa.json) | Base original preservada y cero bases temporales. |
+| [p02l-qa-resumen.json](p02l-qa-resumen.json) | Resumen y hashes de fuentes, pruebas, contrato y evidencia. |
+
+El [detalle](../p02-base-tecnica/p02-l-catalogos-configuracion.md) conserva el alcance y los pendientes. No se alteró la UI ni se ejecutó instalación/impresión física. La aprobación productiva/fiscal y G2 siguen pendientes.

@@ -20,6 +20,8 @@ La entrega [P02-J](p02-base-tecnica/p02-j-administracion-atomica.md) protege la 
 
 La entrega [P02-K](p02-base-tecnica/p02-k-revocacion-operativa.md), del 30 de octubre, coordina 27 mutaciones operativas con revocación y logout, y prueba cancelación sin cambios parciales. QA: 147 unitarias, 10 integraciones y 5 validaciones del expediente. El inventario deja 34 mutaciones directas y efectos externos pendientes; G2 sigue abierta.
 
+La entrega [P02-L](p02-base-tecnica/p02-l-catalogos-configuracion.md) cubre las 34 mutaciones de catálogos/configuración que quedaban directas. Añade auditoría atómica, compensación del PDF y pruebas de 71 fallos; son 61 métodos coordinados entre P02-K/P02-L. QA: 170 unitarias, 13 integraciones y 5 validaciones del expediente. Siguen pendientes efectos externos, lecturas y el alcance de seguridad/aceptación documentado; G2 permanece abierta.
+
 ## Resultado esperado
 
 Al cerrar este plan debe existir una versión que:

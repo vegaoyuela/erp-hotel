@@ -13,6 +13,9 @@ public sealed class NoOpApplicationFailureInjector : IApplicationFailureInjector
 
 public static class ApplicationFailureCheckpoints
 {
+    public const string CatalogAfterAttachment = "catalog:after-attachment";
+    public const string CatalogAfterPersistence = "catalog:after-persistence";
+    public const string CatalogAfterAudit = "catalog:after-audit";
     public const string OperationalAfterAdmission = "operational:after-admission";
     public const string SecurityAfterLock = "security:after-lock";
     public const string SecurityAfterPersistence = "security:after-persistence";

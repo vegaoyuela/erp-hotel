@@ -1,3 +1,5 @@
+using hotel_erp.Api.Infrastructure;
+using hotel_erp.Api.Services;
 using AutoMapper;
 using hotel_erp.Api.Authorization;
 using hotel_erp.Api.Dtos.Common;
@@ -12,16 +14,16 @@ namespace hotel_erp.Api.Controllers
     [Authorize(Policy = PermissionNames.ManageAccounting)]
     public class SuppliersController : ControllerBase
     {
+        private readonly SupplierApplicationService _application;
         private readonly ISupplierRepository _repo;
         private readonly IMapper _mapper;
 
-        private readonly IUnitOfWork _unitOfWork;
 
-        public SuppliersController(ISupplierRepository repo, IMapper mapper, IUnitOfWork unitOfWork)
+        public SuppliersController(ISupplierRepository repo, IMapper mapper, SupplierApplicationService application)
         {
-            _unitOfWork = unitOfWork;
             _repo = repo;
             _mapper = mapper;
+            _application = application;
         }
 
         [HttpGet]
@@ -44,47 +46,21 @@ namespace hotel_erp.Api.Controllers
         [ProducesResponseType(typeof(SupplierDto), StatusCodes.Status201Created)]
         public async Task<ActionResult<SupplierDto>> Create([FromBody] CreateSupplierRequest request)
         {
-            var supplier = new hotel_erp.Api.Database.Entities.Supplier
-            {
-                Name = request.Name,
-                RTN = request.RTN,
-                ContactPerson = request.ContactPerson,
-                Phone = request.Phone,
-                Email = request.Email,
-                Address = request.Address
-            };
-            await _repo.AddAsync(supplier);
-            await _unitOfWork.SaveChangesAsync(HttpContext.RequestAborted);
-            return CreatedAtAction(nameof(GetById), new { id = supplier.Id }, _mapper.Map<SupplierDto>(supplier));
+            return this.CatalogResult(await _application.CreateAsync(SecurityActor.From(User), request, HttpContext.RequestAborted), nameof(GetById));
         }
 
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<ActionResult> Update(Guid id, [FromBody] UpdateSupplierRequest request)
         {
-            var supplier = await _repo.GetByIdAsync(id);
-            if (supplier == null) return NotFound();
-
-            if (request.Name != null) supplier.Name = request.Name;
-            if (request.RTN != null) supplier.RTN = request.RTN;
-            if (request.ContactPerson != null) supplier.ContactPerson = request.ContactPerson;
-            if (request.Phone != null) supplier.Phone = request.Phone;
-            if (request.Email != null) supplier.Email = request.Email;
-            if (request.Address != null) supplier.Address = request.Address;
-            if (request.IsActive.HasValue) supplier.IsActive = request.IsActive.Value;
-
-            await _repo.UpdateAsync(supplier);
-            await _unitOfWork.SaveChangesAsync(HttpContext.RequestAborted);
-            return NoContent();
+            return this.CatalogResult(await _application.UpdateAsync(SecurityActor.From(User), id, request, HttpContext.RequestAborted));
         }
 
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<ActionResult> Delete(Guid id)
         {
-            await _repo.DeleteAsync(id);
-            await _unitOfWork.SaveChangesAsync(HttpContext.RequestAborted);
-            return NoContent();
+            return this.CatalogResult(await _application.DeleteAsync(SecurityActor.From(User), id, HttpContext.RequestAborted));
         }
     }
 }
