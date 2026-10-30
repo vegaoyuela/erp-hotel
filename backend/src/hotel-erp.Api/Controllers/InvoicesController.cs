@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using AutoMapper;
 using hotel_erp.Api.Authorization;
 using hotel_erp.Api.Dtos.Common;
@@ -69,7 +68,7 @@ public class InvoicesController(
     {
         var result = await invoiceService.UpdateDraftAsync(
             id,
-            CurrentUserId(),
+            CurrentActor(),
             request,
             HttpContext.RequestAborted);
         if (!result.Succeeded)
@@ -86,7 +85,7 @@ public class InvoicesController(
         [FromHeader(Name = "Idempotency-Key")] string? idempotencyKey)
     {
         var result = await invoiceService.CreateAsync(
-            CurrentUserId(),
+            CurrentActor(),
             request,
             idempotencyKey,
             HttpContext.RequestAborted);
@@ -120,7 +119,7 @@ public class InvoicesController(
     {
         var result = await invoiceService.CreateCreditNoteAsync(
             id,
-            CurrentUserId(),
+            CurrentActor(),
             request,
             idempotencyKey,
             HttpContext.RequestAborted);
@@ -141,7 +140,7 @@ public class InvoicesController(
     {
         var result = await invoiceService.CreateDebitNoteAsync(
             id,
-            CurrentUserId(),
+            CurrentActor(),
             request,
             idempotencyKey,
             HttpContext.RequestAborted);
@@ -152,8 +151,8 @@ public class InvoicesController(
         return CreatedAtAction(nameof(GetById), new { id = result.Invoice!.Id }, mapper.Map<InvoiceDto>(result.Invoice));
     }
 
-    private Guid CurrentUserId()
-        => Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+    private SecurityActor CurrentActor()
+        => SecurityActor.From(User);
 
     private ObjectResult Failure(InvoiceMutationResult result)
     {

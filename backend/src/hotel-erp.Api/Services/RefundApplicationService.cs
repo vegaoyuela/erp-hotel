@@ -1,3 +1,4 @@
+using hotel_erp.Api.Authorization;
 using hotel_erp.Api.Database;
 using hotel_erp.Api.Database.Entities;
 using hotel_erp.Api.Dtos.Payments;
@@ -22,15 +23,19 @@ public sealed class RefundApplicationService(
     IAuditService auditService,
     IdempotencyService idempotencyService,
     IHotelClock clock,
-    IApplicationFailureInjector failureInjector)
+    IApplicationFailureInjector failureInjector,
+    OperationalMutationGuard access)
 {
     public async Task<RefundCreationResult> CreateAsync(
-        Guid userId,
+        SecurityActor actor,
         Guid paymentId,
         CreateRefundRequest request,
         string? idempotencyKey,
         CancellationToken cancellationToken = default)
     {
+        var userId = actor.Id;
+        await using var transaction = await access.BeginAsync(actor, PermissionNames.ManageCash, cancellationToken);
+
         if (!IdempotencyService.TryNormalizeKey(idempotencyKey, out var normalizedKey))
             return RefundCreationResult.BadRequest("Idempotency-Key debe ser un UUID válido");
 
@@ -60,7 +65,6 @@ public sealed class RefundApplicationService(
             Applications = applications
         });
 
-        await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
         try
         {
             var existingIntent = await idempotencyService.LockAndFindAsync(

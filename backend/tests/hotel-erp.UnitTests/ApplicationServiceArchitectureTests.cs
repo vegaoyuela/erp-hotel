@@ -7,6 +7,24 @@ namespace hotel_erp.UnitTests;
 public class ApplicationServiceArchitectureTests
 {
     [Theory]
+    [InlineData(typeof(InvoiceApplicationService))]
+    [InlineData(typeof(PaymentApplicationService))]
+    [InlineData(typeof(RefundApplicationService))]
+    [InlineData(typeof(CardSettlementApplicationService))]
+    [InlineData(typeof(ReservationApplicationService))]
+    [InlineData(typeof(FolioApplicationService))]
+    [InlineData(typeof(CashRegisterApplicationService))]
+    [InlineData(typeof(PurchaseInvoiceApplicationService))]
+    [InlineData(typeof(InventoryApplicationService))]
+    public void OperationalMutation_RequiresVersionedActorAndTransactionGuard(Type service)
+    {
+        Assert.Contains(Assert.Single(service.GetConstructors()).GetParameters(), parameter => parameter.ParameterType == typeof(OperationalMutationGuard));
+        var methods = service.GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.DeclaredOnly)
+            .Where(method => typeof(Task).IsAssignableFrom(method.ReturnType));
+        Assert.All(methods, method => Assert.Contains(method.GetParameters(), parameter => parameter.ParameterType == typeof(SecurityActor)));
+    }
+
+    [Theory]
     [InlineData(typeof(UsersController))]
     [InlineData(typeof(RolesController))]
     public void SecurityMutationController_DelegatesToTransactionalService(Type controller)

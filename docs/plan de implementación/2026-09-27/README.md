@@ -18,6 +18,8 @@ La entrega [P02-I](p02-base-tecnica/p02-i-accesos-seguridad.md) alinea consultas
 
 La entrega [P02-J](p02-base-tecnica/p02-j-administracion-atomica.md) protege la administración y sesiones con transacciones/bloqueos, conserva el último administrador y confirma auditoría con revocación. Añade 39 rollbacks y ocho carreras; la QA suma 138 unitarias, 8 integraciones y 5 validaciones del expediente. Quedan las aprobaciones sensibles y brechas formales documentadas; G2 permanece abierta.
 
+La entrega [P02-K](p02-base-tecnica/p02-k-revocacion-operativa.md), del 30 de octubre, coordina 27 mutaciones operativas con revocación y logout, y prueba cancelación sin cambios parciales. QA: 147 unitarias, 10 integraciones y 5 validaciones del expediente. El inventario deja 34 mutaciones directas y efectos externos pendientes; G2 sigue abierta.
+
 ## Resultado esperado
 
 Al cerrar este plan debe existir una versión que:

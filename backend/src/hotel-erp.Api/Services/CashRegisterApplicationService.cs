@@ -1,3 +1,4 @@
+using hotel_erp.Api.Authorization;
 using hotel_erp.Api.Services.Interfaces;
 using hotel_erp.Api.Database;
 using hotel_erp.Api.Database.Entities;
@@ -11,14 +12,17 @@ public sealed class CashRegisterApplicationService(
     IAuditService auditService,
     IdempotencyService idempotencyService,
     IHotelClock clock,
-    IApplicationFailureInjector failureInjector)
+    IApplicationFailureInjector failureInjector,
+    OperationalMutationGuard access)
 {
     public async Task<ApplicationMutationResult<CashRegisterDto>> CreateAsync(
-        Guid userId,
+        SecurityActor actor,
         CreateCashRegisterRequest request,
         CancellationToken cancellationToken = default)
     {
-        await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
+        var userId = actor.Id;
+        await using var transaction = await access.BeginAsync(actor, PermissionNames.ManageCash, cancellationToken);
+
         const string catalogLock = "cash-register-catalog";
         await context.Database.ExecuteSqlInterpolatedAsync(
             $"SELECT pg_advisory_xact_lock(hashtext({catalogLock}));",
@@ -52,11 +56,14 @@ public sealed class CashRegisterApplicationService(
 
     public async Task<ApplicationMutationResult<CashRegisterOperationDto>> OpenAsync(
         Guid id,
-        Guid userId,
+        SecurityActor actor,
         OpenCashRegisterRequest request,
         string? idempotencyKey,
         CancellationToken cancellationToken = default)
     {
+        var userId = actor.Id;
+        await using var transaction = await access.BeginAsync(actor, PermissionNames.ManageCash, cancellationToken);
+
         if (!IdempotencyService.TryNormalizeKey(idempotencyKey, out var normalizedKey))
         {
             return ApplicationMutationResult<CashRegisterOperationDto>.BadRequest(
@@ -69,7 +76,6 @@ public sealed class CashRegisterApplicationService(
             CashRegisterId = id,
             InitialAmount = initialAmount
         });
-        await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
         IdempotencyRecord? existingIntent;
         try
         {
@@ -144,11 +150,14 @@ public sealed class CashRegisterApplicationService(
 
     public async Task<ApplicationMutationResult<CashRegisterOperationDto>> CloseAsync(
         Guid id,
-        Guid userId,
+        SecurityActor actor,
         CloseCashRegisterRequest request,
         string? idempotencyKey,
         CancellationToken cancellationToken = default)
     {
+        var userId = actor.Id;
+        await using var transaction = await access.BeginAsync(actor, PermissionNames.ManageCash, cancellationToken);
+
         if (!IdempotencyService.TryNormalizeKey(idempotencyKey, out var normalizedKey))
         {
             return ApplicationMutationResult<CashRegisterOperationDto>.BadRequest(
@@ -163,7 +172,6 @@ public sealed class CashRegisterApplicationService(
             CountedAmount = countedAmount,
             Notes = notes
         });
-        await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
         IdempotencyRecord? existingIntent;
         try
         {

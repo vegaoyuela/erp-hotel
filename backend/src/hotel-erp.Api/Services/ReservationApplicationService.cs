@@ -1,3 +1,4 @@
+using hotel_erp.Api.Authorization;
 using hotel_erp.Api.Database;
 using hotel_erp.Api.Database.Entities;
 using hotel_erp.Api.Dtos.Common;
@@ -32,20 +33,23 @@ public sealed class ReservationApplicationService(
     ITaxCalculator taxService,
     IAuditService auditService,
     IHotelClock clock,
-    IApplicationFailureInjector failureInjector)
+    IApplicationFailureInjector failureInjector,
+    OperationalMutationGuard access)
 {
     public async Task<ApplicationMutationResult<Reservation>> CreateAsync(
-        Guid userId,
+        SecurityActor actor,
         CreateReservationRequest request,
         CancellationToken cancellationToken = default)
     {
+        var userId = actor.Id;
+        await using var transaction = await access.BeginAsync(actor, PermissionNames.ManageReservations, cancellationToken);
+
         if (request.AdvancePayment > 0m)
         {
             return ApplicationMutationResult<Reservation>.BadRequest(
                 "Los anticipos estarán disponibles cuando puedan registrarse y aplicarse contablemente");
         }
 
-        await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
         await LockRoomScheduleAsync(request.RoomId, cancellationToken);
 
         var room = await context.Rooms
@@ -113,11 +117,13 @@ public sealed class ReservationApplicationService(
 
     public async Task<ApplicationMutationResult<ReservationVersionResult>> UpdateAsync(
         Guid id,
-        Guid userId,
+        SecurityActor actor,
         UpdateReservationRequest request,
         CancellationToken cancellationToken = default)
     {
-        await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
+        var userId = actor.Id;
+        await using var transaction = await access.BeginAsync(actor, PermissionNames.ManageReservations, cancellationToken);
+
         await LockReservationAsync(id, cancellationToken);
         var reservation = await context.Reservations
             .Include(candidate => candidate.Guest)
@@ -207,11 +213,13 @@ public sealed class ReservationApplicationService(
 
     public async Task<ApplicationMutationResult<ReservationStateResult>> ConfirmAsync(
         Guid id,
-        Guid userId,
+        SecurityActor actor,
         ConfirmReservationRequest request,
         CancellationToken cancellationToken = default)
     {
-        await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
+        var userId = actor.Id;
+        await using var transaction = await access.BeginAsync(actor, PermissionNames.ManageReservations, cancellationToken);
+
         await LockReservationAsync(id, cancellationToken);
         var reservation = await context.Reservations
             .SingleOrDefaultAsync(candidate => candidate.Id == id, cancellationToken);
@@ -251,11 +259,13 @@ public sealed class ReservationApplicationService(
 
     public async Task<ApplicationMutationResult<ReservationStateResult>> CancelAsync(
         Guid id,
-        Guid userId,
+        SecurityActor actor,
         CancelReservationRequest request,
         CancellationToken cancellationToken = default)
     {
-        await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
+        var userId = actor.Id;
+        await using var transaction = await access.BeginAsync(actor, PermissionNames.ManageReservations, cancellationToken);
+
         await LockReservationAsync(id, cancellationToken);
         var reservation = await context.Reservations
             .SingleOrDefaultAsync(candidate => candidate.Id == id, cancellationToken);
@@ -294,11 +304,13 @@ public sealed class ReservationApplicationService(
     }
 
     public async Task<ApplicationMutationResult<CheckInResult>> CheckInAsync(
-        Guid userId,
+        SecurityActor actor,
         CheckInRequest request,
         CancellationToken cancellationToken = default)
     {
-        await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
+        var userId = actor.Id;
+        await using var transaction = await access.BeginAsync(actor, PermissionNames.ManageReservations, cancellationToken);
+
         await LockReservationAsync(request.ReservationId, cancellationToken);
         await LockRoomScheduleAsync(request.RoomId, cancellationToken);
 
@@ -435,11 +447,13 @@ public sealed class ReservationApplicationService(
 
     public async Task<ApplicationMutationResult<CheckOutResult>> CheckOutAsync(
         Guid id,
-        Guid userId,
+        SecurityActor actor,
         CheckOutRequest request,
         CancellationToken cancellationToken = default)
     {
-        await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
+        var userId = actor.Id;
+        await using var transaction = await access.BeginAsync(actor, PermissionNames.ManageReservations, cancellationToken);
+
         await LockReservationAsync(id, cancellationToken);
 
         var reservation = await context.Reservations

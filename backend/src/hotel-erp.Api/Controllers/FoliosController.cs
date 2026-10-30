@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using AutoMapper;
 using hotel_erp.Api.Authorization;
 using hotel_erp.Api.Dtos.Common;
@@ -57,8 +56,8 @@ public class FoliosController(
     [Authorize(Policy = PermissionNames.CreateInvoices)]
     public async Task<ActionResult<FolioChargeResult>> AddItem(Guid folioId, [FromBody] AddFolioItemRequest request)
     {
-        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        var result = await folioService.AddItemAsync(folioId, userId, request, HttpContext.RequestAborted);
+        var actor = SecurityActor.From(User);
+        var result = await folioService.AddItemAsync(folioId, actor, request, HttpContext.RequestAborted);
         if (!result.Succeeded)
             return StatusCode(result.FailureStatus!.Value, result.FailureDetail);
 

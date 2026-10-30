@@ -1,3 +1,4 @@
+using hotel_erp.Api.Authorization;
 using hotel_erp.Api.Services.Interfaces;
 using hotel_erp.Api.Database;
 using hotel_erp.Api.Database.Entities;
@@ -12,15 +13,18 @@ public sealed class FolioApplicationService(
     ApplicationDbContext context,
     IAuditService auditService,
     IInvoiceCalculator invoiceCalculator,
-    IApplicationFailureInjector failureInjector)
+    IApplicationFailureInjector failureInjector,
+    OperationalMutationGuard access)
 {
     public async Task<ApplicationMutationResult<FolioChargeResult>> AddItemAsync(
         Guid folioId,
-        Guid userId,
+        SecurityActor actor,
         AddFolioItemRequest request,
         CancellationToken cancellationToken = default)
     {
-        await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
+        var userId = actor.Id;
+        await using var transaction = await access.BeginAsync(actor, PermissionNames.CreateInvoices, cancellationToken);
+
         var folioLock = $"folio-settlement:{folioId:N}";
         await context.Database.ExecuteSqlInterpolatedAsync(
             $"SELECT pg_advisory_xact_lock(hashtext({folioLock}));",

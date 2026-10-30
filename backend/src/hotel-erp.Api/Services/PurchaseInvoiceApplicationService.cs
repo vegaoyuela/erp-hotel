@@ -1,3 +1,4 @@
+using hotel_erp.Api.Authorization;
 using hotel_erp.Api.Database;
 using hotel_erp.Api.Database.Entities;
 using hotel_erp.Api.Dtos.Common;
@@ -12,19 +13,22 @@ public sealed class PurchaseInvoiceApplicationService(
     ApplicationDbContext context,
     IAccountingService accountingService,
     IAuditService auditService,
-    IApplicationFailureInjector failureInjector)
+    IApplicationFailureInjector failureInjector,
+    OperationalMutationGuard access)
 {
     public async Task<ApplicationMutationResult<PurchaseInvoice>> CreateAsync(
-        Guid userId,
+        SecurityActor actor,
         CreatePurchaseInvoiceRequest request,
         CancellationToken cancellationToken = default)
     {
+        var userId = actor.Id;
+        await using var transaction = await access.BeginAsync(actor, PermissionNames.ManageAccounting, cancellationToken);
+
         var validation = ValidateItems(request.Items);
         if (validation is not null)
             return ApplicationMutationResult<PurchaseInvoice>.BadRequest(validation);
 
         var invoiceNumber = request.InvoiceNumber.Trim();
-        await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
         var lockName = $"purchase-invoice:{request.SupplierId:N}:{invoiceNumber.ToUpperInvariant()}";
         await context.Database.ExecuteSqlInterpolatedAsync(
             $"SELECT pg_advisory_xact_lock(hashtext({lockName}));",
@@ -116,10 +120,12 @@ public sealed class PurchaseInvoiceApplicationService(
 
     public async Task<ApplicationMutationResult<PurchaseOperationResult>> MarkAsPaidAsync(
         Guid id,
-        Guid userId,
+        SecurityActor actor,
         CancellationToken cancellationToken = default)
     {
-        await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
+        var userId = actor.Id;
+        await using var transaction = await access.BeginAsync(actor, PermissionNames.ManageAccounting, cancellationToken);
+
         await LockPurchaseAsync(id, cancellationToken);
         var purchase = await context.PurchaseInvoices
             .SingleOrDefaultAsync(candidate => candidate.Id == id, cancellationToken);
@@ -149,10 +155,12 @@ public sealed class PurchaseInvoiceApplicationService(
 
     public async Task<ApplicationMutationResult<PurchaseOperationResult>> DeleteAsync(
         Guid id,
-        Guid userId,
+        SecurityActor actor,
         CancellationToken cancellationToken = default)
     {
-        await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
+        var userId = actor.Id;
+        await using var transaction = await access.BeginAsync(actor, PermissionNames.ManageAccounting, cancellationToken);
+
         await LockPurchaseAsync(id, cancellationToken);
         var purchase = await context.PurchaseInvoices
             .SingleOrDefaultAsync(candidate => candidate.Id == id, cancellationToken);

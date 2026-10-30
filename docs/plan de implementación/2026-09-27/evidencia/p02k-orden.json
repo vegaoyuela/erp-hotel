@@ -1,0 +1,13 @@
+{
+  "syntheticDatabase": true,
+  "passed": true,
+  "activeOperationBeforeRoleRevocation": true,
+  "activeOperationBeforeOwnLogout": true,
+  "canceledAdmissionReleasesSecurityLocks": true,
+  "resourceAndSecurityWaitersObserved": true,
+  "initialStock": 10,
+  "committedMovements": 2,
+  "finalStock": 12,
+  "canceledMovements": 0,
+  "auditChainValid": true
+}

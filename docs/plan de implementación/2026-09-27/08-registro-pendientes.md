@@ -1,6 +1,6 @@
 # 08 — Registro de pendientes y bloqueos
 
-**Última actualización:** 29 de octubre de 2026
+**Última actualización:** 30 de octubre de 2026
 
 Este registro separa lo que depende del código de aquello que requiere información o aprobación del hotel. Una tarea externa no se cierra con datos supuestos ni con el expediente sintético de QA.
 
@@ -99,3 +99,13 @@ Se cerró en código/QA la concurrencia y atomicidad de administración de usuar
 P02-06 sigue abierta por aprobaciones segregadas por monto/medio/origen y motivos/aprobaciones sensibles restantes; los umbrales deben provenir del hotel. El siguiente bloque ejecutable debe comprobar revocación durante esperas de operaciones hoteleras/financieras y completar las demás brechas formales API/DAT/SEC independientes de Windows/decisiones del hotel. Persisten P02-04 (límites/volumen y clientes heredados), P02-07, P02-09/P02-10, P03-folio y G0/G1. No se presume aprobación técnica independiente ni fiscal.
 
 Windows 11, Docker Desktop, QA PowerShell e impresión física conservan su aplazamiento y el recordatorio diario existente a las 10:00 de Honduras.
+
+### Avance P02-K — revocación operativa (30 de octubre de 2026)
+
+Los 27 métodos de nueve servicios hoteleros/financieros/inventario revalidan la sesión y el permiso después de adquirir los bloqueos compartidos de catálogo/usuario, que conservan hasta finalizar su transacción. La revocación y logout esperan a operaciones ya admitidas. Pasan 54 denegaciones directas, tres HTTP en espera, un 403 HTTP adicional y pruebas de orden/cancelación. QA completa: 147 unitarias, 10 integraciones y 5 validaciones del expediente. Véase [detalle P02-K](p02-base-tecnica/p02-k-revocacion-operativa.md).
+
+**Siguiente bloque ejecutable:** extraer y coordinar las 34 mutaciones de clientes, huéspedes, habitaciones/tipos, descuentos, CAI/autorizaciones, impuestos, configuración/perfil fiscal, cuentas/asientos manuales y proveedores. Conservar sus contratos, probar atomicidad/auditoría y ambas órdenes de revocación. Respaldo manual e impresión suman cuatro acciones con efectos externos y requieren un protocolo propio. Las lecturas no se declaran coordinadas por esta entrega. El [inventario](evidencia/p02k-alcance.json) enumera las acciones.
+
+P02-06/P02-09 y G2 continúan abiertas; siguen las aprobaciones sensibles que dependen del hotel, límites/volumen y clientes heredados, roles/secretos definitivos y revisión independiente. G0/G1 y P03-folio no cambian. Windows 11, Docker Desktop, QA PowerShell e impresión física conservan el aplazamiento solicitado y el recordatorio diario existente a las 10:00 de Honduras.
+
+P07 conserva la advertencia previa de ESLint en `App.tsx:92` (`sessionKey` en `useMemo`): revisar preservando el aislamiento de caché por identidad/permisos. Lint final tiene cero errores; no se modificó la UI en P02-K.

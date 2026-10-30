@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using AutoMapper;
 using hotel_erp.Api.Authorization;
 using hotel_erp.Api.Database;
@@ -124,9 +123,9 @@ namespace hotel_erp.Api.Controllers
             [FromBody] CreateCardSettlementRequest request,
             [FromHeader(Name = "Idempotency-Key")] string? idempotencyKey)
         {
-            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var actor = SecurityActor.From(User);
             var result = await _settlementService.CreateAsync(
-                userId,
+                actor,
                 request,
                 idempotencyKey,
                 HttpContext.RequestAborted);

@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.WebUtilities;
 
 namespace hotel_erp.Api.Infrastructure;
 
-public sealed class ApiProblemDetailsFilter : IAsyncResultFilter
+public sealed class ApiProblemDetailsFilter : IAsyncAlwaysRunResultFilter
 {
     public async Task OnResultExecutionAsync(ResultExecutingContext context, ResultExecutionDelegate next)
     {

@@ -1,6 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using hotel_erp.Api.Authorization;
 using hotel_erp.Api.Database;
 using hotel_erp.Api.Database.Entities;
 using hotel_erp.Api.Dtos.Common;
@@ -43,14 +44,18 @@ public sealed class InvoiceApplicationService(
     IAuditService auditService,
     IInvoiceCalculator invoiceCalculator,
     IHotelClock clock,
-    IApplicationFailureInjector failureInjector)
+    IApplicationFailureInjector failureInjector,
+    OperationalMutationGuard access)
 {
     public async Task<InvoiceMutationResult> UpdateDraftAsync(
         Guid id,
-        Guid userId,
+        SecurityActor actor,
         CreateInvoiceRequest request,
         CancellationToken cancellationToken = default)
     {
+        var userId = actor.Id;
+        await using var transaction = await access.BeginAsync(actor, PermissionNames.CreateInvoices, cancellationToken);
+
         var invoice = await repository.GetByIdAsync(id);
         if (invoice is null)
             return InvoiceMutationResult.NotFound("Factura no encontrada");
@@ -58,8 +63,6 @@ public sealed class InvoiceApplicationService(
             return InvoiceMutationResult.BadRequest("Un documento fiscal emitido no puede modificarse; use el documento de ajuste correspondiente");
         if (invoice.Status == InvoiceStatus.Anulada)
             return InvoiceMutationResult.BadRequest("No se puede modificar una factura anulada");
-
-        await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
 
         decimal subtotal = 0m;
         decimal isvAmount = 0m;
@@ -118,11 +121,14 @@ public sealed class InvoiceApplicationService(
     }
 
     public async Task<InvoiceMutationResult> CreateAsync(
-        Guid userId,
+        SecurityActor actor,
         CreateInvoiceRequest request,
         string? idempotencyKey,
         CancellationToken cancellationToken = default)
     {
+        var userId = actor.Id;
+        await using var transaction = await access.BeginAsync(actor, PermissionNames.CreateInvoices, cancellationToken);
+
         if (!IdempotencyService.TryNormalizeKey(idempotencyKey, out var normalizedKey))
         {
             return InvoiceMutationResult.BadRequest(
@@ -131,7 +137,6 @@ public sealed class InvoiceApplicationService(
         }
 
         var requestHash = IdempotencyService.ComputeRequestHash(request);
-        await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
 
         try
         {
@@ -505,11 +510,14 @@ public sealed class InvoiceApplicationService(
 
     public async Task<InvoiceMutationResult> CreateCreditNoteAsync(
         Guid originalInvoiceId,
-        Guid userId,
+        SecurityActor actor,
         CreateCreditNoteRequest request,
         string? idempotencyKey,
         CancellationToken cancellationToken = default)
     {
+        var userId = actor.Id;
+        await using var transaction = await access.BeginAsync(actor, PermissionNames.AdjustInvoices, cancellationToken);
+
         if (!IdempotencyService.TryNormalizeKey(idempotencyKey, out var normalizedKey))
         {
             return InvoiceMutationResult.BadRequest(
@@ -520,7 +528,6 @@ public sealed class InvoiceApplicationService(
             return InvoiceMutationResult.BadRequest("La factura original de la ruta no coincide con la solicitud");
 
         var requestHash = IdempotencyService.ComputeRequestHash(request);
-        await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
         try
         {
             var priorAttempt = await idempotencyService.LockAndFindAsync(
@@ -684,11 +691,14 @@ public sealed class InvoiceApplicationService(
 
     public async Task<InvoiceMutationResult> CreateDebitNoteAsync(
         Guid originalInvoiceId,
-        Guid userId,
+        SecurityActor actor,
         CreateDebitNoteRequest request,
         string? idempotencyKey,
         CancellationToken cancellationToken = default)
     {
+        var userId = actor.Id;
+        await using var transaction = await access.BeginAsync(actor, PermissionNames.AdjustInvoices, cancellationToken);
+
         if (!IdempotencyService.TryNormalizeKey(idempotencyKey, out var normalizedKey))
         {
             return InvoiceMutationResult.BadRequest(
@@ -699,7 +709,6 @@ public sealed class InvoiceApplicationService(
             return InvoiceMutationResult.BadRequest("La factura original de la ruta no coincide con la solicitud");
 
         var requestHash = IdempotencyService.ComputeRequestHash(request);
-        await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
         try
         {
             var priorAttempt = await idempotencyService.LockAndFindAsync(

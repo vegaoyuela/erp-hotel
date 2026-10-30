@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using hotel_erp.Api.Authorization;
 using hotel_erp.Api.Database;
 using hotel_erp.Api.Database.Entities;
@@ -36,7 +35,7 @@ public class InventoryController(
     public async Task<ActionResult<CategoryDto>> CreateCategory([FromBody] CreateCategoryRequest request)
     {
         var result = await inventoryService.CreateCategoryAsync(
-            CurrentUserId(),
+            CurrentActor(),
             request,
             HttpContext.RequestAborted);
         if (!result.Succeeded)
@@ -56,7 +55,7 @@ public class InventoryController(
     {
         var result = await inventoryService.UpdateCategoryAsync(
             id,
-            CurrentUserId(),
+            CurrentActor(),
             request,
             HttpContext.RequestAborted);
         return result.Succeeded ? NoContent() : Failure(result);
@@ -66,7 +65,7 @@ public class InventoryController(
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<ActionResult> DeleteCategory(Guid id)
     {
-        var result = await inventoryService.DeleteCategoryAsync(id, CurrentUserId(), HttpContext.RequestAborted);
+        var result = await inventoryService.DeleteCategoryAsync(id, CurrentActor(), HttpContext.RequestAborted);
         return result.Succeeded ? NoContent() : Failure(result);
     }
 
@@ -115,7 +114,7 @@ public class InventoryController(
     public async Task<ActionResult<ProductDto>> CreateProduct([FromBody] CreateProductRequest request)
     {
         var result = await inventoryService.CreateProductAsync(
-            CurrentUserId(),
+            CurrentActor(),
             request,
             HttpContext.RequestAborted);
         if (!result.Succeeded)
@@ -130,7 +129,7 @@ public class InventoryController(
     {
         var result = await inventoryService.UpdateProductAsync(
             id,
-            CurrentUserId(),
+            CurrentActor(),
             request,
             HttpContext.RequestAborted);
         return result.Succeeded ? NoContent() : Failure(result);
@@ -140,7 +139,7 @@ public class InventoryController(
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<ActionResult> DeleteProduct(Guid id)
     {
-        var result = await inventoryService.DeleteProductAsync(id, CurrentUserId(), HttpContext.RequestAborted);
+        var result = await inventoryService.DeleteProductAsync(id, CurrentActor(), HttpContext.RequestAborted);
         return result.Succeeded ? NoContent() : Failure(result);
     }
 
@@ -167,7 +166,7 @@ public class InventoryController(
         [FromBody] CreateInventoryMovementRequest request)
     {
         var result = await inventoryService.CreateMovementAsync(
-            CurrentUserId(),
+            CurrentActor(),
             request,
             HttpContext.RequestAborted);
         if (!result.Succeeded)
@@ -220,8 +219,8 @@ public class InventoryController(
             UserName = movement.User != null ? movement.User.FirstName + " " + movement.User.LastName : null
         };
 
-    private Guid CurrentUserId()
-        => Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+    private SecurityActor CurrentActor()
+        => SecurityActor.From(User);
 
     private ObjectResult Failure<T>(ApplicationMutationResult<T> result)
         where T : class

@@ -1,0 +1,433 @@
+{
+  "date": "2026-10-30",
+  "baseline": "889230c",
+  "scope": "P02-K core operational mutation services",
+  "coveredServices": 9,
+  "coveredMethods": [
+    {
+      "service": "InvoiceApplicationService",
+      "method": "UpdateDraftAsync",
+      "permission": "CreateInvoices"
+    },
+    {
+      "service": "InvoiceApplicationService",
+      "method": "CreateAsync",
+      "permission": "CreateInvoices"
+    },
+    {
+      "service": "InvoiceApplicationService",
+      "method": "CreateCreditNoteAsync",
+      "permission": "AdjustInvoices"
+    },
+    {
+      "service": "InvoiceApplicationService",
+      "method": "CreateDebitNoteAsync",
+      "permission": "AdjustInvoices"
+    },
+    {
+      "service": "PaymentApplicationService",
+      "method": "CreateAsync",
+      "permission": "ManageCash"
+    },
+    {
+      "service": "RefundApplicationService",
+      "method": "CreateAsync",
+      "permission": "ManageCash"
+    },
+    {
+      "service": "CardSettlementApplicationService",
+      "method": "CreateAsync",
+      "permission": "ManageAccounting"
+    },
+    {
+      "service": "ReservationApplicationService",
+      "method": "CreateAsync",
+      "permission": "ManageReservations"
+    },
+    {
+      "service": "ReservationApplicationService",
+      "method": "UpdateAsync",
+      "permission": "ManageReservations"
+    },
+    {
+      "service": "ReservationApplicationService",
+      "method": "ConfirmAsync",
+      "permission": "ManageReservations"
+    },
+    {
+      "service": "ReservationApplicationService",
+      "method": "CancelAsync",
+      "permission": "ManageReservations"
+    },
+    {
+      "service": "ReservationApplicationService",
+      "method": "CheckInAsync",
+      "permission": "ManageReservations"
+    },
+    {
+      "service": "ReservationApplicationService",
+      "method": "CheckOutAsync",
+      "permission": "ManageReservations"
+    },
+    {
+      "service": "FolioApplicationService",
+      "method": "AddItemAsync",
+      "permission": "CreateInvoices"
+    },
+    {
+      "service": "CashRegisterApplicationService",
+      "method": "CreateAsync",
+      "permission": "ManageCash"
+    },
+    {
+      "service": "CashRegisterApplicationService",
+      "method": "OpenAsync",
+      "permission": "ManageCash"
+    },
+    {
+      "service": "CashRegisterApplicationService",
+      "method": "CloseAsync",
+      "permission": "ManageCash"
+    },
+    {
+      "service": "PurchaseInvoiceApplicationService",
+      "method": "CreateAsync",
+      "permission": "ManageAccounting"
+    },
+    {
+      "service": "PurchaseInvoiceApplicationService",
+      "method": "MarkAsPaidAsync",
+      "permission": "ManageAccounting"
+    },
+    {
+      "service": "PurchaseInvoiceApplicationService",
+      "method": "DeleteAsync",
+      "permission": "ManageAccounting"
+    },
+    {
+      "service": "InventoryApplicationService",
+      "method": "CreateCategoryAsync",
+      "permission": "ManageInventory"
+    },
+    {
+      "service": "InventoryApplicationService",
+      "method": "UpdateCategoryAsync",
+      "permission": "ManageInventory"
+    },
+    {
+      "service": "InventoryApplicationService",
+      "method": "DeleteCategoryAsync",
+      "permission": "ManageInventory"
+    },
+    {
+      "service": "InventoryApplicationService",
+      "method": "CreateProductAsync",
+      "permission": "ManageInventory"
+    },
+    {
+      "service": "InventoryApplicationService",
+      "method": "UpdateProductAsync",
+      "permission": "ManageInventory"
+    },
+    {
+      "service": "InventoryApplicationService",
+      "method": "DeleteProductAsync",
+      "permission": "ManageInventory"
+    },
+    {
+      "service": "InventoryApplicationService",
+      "method": "CreateMovementAsync",
+      "permission": "ManageInventory"
+    }
+  ],
+  "remainingDirectControllers": [
+    {
+      "file": "backend/src/hotel-erp.Api/Controllers/CustomersController.cs",
+      "module": "clientes",
+      "actions": [
+        {
+          "action": "Create",
+          "verb": "POST",
+          "relativeRoute": ""
+        },
+        {
+          "action": "Update",
+          "verb": "PUT",
+          "relativeRoute": "{id}"
+        },
+        {
+          "action": "Delete",
+          "verb": "DELETE",
+          "relativeRoute": "{id}"
+        }
+      ],
+      "status": "pending; HTTP policies remain; transactional revocation coordination not covered"
+    },
+    {
+      "file": "backend/src/hotel-erp.Api/Controllers/GuestsController.cs",
+      "module": "huéspedes",
+      "actions": [
+        {
+          "action": "Create",
+          "verb": "POST",
+          "relativeRoute": ""
+        },
+        {
+          "action": "Update",
+          "verb": "PUT",
+          "relativeRoute": "{id}"
+        },
+        {
+          "action": "UpdateClassification",
+          "verb": "PATCH",
+          "relativeRoute": "{id}/classification"
+        },
+        {
+          "action": "Delete",
+          "verb": "DELETE",
+          "relativeRoute": "{id}"
+        }
+      ],
+      "status": "pending; HTTP policies remain; transactional revocation coordination not covered"
+    },
+    {
+      "file": "backend/src/hotel-erp.Api/Controllers/RoomsController.cs",
+      "module": "habitaciones",
+      "actions": [
+        {
+          "action": "Create",
+          "verb": "POST",
+          "relativeRoute": ""
+        },
+        {
+          "action": "Update",
+          "verb": "PUT",
+          "relativeRoute": "{id}"
+        },
+        {
+          "action": "Delete",
+          "verb": "DELETE",
+          "relativeRoute": "{id}"
+        }
+      ],
+      "status": "pending; HTTP policies remain; transactional revocation coordination not covered"
+    },
+    {
+      "file": "backend/src/hotel-erp.Api/Controllers/RoomTypesController.cs",
+      "module": "tipos de habitación",
+      "actions": [
+        {
+          "action": "Create",
+          "verb": "POST",
+          "relativeRoute": ""
+        },
+        {
+          "action": "Update",
+          "verb": "PUT",
+          "relativeRoute": "{id}"
+        },
+        {
+          "action": "Delete",
+          "verb": "DELETE",
+          "relativeRoute": "{id}"
+        }
+      ],
+      "status": "pending; HTTP policies remain; transactional revocation coordination not covered"
+    },
+    {
+      "file": "backend/src/hotel-erp.Api/Controllers/DiscountsController.cs",
+      "module": "descuentos",
+      "actions": [
+        {
+          "action": "Create",
+          "verb": "POST",
+          "relativeRoute": ""
+        },
+        {
+          "action": "Update",
+          "verb": "PUT",
+          "relativeRoute": "{id}"
+        },
+        {
+          "action": "Delete",
+          "verb": "DELETE",
+          "relativeRoute": "{id}"
+        }
+      ],
+      "status": "pending; HTTP policies remain; transactional revocation coordination not covered"
+    },
+    {
+      "file": "backend/src/hotel-erp.Api/Controllers/CAIController.cs",
+      "module": "CAI",
+      "actions": [
+        {
+          "action": "Create",
+          "verb": "POST",
+          "relativeRoute": ""
+        },
+        {
+          "action": "Delete",
+          "verb": "DELETE",
+          "relativeRoute": "{id}"
+        }
+      ],
+      "status": "pending; HTTP policies remain; transactional revocation coordination not covered"
+    },
+    {
+      "file": "backend/src/hotel-erp.Api/Controllers/DocumentAuthorizationsController.cs",
+      "module": "autorizaciones y adjuntos",
+      "actions": [
+        {
+          "action": "Create",
+          "verb": "POST",
+          "relativeRoute": ""
+        },
+        {
+          "action": "Delete",
+          "verb": "DELETE",
+          "relativeRoute": "{id}"
+        },
+        {
+          "action": "CreateWithFile",
+          "verb": "POST",
+          "relativeRoute": "with-file"
+        }
+      ],
+      "status": "pending; HTTP policies remain; transactional revocation coordination not covered"
+    },
+    {
+      "file": "backend/src/hotel-erp.Api/Controllers/TaxConfigurationsController.cs",
+      "module": "impuestos",
+      "actions": [
+        {
+          "action": "Create",
+          "verb": "POST",
+          "relativeRoute": ""
+        },
+        {
+          "action": "Update",
+          "verb": "PUT",
+          "relativeRoute": "{id}"
+        },
+        {
+          "action": "Delete",
+          "verb": "DELETE",
+          "relativeRoute": "{id}"
+        }
+      ],
+      "status": "pending; HTTP policies remain; transactional revocation coordination not covered"
+    },
+    {
+      "file": "backend/src/hotel-erp.Api/Controllers/SettingsController.cs",
+      "module": "configuración y perfil fiscal",
+      "actions": [
+        {
+          "action": "Update",
+          "verb": "PUT",
+          "relativeRoute": "business"
+        },
+        {
+          "action": "ApproveFiscalProfile",
+          "verb": "POST",
+          "relativeRoute": "business/approve"
+        },
+        {
+          "action": "RetireFiscalProfile",
+          "verb": "POST",
+          "relativeRoute": "business/retire"
+        }
+      ],
+      "status": "pending; HTTP policies remain; transactional revocation coordination not covered"
+    },
+    {
+      "file": "backend/src/hotel-erp.Api/Controllers/AccountingController.cs",
+      "module": "cuentas y asientos manuales",
+      "actions": [
+        {
+          "action": "Create",
+          "verb": "POST",
+          "relativeRoute": ""
+        },
+        {
+          "action": "Update",
+          "verb": "PUT",
+          "relativeRoute": "{id}"
+        },
+        {
+          "action": "Deactivate",
+          "verb": "DELETE",
+          "relativeRoute": "{id}"
+        },
+        {
+          "action": "CreateJournalEntry",
+          "verb": "POST",
+          "relativeRoute": "journal-entries"
+        }
+      ],
+      "status": "pending; HTTP policies remain; transactional revocation coordination not covered"
+    },
+    {
+      "file": "backend/src/hotel-erp.Api/Controllers/SuppliersController.cs",
+      "module": "proveedores",
+      "actions": [
+        {
+          "action": "Create",
+          "verb": "POST",
+          "relativeRoute": ""
+        },
+        {
+          "action": "Update",
+          "verb": "PUT",
+          "relativeRoute": "{id}"
+        },
+        {
+          "action": "Delete",
+          "verb": "DELETE",
+          "relativeRoute": "{id}"
+        }
+      ],
+      "status": "pending; HTTP policies remain; transactional revocation coordination not covered"
+    }
+  ],
+  "remainingDirectMutationCount": 34,
+  "externalEffects": [
+    {
+      "file": "backend/src/hotel-erp.Api/Controllers/BackupController.cs",
+      "actions": [
+        {
+          "action": "CreateManualBackup",
+          "verb": "POST",
+          "relativeRoute": "manual"
+        }
+      ],
+      "status": "pending external effects protocol; Windows printing deferred"
+    },
+    {
+      "file": "backend/src/hotel-erp.Api/Controllers/PrintController.cs",
+      "actions": [
+        {
+          "action": "PrintTest",
+          "verb": "POST",
+          "relativeRoute": "test-print"
+        },
+        {
+          "action": "GetTestRuler",
+          "verb": "POST",
+          "relativeRoute": "test-ruler"
+        },
+        {
+          "action": "PrintInvoice",
+          "verb": "POST",
+          "relativeRoute": "invoice/{id}"
+        }
+      ],
+      "status": "pending external effects protocol; Windows printing deferred"
+    }
+  ],
+  "externalEffectActionCount": 4,
+  "readEndpointsCoordinated": false,
+  "disabledMutationEndpoints": "Invoice cancel and reservation DELETE remain disabled; not included as implemented business writes",
+  "migrationsAdded": 0,
+  "dependenciesAdded": 0,
+  "publicContractChanges": false
+}

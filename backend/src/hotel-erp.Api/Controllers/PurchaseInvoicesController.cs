@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using AutoMapper;
 using hotel_erp.Api.Authorization;
 using hotel_erp.Api.Dtos.Common;
@@ -44,7 +43,7 @@ public class PurchaseInvoicesController(
     [ProducesResponseType(typeof(PurchaseInvoiceDto), StatusCodes.Status201Created)]
     public async Task<ActionResult<PurchaseInvoiceDto>> Create([FromBody] CreatePurchaseInvoiceRequest request)
     {
-        var result = await purchaseService.CreateAsync(CurrentUserId(), request, HttpContext.RequestAborted);
+        var result = await purchaseService.CreateAsync(CurrentActor(), request, HttpContext.RequestAborted);
         if (!result.Succeeded)
             return Failure(result);
 
@@ -56,7 +55,7 @@ public class PurchaseInvoicesController(
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<ActionResult> MarkAsPaid(Guid id)
     {
-        var result = await purchaseService.MarkAsPaidAsync(id, CurrentUserId(), HttpContext.RequestAborted);
+        var result = await purchaseService.MarkAsPaidAsync(id, CurrentActor(), HttpContext.RequestAborted);
         return result.Succeeded ? NoContent() : Failure(result);
     }
 
@@ -64,12 +63,12 @@ public class PurchaseInvoicesController(
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<ActionResult> Delete(Guid id)
     {
-        var result = await purchaseService.DeleteAsync(id, CurrentUserId(), HttpContext.RequestAborted);
+        var result = await purchaseService.DeleteAsync(id, CurrentActor(), HttpContext.RequestAborted);
         return result.Succeeded ? NoContent() : Failure(result);
     }
 
-    private Guid CurrentUserId()
-        => Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+    private SecurityActor CurrentActor()
+        => SecurityActor.From(User);
 
     private ObjectResult Failure<T>(ApplicationMutationResult<T> result)
         where T : class

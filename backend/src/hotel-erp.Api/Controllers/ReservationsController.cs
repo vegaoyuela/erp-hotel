@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using AutoMapper;
 using hotel_erp.Api.Authorization;
 using hotel_erp.Api.Dtos.Common;
@@ -67,7 +66,7 @@ public class ReservationsController(
     [Authorize(Policy = PermissionNames.ManageReservations)]
     public async Task<ActionResult<ReservationDto>> Create([FromBody] CreateReservationRequest request)
     {
-        var result = await reservationService.CreateAsync(CurrentUserId(), request, HttpContext.RequestAborted);
+        var result = await reservationService.CreateAsync(CurrentActor(), request, HttpContext.RequestAborted);
         if (!result.Succeeded)
             return Failure(result);
 
@@ -84,7 +83,7 @@ public class ReservationsController(
     [Authorize(Policy = PermissionNames.ManageReservations)]
     public async Task<ActionResult<ReservationVersionResult>> Update(Guid id, [FromBody] UpdateReservationRequest request)
     {
-        var result = await reservationService.UpdateAsync(id, CurrentUserId(), request, HttpContext.RequestAborted);
+        var result = await reservationService.UpdateAsync(id, CurrentActor(), request, HttpContext.RequestAborted);
         return result.Succeeded ? Ok(result.Value) : Failure(result);
     }
 
@@ -95,7 +94,7 @@ public class ReservationsController(
     [Authorize(Policy = PermissionNames.ManageReservations)]
     public async Task<ActionResult<ReservationStateResult>> Confirm(Guid id, [FromBody] ConfirmReservationRequest request)
     {
-        var result = await reservationService.ConfirmAsync(id, CurrentUserId(), request, HttpContext.RequestAborted);
+        var result = await reservationService.ConfirmAsync(id, CurrentActor(), request, HttpContext.RequestAborted);
         return result.Succeeded ? Ok(result.Value) : Failure(result);
     }
 
@@ -106,7 +105,7 @@ public class ReservationsController(
     [Authorize(Policy = PermissionNames.ManageReservations)]
     public async Task<ActionResult<ReservationStateResult>> Cancel(Guid id, [FromBody] CancelReservationRequest request)
     {
-        var result = await reservationService.CancelAsync(id, CurrentUserId(), request, HttpContext.RequestAborted);
+        var result = await reservationService.CancelAsync(id, CurrentActor(), request, HttpContext.RequestAborted);
         return result.Succeeded ? Ok(result.Value) : Failure(result);
     }
 
@@ -117,7 +116,7 @@ public class ReservationsController(
     [Authorize(Policy = PermissionNames.ManageReservations)]
     public async Task<ActionResult<CheckInResult>> CheckIn([FromBody] CheckInRequest request)
     {
-        var result = await reservationService.CheckInAsync(CurrentUserId(), request, HttpContext.RequestAborted);
+        var result = await reservationService.CheckInAsync(CurrentActor(), request, HttpContext.RequestAborted);
         return result.Succeeded ? Ok(result.Value) : Failure(result);
     }
 
@@ -128,7 +127,7 @@ public class ReservationsController(
     [Authorize(Policy = PermissionNames.ManageReservations)]
     public async Task<ActionResult<CheckOutResult>> CheckOut(Guid id, [FromBody] CheckOutRequest request)
     {
-        var result = await reservationService.CheckOutAsync(id, CurrentUserId(), request, HttpContext.RequestAborted);
+        var result = await reservationService.CheckOutAsync(id, CurrentActor(), request, HttpContext.RequestAborted);
         return result.Succeeded ? Ok(result.Value) : Failure(result);
     }
 
@@ -144,8 +143,8 @@ public class ReservationsController(
         return BadRequest("Use la cancelación con motivo para preservar el historial de la reserva");
     }
 
-    private Guid CurrentUserId()
-        => Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+    private SecurityActor CurrentActor()
+        => SecurityActor.From(User);
 
     private ObjectResult Failure<T>(ApplicationMutationResult<T> result)
         where T : class

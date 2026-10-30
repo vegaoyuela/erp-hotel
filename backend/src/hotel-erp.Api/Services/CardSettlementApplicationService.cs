@@ -1,3 +1,4 @@
+using hotel_erp.Api.Authorization;
 using hotel_erp.Api.Database;
 using hotel_erp.Api.Database.Entities;
 using hotel_erp.Api.Dtos.Payments;
@@ -24,14 +25,18 @@ public sealed class CardSettlementApplicationService(
     IAuditService auditService,
     IdempotencyService idempotencyService,
     IHotelClock clock,
-    IApplicationFailureInjector failureInjector)
+    IApplicationFailureInjector failureInjector,
+    OperationalMutationGuard access)
 {
     public async Task<CardSettlementCreationResult> CreateAsync(
-        Guid userId,
+        SecurityActor actor,
         CreateCardSettlementRequest request,
         string? idempotencyKey,
         CancellationToken cancellationToken = default)
     {
+        var userId = actor.Id;
+        await using var transaction = await access.BeginAsync(actor, PermissionNames.ManageAccounting, cancellationToken);
+
         if (!IdempotencyService.TryNormalizeKey(idempotencyKey, out var normalizedKey))
             return CardSettlementCreationResult.BadRequest("Idempotency-Key debe ser un UUID válido");
         if (request.SettlementDate == default)
@@ -74,7 +79,6 @@ public sealed class CardSettlementApplicationService(
             Applications = applications
         });
 
-        await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
         try
         {
             var existingIntent = await idempotencyService.LockAndFindAsync(

@@ -13,6 +13,7 @@ public sealed class NoOpApplicationFailureInjector : IApplicationFailureInjector
 
 public static class ApplicationFailureCheckpoints
 {
+    public const string OperationalAfterAdmission = "operational:after-admission";
     public const string SecurityAfterLock = "security:after-lock";
     public const string SecurityAfterPersistence = "security:after-persistence";
     public const string SecurityAfterRevocation = "security:after-revocation";

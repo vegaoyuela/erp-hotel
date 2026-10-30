@@ -1,3 +1,4 @@
+using hotel_erp.Api.Authorization;
 using hotel_erp.Api.Services.Interfaces;
 using hotel_erp.Api.Database;
 using hotel_erp.Api.Database.Entities;
@@ -12,18 +13,21 @@ public sealed class InventoryApplicationService(
     ApplicationDbContext context,
     IAuditService auditService,
     IHotelClock clock,
-    IApplicationFailureInjector failureInjector)
+    IApplicationFailureInjector failureInjector,
+    OperationalMutationGuard access)
 {
     public async Task<ApplicationMutationResult<Category>> CreateCategoryAsync(
-        Guid userId,
+        SecurityActor actor,
         CreateCategoryRequest request,
         CancellationToken cancellationToken = default)
     {
+        var userId = actor.Id;
+        await using var transaction = await access.BeginAsync(actor, PermissionNames.ManageInventory, cancellationToken);
+
         if (string.IsNullOrWhiteSpace(request.Name))
             return ApplicationMutationResult<Category>.BadRequest("El nombre es obligatorio");
 
         var entity = new Category { Name = request.Name.Trim(), Description = NullIfWhiteSpace(request.Description) };
-        await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
         context.Categories.Add(entity);
         await context.SaveChangesAsync(cancellationToken);
         await auditService.LogAsync(userId, "CreateInventoryCategory", nameof(Category), entity.Id, new { entity.Name });
@@ -33,14 +37,16 @@ public sealed class InventoryApplicationService(
 
     public async Task<ApplicationMutationResult<InventoryMutationResult>> UpdateCategoryAsync(
         Guid id,
-        Guid userId,
+        SecurityActor actor,
         UpdateCategoryRequest request,
         CancellationToken cancellationToken = default)
     {
+        var userId = actor.Id;
+        await using var transaction = await access.BeginAsync(actor, PermissionNames.ManageInventory, cancellationToken);
+
         if (request.Name is not null && string.IsNullOrWhiteSpace(request.Name))
             return ApplicationMutationResult<InventoryMutationResult>.BadRequest("El nombre no puede quedar vacío");
 
-        await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
         var entity = await context.Categories.SingleOrDefaultAsync(candidate => candidate.Id == id, cancellationToken);
         if (entity is null)
             return ApplicationMutationResult<InventoryMutationResult>.NotFound("Categoría no encontrada");
@@ -55,10 +61,12 @@ public sealed class InventoryApplicationService(
 
     public async Task<ApplicationMutationResult<InventoryMutationResult>> DeleteCategoryAsync(
         Guid id,
-        Guid userId,
+        SecurityActor actor,
         CancellationToken cancellationToken = default)
     {
-        await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
+        var userId = actor.Id;
+        await using var transaction = await access.BeginAsync(actor, PermissionNames.ManageInventory, cancellationToken);
+
         var entity = await context.Categories.SingleOrDefaultAsync(candidate => candidate.Id == id, cancellationToken);
         if (entity is null)
             return ApplicationMutationResult<InventoryMutationResult>.NotFound("Categoría no encontrada");
@@ -73,10 +81,13 @@ public sealed class InventoryApplicationService(
     }
 
     public async Task<ApplicationMutationResult<Product>> CreateProductAsync(
-        Guid userId,
+        SecurityActor actor,
         CreateProductRequest request,
         CancellationToken cancellationToken = default)
     {
+        var userId = actor.Id;
+        await using var transaction = await access.BeginAsync(actor, PermissionNames.ManageInventory, cancellationToken);
+
         var validation = ValidateProduct(request.Name, request.UnitPrice, request.CurrentStock, request.MinStockLevel);
         if (validation is not null)
             return ApplicationMutationResult<Product>.BadRequest(validation);
@@ -94,7 +105,6 @@ public sealed class InventoryApplicationService(
             MinStockLevel = request.MinStockLevel,
             IsActive = request.IsActive
         };
-        await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
         context.Products.Add(entity);
         await context.SaveChangesAsync(cancellationToken);
         await auditService.LogAsync(
@@ -109,10 +119,13 @@ public sealed class InventoryApplicationService(
 
     public async Task<ApplicationMutationResult<InventoryMutationResult>> UpdateProductAsync(
         Guid id,
-        Guid userId,
+        SecurityActor actor,
         UpdateProductRequest request,
         CancellationToken cancellationToken = default)
     {
+        var userId = actor.Id;
+        await using var transaction = await access.BeginAsync(actor, PermissionNames.ManageInventory, cancellationToken);
+
         if (request.Name is not null && string.IsNullOrWhiteSpace(request.Name))
             return ApplicationMutationResult<InventoryMutationResult>.BadRequest("El nombre no puede quedar vacío");
         if (request.UnitPrice < 0m || request.CurrentStock < 0 || request.MinStockLevel < 0)
@@ -120,7 +133,6 @@ public sealed class InventoryApplicationService(
         if (request.CategoryId.HasValue && !await CategoryExistsAsync(request.CategoryId.Value, cancellationToken))
             return ApplicationMutationResult<InventoryMutationResult>.BadRequest("Categoría no encontrada");
 
-        await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
         await LockProductAsync(id, cancellationToken);
         var entity = await context.Products.SingleOrDefaultAsync(candidate => candidate.Id == id, cancellationToken);
         if (entity is null)
@@ -147,10 +159,12 @@ public sealed class InventoryApplicationService(
 
     public async Task<ApplicationMutationResult<InventoryMutationResult>> DeleteProductAsync(
         Guid id,
-        Guid userId,
+        SecurityActor actor,
         CancellationToken cancellationToken = default)
     {
-        await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
+        var userId = actor.Id;
+        await using var transaction = await access.BeginAsync(actor, PermissionNames.ManageInventory, cancellationToken);
+
         await LockProductAsync(id, cancellationToken);
         var entity = await context.Products.SingleOrDefaultAsync(candidate => candidate.Id == id, cancellationToken);
         if (entity is null)
@@ -164,10 +178,13 @@ public sealed class InventoryApplicationService(
     }
 
     public async Task<ApplicationMutationResult<InventoryMovement>> CreateMovementAsync(
-        Guid userId,
+        SecurityActor actor,
         CreateInventoryMovementRequest request,
         CancellationToken cancellationToken = default)
     {
+        var userId = actor.Id;
+        await using var transaction = await access.BeginAsync(actor, PermissionNames.ManageInventory, cancellationToken);
+
         if (!Enum.TryParse<InventoryMovementType>(request.MovementType, true, out var movementType))
             return ApplicationMutationResult<InventoryMovement>.BadRequest("Tipo de movimiento inválido");
         if (movementType == InventoryMovementType.Ajuste)
@@ -182,7 +199,6 @@ public sealed class InventoryApplicationService(
         if (request.UnitPrice < 0m)
             return ApplicationMutationResult<InventoryMovement>.BadRequest("El precio unitario no puede ser negativo");
 
-        await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
         await LockProductAsync(request.ProductId, cancellationToken);
         var product = await context.Products
             .SingleOrDefaultAsync(candidate => candidate.Id == request.ProductId, cancellationToken);

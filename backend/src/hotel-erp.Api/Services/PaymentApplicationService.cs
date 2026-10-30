@@ -1,3 +1,4 @@
+using hotel_erp.Api.Authorization;
 using hotel_erp.Api.Database;
 using hotel_erp.Api.Database.Entities;
 using hotel_erp.Api.Dtos.Payments;
@@ -21,14 +22,18 @@ public sealed class PaymentApplicationService(
     IAuditService auditService,
     IdempotencyService idempotencyService,
     IHotelClock clock,
-    IApplicationFailureInjector failureInjector)
+    IApplicationFailureInjector failureInjector,
+    OperationalMutationGuard access)
 {
     public async Task<PaymentCreationResult> CreateAsync(
-        Guid userId,
+        SecurityActor actor,
         CreatePaymentRequest request,
         string? idempotencyKey,
         CancellationToken cancellationToken = default)
     {
+        var userId = actor.Id;
+        await using var transaction = await access.BeginAsync(actor, PermissionNames.ManageCash, cancellationToken);
+
         if (!IdempotencyService.TryNormalizeKey(idempotencyKey, out var normalizedKey))
             return PaymentCreationResult.BadRequest("Idempotency-Key debe ser un UUID válido");
         if (!Enum.TryParse<PaymentMethod>(request.Method, out var method))
@@ -75,7 +80,6 @@ public sealed class PaymentApplicationService(
             ExternalReference = externalReference,
             Applications = applications
         });
-        await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
         try
         {
             var existingIntent = await idempotencyService.LockAndFindAsync(

@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using AutoMapper;
 using hotel_erp.Api.Authorization;
 using hotel_erp.Api.Database;
@@ -55,9 +54,9 @@ namespace hotel_erp.Api.Controllers
             [FromBody] CreatePaymentRequest request,
             [FromHeader(Name = "Idempotency-Key")] string? idempotencyKey)
         {
-            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var actor = SecurityActor.From(User);
             var result = await _paymentService.CreateAsync(
-                userId,
+                actor,
                 request,
                 idempotencyKey,
                 HttpContext.RequestAborted);

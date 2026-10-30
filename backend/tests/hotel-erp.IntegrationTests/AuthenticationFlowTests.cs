@@ -3555,6 +3555,7 @@ public partial class AuthenticationFlowTests
         HttpStatusCode expectedStatus,
         string? expectedTitle = null)
     {
+        Assert.Equal(expectedStatus, response.StatusCode);
         Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
         var body = await response.Content.ReadAsStringAsync();
         using var json = System.Text.Json.JsonDocument.Parse(body);

@@ -125,7 +125,12 @@ builder.Services.AddSingleton<IPostgresDumpExecutor, PostgresDumpExecutor>();
 builder.Services.AddScoped<IDatabaseBackupService, DatabaseBackupService>();
 builder.Services.AddHostedService<BackupHostedService>();
 
-builder.Services.AddControllers(options => options.Filters.Add<ApiProblemDetailsFilter>())
+builder.Services.AddScoped<OperationalMutationGuard>();
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<ApiProblemDetailsFilter>();
+    options.Filters.Add<OperationalAccessExceptionFilter>();
+})
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;

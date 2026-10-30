@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using AutoMapper;
 using hotel_erp.Api.Authorization;
 using hotel_erp.Api.Database;
@@ -67,7 +66,7 @@ public class CashRegistersController(
     [Authorize(Policy = PermissionNames.ManageCash)]
     public async Task<ActionResult<CashRegisterDto>> Create([FromBody] CreateCashRegisterRequest request)
     {
-        var result = await cashRegisterService.CreateAsync(CurrentUserId(), request, HttpContext.RequestAborted);
+        var result = await cashRegisterService.CreateAsync(CurrentActor(), request, HttpContext.RequestAborted);
         if (!result.Succeeded)
             return Failure(result);
 
@@ -86,7 +85,7 @@ public class CashRegistersController(
     {
         var result = await cashRegisterService.OpenAsync(
             id,
-            CurrentUserId(),
+            CurrentActor(),
             request,
             idempotencyKey,
             HttpContext.RequestAborted);
@@ -105,7 +104,7 @@ public class CashRegistersController(
     {
         var result = await cashRegisterService.CloseAsync(
             id,
-            CurrentUserId(),
+            CurrentActor(),
             request,
             idempotencyKey,
             HttpContext.RequestAborted);
@@ -130,8 +129,8 @@ public class CashRegistersController(
         return Ok(mapper.Map<IEnumerable<CashMovementDto>>(movements));
     }
 
-    private Guid CurrentUserId()
-        => Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+    private SecurityActor CurrentActor()
+        => SecurityActor.From(User);
 
     private ObjectResult Failure<T>(ApplicationMutationResult<T> result)
         where T : class

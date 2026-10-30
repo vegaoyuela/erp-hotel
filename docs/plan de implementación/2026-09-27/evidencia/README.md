@@ -281,3 +281,20 @@ Administración transaccional de usuarios/roles y coordinación con login/refres
 | [p02j-qa-resumen.json](p02j-qa-resumen.json) | Resumen, límites y hashes de código/contrato/pruebas/evidencia. |
 
 El [detalle](../p02-base-tecnica/p02-j-administracion-atomica.md) y la [matriz formal](../p02-base-tecnica/p02-i-matriz-api-dat-sec.md) distinguen cobertura y brechas. La UI no se modificó en este bloque. Windows e impresión continúan pendientes con su recordatorio existente.
+
+### P02-K — revocación operativa (30 de octubre de 2026)
+
+27 métodos de nueve servicios comparten bloqueos de seguridad con administración/sesiones y revalidan al actor antes del trabajo de negocio.
+
+| Archivo | Resultado |
+|---|---|
+| [p02k-qa.log](p02k-qa.log) | QA final: 147 unitarias, 10 integraciones PostgreSQL, 5 validaciones del expediente, contrato real, npm audit, lint y build. |
+| [p02k-selectiva.log](p02k-selectiva.log) | Dos integraciones nuevas aprobadas antes de la QA completa. |
+| [p02k-revocacion.json](p02k-revocacion.json) | 27 denegaciones 401 y 27 denegaciones 403 directas, tres HTTP en espera y un 403 HTTP adicional; estado de negocio sin cambios. |
+| [p02k-orden.json](p02k-orden.json) | Operación admitida antes de revocación/logout; cancelación libera locks, sin movimiento parcial. |
+| [p02k-alcance.json](p02k-alcance.json) | 27 métodos cubiertos; 34 mutaciones directas y cuatro acciones externas pendientes. |
+| [p02k-modelo-ef.log](p02k-modelo-ef.log) | Sin migración nueva. |
+| [p02k-base-qa.json](p02k-base-qa.json) | Base QA original preservada y cero bases temporales al cierre. |
+| [p02k-qa-resumen.json](p02k-qa-resumen.json) | Resumen, contrato sin cambios, límites y hashes. |
+
+El [detalle](../p02-base-tecnica/p02-k-revocacion-operativa.md) explica alcance, pruebas y uso. No se alteró la UI. P02-06/P02-09, revisión independiente y G2 permanecen abiertas. Windows e impresión continúan aplazados con su recordatorio existente.
